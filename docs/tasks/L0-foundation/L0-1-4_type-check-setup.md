@@ -6,7 +6,7 @@
 |------|-----|
 | ID | L0-1-4 |
 | 優先度 | P0 |
-| ステータス | 🔲 backlog |
+| ステータス | ✅ done |
 | 依存タスク | L0-1-1 |
 | 参照仕様 | `docs/internal/03_QUALITY_STANDARDS.md` |
 
@@ -46,7 +46,10 @@ disallow_untyped_defs = false
 
 ## 実装メモ
 
-（実装時に記録）
+- 2026-01-24: pyproject.toml に mypy 設定追加
+- strict モード + ignore_missing_imports 有効化
+- tests ディレクトリは disallow_untyped_defs を緩和
+- `mypy src` 終了コード 0 で成功
 
 ## 変更履歴
 

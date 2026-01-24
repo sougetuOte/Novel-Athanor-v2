@@ -6,7 +6,7 @@
 |------|-----|
 | ID | L0-1-2 |
 | 優先度 | P0 |
-| ステータス | 🔲 backlog |
+| ステータス | ✅ done |
 | 依存タスク | L0-1-1 |
 | 参照仕様 | `docs/internal/00_PROJECT_STRUCTURE.md`, `docs/specs/novel-generator-v2/02_architecture.md` Section 6 |
 
@@ -58,7 +58,11 @@
 
 ## 実装メモ
 
-（実装時に記録）
+- 2026-01-24: L0-1-1と統合して実装
+- src/ 配下: core/models, core/parsers, core/repositories, agents, cli
+- tests/ 配下: 同等の構造を作成
+- 各ディレクトリに __init__.py を配置
+- import テスト成功
 
 ## 変更履歴
 

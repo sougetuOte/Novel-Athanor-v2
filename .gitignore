@@ -18,6 +18,9 @@ venv/
 build/
 dist/
 *.egg-info/
+pytest_output.txt
+.coverage
+htmlcov/
 
 # Node.js
 node_modules/

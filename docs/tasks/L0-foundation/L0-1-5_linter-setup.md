@@ -6,7 +6,7 @@
 |------|-----|
 | ID | L0-1-5 |
 | 優先度 | P0 |
-| ステータス | 🔲 backlog |
+| ステータス | ✅ done |
 | 依存タスク | L0-1-1 |
 | 参照仕様 | `docs/internal/03_QUALITY_STANDARDS.md` |
 
@@ -57,7 +57,10 @@ known-first-party = ["src"]
 
 ## 実装メモ
 
-（実装時に記録）
+- 2026-01-24: pyproject.toml に ruff 設定追加
+- E, W, F, I, B, C4, UP ルールを有効化
+- isort 互換設定、known-first-party = ["src"]
+- `ruff check src` / `ruff format src --check` 終了コード 0 で成功
 
 ## 変更履歴
 

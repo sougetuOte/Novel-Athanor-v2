@@ -159,6 +159,12 @@ class BaseRepository(ABC, Generic[T]):
 
         Returns:
             読み込んだモデル
+
+        Note:
+            body パラメータは Episode のような本文を持つモデル用。
+            Character/WorldSetting など body フィールドを持たないモデルでは
+            Pydantic の extra='ignore' により無視される。
+            これらのモデルは frontmatter 内の sections フィールドでコンテンツを管理する。
         """
         content = path.read_text(encoding="utf-8")
         frontmatter, body = parse_frontmatter(content)

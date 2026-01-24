@@ -48,7 +48,6 @@ def extract_sections(body: str) -> list[Section]:
     # 見出しパターン: # から始まる行
     header_pattern = re.compile(r"^(#{1,6})\s+(.+)$", re.MULTILINE)
 
-    lines = body.split("\n")
     matches = list(header_pattern.finditer(body))
 
     if not matches:

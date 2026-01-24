@@ -8,6 +8,7 @@ from src.core.repositories.base import (
 )
 from src.core.repositories.character import CharacterRepository
 from src.core.repositories.episode import EpisodeRepository
+from src.core.repositories.world_setting import WorldSettingRepository
 
 __all__ = [
     "BaseRepository",
@@ -16,4 +17,5 @@ __all__ = [
     "EntityNotFoundError",
     "EpisodeRepository",
     "RepositoryError",
+    "WorldSettingRepository",
 ]

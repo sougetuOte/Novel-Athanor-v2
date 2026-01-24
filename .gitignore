@@ -19,6 +19,7 @@ build/
 dist/
 *.egg-info/
 pytest_output.txt
+review_*.txt
 .coverage
 htmlcov/
 

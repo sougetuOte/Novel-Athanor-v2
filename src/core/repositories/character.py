@@ -7,14 +7,20 @@ from pathlib import Path
 
 from src.core.models.character import Character
 from src.core.repositories.base import BaseRepository
+from src.core.vault.path_resolver import VaultPathResolver
 
 
 class CharacterRepository(BaseRepository[Character]):
     """Character リポジトリ."""
 
+    def __init__(self, vault_root: Path) -> None:
+        """初期化."""
+        super().__init__(vault_root)
+        self._path_resolver = VaultPathResolver(vault_root)
+
     def _get_path(self, identifier: str) -> Path:
         """キャラクター名からファイルパスを取得."""
-        return self.vault_root / "characters" / f"{identifier}.md"
+        return self._path_resolver.resolve_character(identifier)
 
     def _model_class(self) -> type[Character]:
         """Character クラスを返す."""
@@ -54,12 +60,14 @@ class CharacterRepository(BaseRepository[Character]):
 
         Returns:
             セクション辞書
+
+        Note:
+            現時点では全セクションを返す。
+            Phase Filter による current_phase に基づくフィルタリングは
+            L2 フェーズ（Phase Filter 実装タスク）で対応予定。
         """
         char = self.read(name)
-        if char.current_phase is None:
-            return char.sections
-        # current_phase に対応するセクションのみ返す
-        # （現時点では全セクションを返す。Phase Filter は別タスクで実装）
+        # TODO(L2-phase-filter): current_phase に基づくセクションフィルタリング
         return char.sections
 
     def update_phase(self, name: str, new_phase: str) -> None:

@@ -7,15 +7,21 @@ from pathlib import Path
 
 from src.core.models.episode import Episode
 from src.core.repositories.base import BaseRepository
+from src.core.vault.path_resolver import VaultPathResolver
 
 
 class EpisodeRepository(BaseRepository[Episode]):
     """Episode リポジトリ."""
 
+    def __init__(self, vault_root: Path) -> None:
+        """初期化."""
+        super().__init__(vault_root)
+        self._path_resolver = VaultPathResolver(vault_root)
+
     def _get_path(self, identifier: str) -> Path:
         """エピソード番号からファイルパスを取得."""
         episode_number = int(identifier)
-        return self.vault_root / "episodes" / f"ep_{episode_number:04d}.md"
+        return self._path_resolver.resolve_episode(episode_number)
 
     def _model_class(self) -> type[Episode]:
         """Episode クラスを返す."""

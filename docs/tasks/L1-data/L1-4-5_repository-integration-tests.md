@@ -6,7 +6,7 @@
 |------|-----|
 | ID | L1-4-5 |
 | 優先度 | P0 |
-| ステータス | 🔲 backlog |
+| ステータス | ✅ done |
 | 依存タスク | L1-4-2, L1-4-3 |
 | 参照仕様 | `docs/internal/02_DEVELOPMENT_FLOW.md` Phase 2 |
 
@@ -88,7 +88,12 @@ def test_episode_crud(temp_vault):
 
 ## 実装メモ
 
-（実装時に記録）
+- 2026-01-24: 統合テスト作成
+- CRUD 往復テスト (Episode, Character)
+- リスト取得テスト
+- Markdown ファイル形式検証
+- 複数リポジトリ共存テスト
+- テスト5件全て PASS
 
 ## 変更履歴
 

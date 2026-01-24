@@ -6,7 +6,7 @@
 |------|-----|
 | ID | L1-3-2 |
 | 優先度 | P0 |
-| ステータス | 🔲 backlog |
+| ステータス | ✅ done |
 | 依存タスク | L0-1-2 |
 | 参照仕様 | `docs/specs/novel-generator-v2/02_architecture.md` Section 2.5, `03_data-model.md` Section 5 |
 
@@ -77,7 +77,10 @@ class VaultPathResolver:
 
 ## 実装メモ
 
-（実装時に記録）
+- 2026-01-24: TDD で実装
+- Episode, Character, WorldSetting, Plot (L1/L2/L3), Foreshadowing 対応
+- exists() メソッドで存在確認可能
+- テスト11件全て PASS
 
 ## 変更履歴
 

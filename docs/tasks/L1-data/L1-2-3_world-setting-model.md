@@ -6,7 +6,7 @@
 |------|-----|
 | ID | L1-2-3 |
 | 優先度 | P0 |
-| ステータス | 🔲 backlog |
+| ステータス | ✅ done |
 | 依存タスク | L0-1-2 |
 | 参照仕様 | `docs/specs/novel-generator-v2/03_data-model.md` |
 
@@ -63,7 +63,9 @@ class WorldSetting(BaseModel):
 
 ## 実装メモ
 
-（実装時に記録）
+- 2026-01-24: TDD で実装
+- Character の Phase, AIVisibilitySettings を再利用
+- テスト4件全て PASS
 
 ## 変更履歴
 

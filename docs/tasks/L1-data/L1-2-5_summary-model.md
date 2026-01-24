@@ -6,7 +6,7 @@
 |------|-----|
 | ID | L1-2-5 |
 | 優先度 | P0 |
-| ステータス | 🔲 backlog |
+| ステータス | ✅ done |
 | 依存タスク | L0-1-2 |
 | 参照仕様 | `docs/specs/novel-generator-v2/03_data-model.md` Section 3.6 |
 
@@ -71,7 +71,10 @@ class SummaryL3(SummaryBase):
 
 ## 実装メモ
 
-（実装時に記録）
+- 2026-01-24: TDD で実装
+- SummaryBase 基底クラス + SummaryL1/L2/L3 派生クラス
+- Plot と対になる構造
+- テスト4件全て PASS
 
 ## 変更履歴
 

@@ -6,7 +6,7 @@
 |------|-----|
 | ID | L1-2-10 |
 | 優先度 | P0 |
-| ステータス | 🔲 backlog |
+| ステータス | ✅ done |
 | 依存タスク | L1-2-1, L1-2-2, L1-2-3, L1-2-4, L1-2-5 |
 | 参照仕様 | `docs/internal/02_DEVELOPMENT_FLOW.md` Phase 2 |
 
@@ -65,7 +65,11 @@
 
 ## 実装メモ
 
-（実装時に記録）
+- 2026-01-24: 統合テスト追加
+- JSON 往復: Episode, Character, Plot
+- YAML 往復: Episode, Summary
+- モデル間関連: Plot階層、Character フェーズ整合
+- テスト9件全て PASS
 
 ## 変更履歴
 

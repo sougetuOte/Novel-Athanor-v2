@@ -6,7 +6,7 @@
 |------|-----|
 | ID | L1-1-1 |
 | 優先度 | P0 |
-| ステータス | 🔲 backlog |
+| ステータス | ✅ done |
 | 依存タスク | L0-1-2 |
 | 参照仕様 | `docs/specs/novel-generator-v2/03_data-model.md` Section 5 |
 
@@ -59,7 +59,10 @@ body = "\n# 本文\n"
 
 ## 実装メモ
 
-（実装時に記録）
+- 2026-01-24: TDD で実装
+- python-frontmatter ライブラリを使用
+- ParseError カスタム例外を定義
+- テスト6件全て PASS
 
 ## 変更履歴
 

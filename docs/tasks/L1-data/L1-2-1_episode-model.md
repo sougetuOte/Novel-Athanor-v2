@@ -6,7 +6,7 @@
 |------|-----|
 | ID | L1-2-1 |
 | 優先度 | P0 |
-| ステータス | 🔲 backlog |
+| ステータス | ✅ done |
 | 依存タスク | L0-1-2 |
 | 参照仕様 | `docs/specs/novel-generator-v2/03_data-model.md` Section 3.1 |
 
@@ -61,7 +61,10 @@ class Episode(BaseModel):
 
 ## 実装メモ
 
-（実装時に記録）
+- 2026-01-24: TDD で実装
+- Pydantic BaseModel 継承
+- バリデーション: episode_number>=1, word_count>=0, status列挙
+- テスト6件全て PASS
 
 ## 変更履歴
 

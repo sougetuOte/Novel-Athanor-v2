@@ -6,7 +6,7 @@
 |------|-----|
 | ID | L1-4-2 |
 | 優先度 | P0 |
-| ステータス | 🔲 backlog |
+| ステータス | ✅ done |
 | 依存タスク | L1-4-1 |
 | 参照仕様 | `docs/specs/novel-generator-v2/03_data-model.md` Section 3.1 |
 
@@ -77,7 +77,10 @@ class EpisodeRepository(BaseRepository[Episode]):
 
 ## 実装メモ
 
-（実装時に記録）
+- 2026-01-24: TDD で実装
+- BaseRepository を継承
+- list_all, get_range, get_by_status, get_latest 実装
+- テスト6件全て PASS
 
 ## 変更履歴
 

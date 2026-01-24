@@ -346,7 +346,7 @@ JSONL形式でエージェントの動作を記録する。
 ## 6. ディレクトリ構成
 
 ```
-Auto-Novel-Athanor/
+Novel-Athanor-v2/
 ├── CLAUDE.md                      # プロジェクト憲法
 ├── .claude/
 │   ├── agents/                    # エージェント定義

@@ -8,8 +8,9 @@
 ```
 /
 ├── src/                    # ソースコード (実装)
-│   ├── backend/            # バックエンド (Python/FastAPI)
-│   └── frontend/           # フロントエンド (React/Vite)
+│   ├── core/               # コアモジュール (Python)
+│   ├── agents/             # エージェント実装
+│   └── cli/                # CLIインターフェース
 ├── tests/                  # テストコード
 ├── docs/                   # ドキュメント資産
 │   ├── specs/              # 要求仕様書 (Source of Truth)
@@ -63,7 +64,7 @@
 
 ### C. ADR (Architectural Decision Records)
 
-- **Naming**: `docs/adr/YYYY-MM-DD_{decision_title}.md`
+- **Naming**: `docs/adr/NNNN-kebab-case-title.md`（例: `0001-three-project-integration.md`）
 - **Immutable**: 一度確定した ADR は原則変更せず、変更が必要な場合は新しい ADR を作成して "Supersedes" と明記する。
 
 ## 3. File Naming Conventions (命名規則)

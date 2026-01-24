@@ -1,0 +1,71 @@
+{
+  "feature": "novel-generator",
+  "description": "AIとユーザーが協力して小説を作成する半自動生成システム",
+  "phase": "PLANNING",
+  "subPhase": "design",
+  "status": {
+    "requirements": "approved",
+    "design": "pending",
+    "tasks": "pending"
+  },
+  "approvals": {
+    "requirements": "2026-01-24T12:40:00Z",
+    "design": null,
+    "tasks": null
+  },
+  "currentActivity": "Phase 3.5 依頼送信完了: Antigravity回答待ち、回答後Phase 4へ",
+  "artifacts": {
+    "analysisTarget": [
+      "docs/Novel-Athanor-main",
+      "docs/NovelWriter-main",
+      "docs/302_novel_writing-main"
+    ],
+    "created": [
+      "docs/specs/novel-generator/analysis-plan.md",
+      ".claude/rules/self-modification.md",
+      "docs/specs/novel-generator/analysis-novel-athanor-architecture.md",
+      "docs/specs/novel-generator/analysis-novel-athanor-datamodel.md",
+      "docs/specs/novel-generator/analysis-novel-athanor-functionflow.md",
+      "docs/memos/2026-01-24_ai-information-control.md",
+      "docs/specs/novel-generator/analysis-novelwriter-architecture.md",
+      "docs/specs/novel-generator/analysis-302-novel-writing.md",
+      "docs/specs/novel-generator/analysis-crossreview.md"
+    ]
+  },
+  "analysisProgress": {
+    "phase1_novel_athanor": {
+      "status": "completed",
+      "reports": [
+        "analysis-novel-athanor-architecture.md",
+        "analysis-novel-athanor-datamodel.md",
+        "analysis-novel-athanor-functionflow.md"
+      ]
+    },
+    "phase2_novelwriter": {
+      "status": "completed",
+      "reports": [
+        "analysis-novelwriter-architecture.md"
+      ]
+    },
+    "phase3_302_novel_writing": {
+      "status": "completed",
+      "reports": [
+        "analysis-302-novel-writing.md"
+      ]
+    },
+    "phase3_5_antigravity": {
+      "status": "waiting_response",
+      "request_file": ".exchange/sessions/2026-01-24_001_architecture.md",
+      "sent_at": "2026-01-24",
+      "reports": []
+    },
+    "phase3_9_crossreview": {
+      "status": "completed",
+      "reports": [
+        "analysis-crossreview.md"
+      ]
+    }
+  },
+  "createdAt": "2026-01-24T00:00:00Z",
+  "updatedAt": "2026-01-24T14:00:00Z"
+}

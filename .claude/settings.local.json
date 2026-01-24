@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__heimdall__memory_status",
+      "mcp__heimdall__store_memory",
+      "mcp__serena__list_dir",
+      "Bash(tree:*)",
+      "mcp__heimdall__session_lessons",
+      "mcp__heimdall__recall_memories",
+      "WebSearch",
+      "mcp__serena__list_memories",
+      "mcp__serena__get_current_config",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

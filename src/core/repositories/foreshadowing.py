@@ -5,6 +5,7 @@
 
 from datetime import date
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -32,7 +33,7 @@ class ForeshadowingRepository:
         """レジストリファイルのパスを返す."""
         return self.vault_root / self.work_name / "_foreshadowing" / "registry.yaml"
 
-    def _load_registry(self) -> dict:
+    def _load_registry(self) -> dict[str, Any]:
         """レジストリを読み込む."""
         path = self._get_registry_path()
         if not path.exists():
@@ -42,16 +43,16 @@ class ForeshadowingRepository:
         data = yaml.safe_load(content)
         return data if data else {"version": "1.0", "last_updated": None, "foreshadowing": []}
 
-    def _save_registry(self, data: dict) -> None:
+    def _save_registry(self, data: dict[str, Any]) -> None:
         """レジストリを保存する."""
         path = self._get_registry_path()
         path.parent.mkdir(parents=True, exist_ok=True)
 
         data["last_updated"] = date.today().isoformat()
-        content = yaml.dump(data, allow_unicode=True, default_flow_style=False)
+        content = yaml.dump(data, allow_unicode=True, default_flow_style=False, sort_keys=False)
         path.write_text(content, encoding="utf-8")
 
-    def _find_index(self, registry: dict, fs_id: str) -> int | None:
+    def _find_index(self, registry: dict[str, Any], fs_id: str) -> int | None:
         """ID から伏線のインデックスを検索."""
         for i, fs in enumerate(registry.get("foreshadowing", [])):
             if fs.get("id") == fs_id:

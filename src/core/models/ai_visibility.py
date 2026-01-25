@@ -5,7 +5,7 @@ AI情報制御システムの可視性設定モデル。
 """
 
 from enum import IntEnum
-from typing import Union
+from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -48,7 +48,7 @@ class AIVisibility(BaseModel):
     @field_validator("allowed_expressions", mode="before")
     @classmethod
     def coerce_expressions(
-        cls, v: list[Union[str, AllowedExpression, dict]]
+        cls, v: list[str | AllowedExpression | dict[str, Any]]
     ) -> list[AllowedExpression]:
         """文字列リストも AllowedExpression リストに変換する."""
         if not v:

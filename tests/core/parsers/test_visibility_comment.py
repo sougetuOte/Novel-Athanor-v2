@@ -147,6 +147,15 @@ Content C
         assert sections["Section B"] == AIVisibilityLevel.AWARE
         assert sections["Section C"] == AIVisibilityLevel.USE
 
+    def test_invalid_level_raises_error(self) -> None:
+        """不正なレベルは例外を発生させる（セキュリティ対策）."""
+        content = """## 秘密セクション
+<!-- ai_visibility: 5 -->
+機密情報
+"""
+        with pytest.raises(ValueError, match="Invalid visibility level"):
+            extract_section_visibility(content)
+
 
 class TestVisibilityMarker:
     """VisibilityMarker データクラスのテスト."""

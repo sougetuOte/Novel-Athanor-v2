@@ -251,3 +251,30 @@ class TestForeshadowingManager:
 
         assert result.status == ForeshadowingStatus.REVEALED
         assert result.ai_visibility.level == 3  # USE
+
+    def test_reinforce_foreshadowing(self) -> None:
+        """伏線を強化するショートカット."""
+        fs = _create_foreshadowing(status=ForeshadowingStatus.PLANTED)
+        manager = ForeshadowingManager()
+
+        result = manager.reinforce(fs)
+
+        assert result.status == ForeshadowingStatus.REINFORCED
+
+    def test_transition_to_abandoned(self) -> None:
+        """伏線を断念できる."""
+        fs = _create_foreshadowing(status=ForeshadowingStatus.PLANTED)
+        manager = ForeshadowingManager()
+
+        result = manager.transition_status(fs, ForeshadowingStatus.ABANDONED)
+
+        assert result.status == ForeshadowingStatus.ABANDONED
+
+    def test_abandoned_can_be_revived(self) -> None:
+        """断念した伏線を復活できる."""
+        fs = _create_foreshadowing(status=ForeshadowingStatus.ABANDONED)
+        manager = ForeshadowingManager()
+
+        result = manager.transition_status(fs, ForeshadowingStatus.REGISTERED)
+
+        assert result.status == ForeshadowingStatus.REGISTERED

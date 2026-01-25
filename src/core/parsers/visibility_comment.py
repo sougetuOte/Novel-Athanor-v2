@@ -129,11 +129,9 @@ def extract_section_visibility(
         visibility_match = VISIBILITY_COMMENT_PATTERN.search(line)
         if visibility_match and current_section:
             level_str = visibility_match.group(1)
-            try:
-                level = _parse_level(level_str, i + 1)
-                sections[current_section] = level
-            except ValueError:
-                # パースエラーの場合はデフォルトを維持
-                pass
+            # セキュリティ優先: 不正なレベルは例外を発生させる
+            # 静かにデフォルト(USE=3)に変換すると機密情報が漏洩するリスクがある
+            level = _parse_level(level_str, i + 1)
+            sections[current_section] = level
 
     return sections

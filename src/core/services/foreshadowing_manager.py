@@ -19,19 +19,26 @@ VALID_TRANSITIONS: dict[ForeshadowingStatus, set[ForeshadowingStatus]] = {
     ForeshadowingStatus.REGISTERED: {
         ForeshadowingStatus.REGISTERED,
         ForeshadowingStatus.PLANTED,
+        ForeshadowingStatus.ABANDONED,  # 張る前に断念
     },
     ForeshadowingStatus.PLANTED: {
         ForeshadowingStatus.PLANTED,
         ForeshadowingStatus.REINFORCED,
         ForeshadowingStatus.REVEALED,
+        ForeshadowingStatus.ABANDONED,  # 回収を断念
     },
     ForeshadowingStatus.REINFORCED: {
         ForeshadowingStatus.REINFORCED,
         ForeshadowingStatus.PLANTED,  # 巻き戻し可能
         ForeshadowingStatus.REVEALED,
+        ForeshadowingStatus.ABANDONED,  # 回収を断念
     },
     ForeshadowingStatus.REVEALED: {
         ForeshadowingStatus.REVEALED,  # 自己遷移のみ
+    },
+    ForeshadowingStatus.ABANDONED: {
+        ForeshadowingStatus.ABANDONED,  # 自己遷移のみ
+        ForeshadowingStatus.REGISTERED,  # 復活して再計画
     },
 }
 

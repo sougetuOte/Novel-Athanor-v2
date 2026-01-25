@@ -55,7 +55,11 @@
       "Bash(.venv/Scripts/pytest.exe:*)",
       "Bash(python -m pytest:*)",
       "Bash(python -m mypy:*)",
-      "Bash(python -m ruff:*)"
+      "Bash(python -m ruff:*)",
+      "mcp__plugin_serena_serena__get_current_config",
+      "mcp__plugin_serena_serena__replace_content",
+      "mcp__plugin_serena_serena__create_text_file",
+      "mcp__plugin_serena_serena__list_dir"
     ]
   },
   "enableAllProjectMcpServers": true,

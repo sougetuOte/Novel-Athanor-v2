@@ -36,10 +36,10 @@ yarn-error.log*
 # Agent
 .agent/
 memos/
-.serena/
 data/
 
 # Analyzed source projects (local reference only)
 docs/Novel-Athanor-main/
 docs/NovelWriter-main/
 docs/302_novel_writing-main/
+.heimdall/

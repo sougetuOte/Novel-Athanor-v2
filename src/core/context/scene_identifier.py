@@ -5,7 +5,6 @@ a scene in the novel structure.
 """
 
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass(frozen=True)
@@ -34,9 +33,9 @@ class SceneIdentifier:
     """
 
     episode_id: str
-    sequence_id: Optional[str] = None
-    chapter_id: Optional[str] = None
-    current_phase: Optional[str] = None
+    sequence_id: str | None = None
+    chapter_id: str | None = None
+    current_phase: str | None = None
 
     def __post_init__(self) -> None:
         """Validate fields after initialization."""

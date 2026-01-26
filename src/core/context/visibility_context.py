@@ -6,8 +6,10 @@ for Level 1-2 information and tracks excluded sections.
 """
 
 from dataclasses import dataclass, field
+from typing import Any
 
 from src.core.models.ai_visibility import AIVisibilityLevel
+
 from .filtered_context import FilteredContext
 
 
@@ -129,7 +131,7 @@ class VisibilityAwareContext:
         current_set.update(keywords)
         self.forbidden_keywords = sorted(current_set)
 
-    def to_ghost_writer_context(self) -> dict:
+    def to_ghost_writer_context(self) -> dict[str, Any]:
         """Convert to a context dictionary for Ghost Writer.
 
         Creates a flat dictionary suitable for prompt construction,
@@ -139,7 +141,7 @@ class VisibilityAwareContext:
         Returns:
             Dictionary with context fields and metadata.
         """
-        result = self.base_context.to_prompt_dict()
+        result: dict[str, Any] = dict(self.base_context.to_prompt_dict())
 
         # Add hints if available
         if self.hints:

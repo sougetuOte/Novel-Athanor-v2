@@ -6,7 +6,6 @@ that guide the Ghost Writer on how to handle foreshadowing elements in each scen
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
 
 
 class InstructionAction(Enum):
@@ -60,7 +59,7 @@ class ForeshadowInstruction:
     action: InstructionAction
     allowed_expressions: list[str] = field(default_factory=list)
     forbidden_expressions: list[str] = field(default_factory=list)
-    note: Optional[str] = None
+    note: str | None = None
     subtlety_target: int = 5
 
     def __post_init__(self) -> None:

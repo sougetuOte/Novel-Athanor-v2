@@ -6,7 +6,6 @@ and phase filtering has been applied.
 """
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 
 @dataclass
@@ -45,14 +44,14 @@ class FilteredContext:
     """
 
     # Plot information (hierarchical)
-    plot_l1: Optional[str] = None
-    plot_l2: Optional[str] = None
-    plot_l3: Optional[str] = None
+    plot_l1: str | None = None
+    plot_l2: str | None = None
+    plot_l3: str | None = None
 
     # Summary information (hierarchical)
-    summary_l1: Optional[str] = None
-    summary_l2: Optional[str] = None
-    summary_l3: Optional[str] = None
+    summary_l1: str | None = None
+    summary_l2: str | None = None
+    summary_l3: str | None = None
 
     # Character information (phase-filtered)
     # key: character name, value: filtered setting text
@@ -63,11 +62,11 @@ class FilteredContext:
     world_settings: dict[str, str] = field(default_factory=dict)
 
     # Style guide
-    style_guide: Optional[str] = None
+    style_guide: str | None = None
 
     # Meta information
     scene_id: str = ""
-    current_phase: Optional[str] = None
+    current_phase: str | None = None
     warnings: list[str] = field(default_factory=list)
 
     def has_plot(self) -> bool:

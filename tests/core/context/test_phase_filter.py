@@ -1,6 +1,7 @@
 """Tests for PhaseFilter protocol and related classes."""
 
 import pytest
+from datetime import date
 from typing import TypeVar
 
 from src.core.context.phase_filter import (
@@ -226,3 +227,209 @@ class TestPhaseFilterUseCases:
         result = filter_impl.filter_by_phase(empty_entity, "any_phase")
         assert result == {}
         assert filter_impl.get_available_phases(empty_entity) == []
+
+
+class TestCharacterPhaseFilter:
+    """Test CharacterPhaseFilter concrete implementation."""
+
+    @pytest.fixture
+    def phase_order(self):
+        """Define phase progression order."""
+        return ["initial", "arc_1", "arc_2", "finale"]
+
+    @pytest.fixture
+    def character(self):
+        """Create a test character with phases."""
+        from src.core.models.character import Character, Phase
+
+        return Character(
+            name="Alice",
+            phases=[
+                Phase(name="initial", episodes="1-5"),
+                Phase(name="arc_1", episodes="6-15"),
+                Phase(name="finale", episodes="16-"),
+            ],
+            sections={
+                "basic": "Basic info visible always",
+                "initial_secret": "Secret for initial phase",
+                "arc_1_reveal": "Revealed in arc_1",
+            },
+            created=date(2026, 1, 26),
+            updated=date(2026, 1, 26),
+        )
+
+    @pytest.fixture
+    def filter(self, phase_order):
+        """Create CharacterPhaseFilter instance."""
+        from src.core.context.phase_filter import CharacterPhaseFilter
+
+        return CharacterPhaseFilter(phase_order)
+
+    def test_filter_by_phase_initial(self, filter, character):
+        """Filter character at initial phase - should only see initial phase."""
+        filtered = filter.filter_by_phase(character, "initial")
+        assert filtered.name == "Alice"
+
+        # Only initial phase should be included
+        phase_names = [p.name for p in filtered.phases]
+        assert "initial" in phase_names
+        assert "arc_1" not in phase_names
+        assert "finale" not in phase_names
+
+    def test_filter_by_phase_arc_1(self, filter, character):
+        """Filter at arc_1 - should see initial + arc_1, but not finale."""
+        filtered = filter.filter_by_phase(character, "arc_1")
+        phase_names = [p.name for p in filtered.phases]
+        assert "initial" in phase_names
+        assert "arc_1" in phase_names
+        assert "finale" not in phase_names
+
+    def test_filter_by_phase_finale(self, filter, character):
+        """Filter at finale - should see all phases."""
+        filtered = filter.filter_by_phase(character, "finale")
+        phase_names = [p.name for p in filtered.phases]
+        assert "initial" in phase_names
+        assert "arc_1" in phase_names
+        assert "finale" in phase_names
+
+    def test_filter_by_phase_arc_2_no_data(self, filter, character):
+        """Filter at arc_2 - character has no arc_2 data, but filter should work."""
+        # arc_2 is in phase_order but not in character's phases
+        filtered = filter.filter_by_phase(character, "arc_2")
+        phase_names = [p.name for p in filtered.phases]
+        # Should see initial and arc_1, but not finale
+        assert "initial" in phase_names
+        assert "arc_1" in phase_names
+        assert "arc_2" not in phase_names
+        assert "finale" not in phase_names
+
+    def test_filter_by_phase_invalid(self, filter, character):
+        """Filter with invalid phase should raise InvalidPhaseError."""
+        with pytest.raises(InvalidPhaseError) as exc_info:
+            filter.filter_by_phase(character, "unknown_phase")
+        assert "unknown_phase" in str(exc_info.value)
+
+    def test_get_available_phases(self, filter, character):
+        """Get phases that are available in the character."""
+        phases = filter.get_available_phases(character)
+        assert "initial" in phases
+        assert "arc_1" in phases
+        assert "finale" in phases
+        # arc_2 is in phase_order but not in character
+        assert "arc_2" not in phases
+
+    def test_get_available_phases_empty(self, filter):
+        """Get phases from character with no phases."""
+        from src.core.models.character import Character
+
+        char = Character(
+            name="NPC",
+            created=date(2026, 1, 26),
+            updated=date(2026, 1, 26),
+        )
+        phases = filter.get_available_phases(char)
+        assert phases == []
+
+    def test_to_context_string(self, filter, character):
+        """Convert filtered character to context string."""
+        context = filter.to_context_string(character, "initial")
+        assert "Alice" in context
+        assert "basic" in context.lower() or "Basic info" in context
+
+    def test_filter_preserves_other_fields(self, filter, character):
+        """Filter should preserve other fields like name, sections, etc."""
+        filtered = filter.filter_by_phase(character, "initial")
+        assert filtered.name == character.name
+        assert filtered.sections == character.sections
+        assert filtered.created == character.created
+        assert filtered.updated == character.updated
+        assert filtered.tags == character.tags
+
+
+class TestWorldSettingPhaseFilter:
+    """Test WorldSettingPhaseFilter concrete implementation."""
+
+    @pytest.fixture
+    def phase_order(self):
+        """Define phase progression order."""
+        return ["initial", "arc_1", "arc_2", "finale"]
+
+    @pytest.fixture
+    def world_setting(self):
+        """Create a test world setting with phases."""
+        from src.core.models.world_setting import WorldSetting, Phase
+
+        return WorldSetting(
+            name="Magic System",
+            category="System",
+            phases=[
+                Phase(name="initial", episodes="1-5"),
+                Phase(name="arc_2", episodes="10-15"),
+            ],
+            sections={
+                "basic": "Basic magic rules",
+                "advanced": "Advanced concepts revealed later",
+            },
+            created=date(2026, 1, 26),
+            updated=date(2026, 1, 26),
+        )
+
+    @pytest.fixture
+    def filter(self, phase_order):
+        """Create WorldSettingPhaseFilter instance."""
+        from src.core.context.phase_filter import WorldSettingPhaseFilter
+
+        return WorldSettingPhaseFilter(phase_order)
+
+    def test_filter_by_phase_initial(self, filter, world_setting):
+        """Filter world setting at initial phase."""
+        filtered = filter.filter_by_phase(world_setting, "initial")
+        assert filtered.name == "Magic System"
+        assert filtered.category == "System"
+
+        phase_names = [p.name for p in filtered.phases]
+        assert "initial" in phase_names
+        assert "arc_2" not in phase_names
+
+    def test_filter_by_phase_arc_1(self, filter, world_setting):
+        """Filter at arc_1 - should see initial but not arc_2."""
+        filtered = filter.filter_by_phase(world_setting, "arc_1")
+        phase_names = [p.name for p in filtered.phases]
+        assert "initial" in phase_names
+        assert "arc_2" not in phase_names
+
+    def test_filter_by_phase_arc_2(self, filter, world_setting):
+        """Filter at arc_2 - should see both initial and arc_2."""
+        filtered = filter.filter_by_phase(world_setting, "arc_2")
+        phase_names = [p.name for p in filtered.phases]
+        assert "initial" in phase_names
+        assert "arc_2" in phase_names
+
+    def test_filter_by_phase_invalid(self, filter, world_setting):
+        """Invalid phase should raise InvalidPhaseError."""
+        with pytest.raises(InvalidPhaseError):
+            filter.filter_by_phase(world_setting, "unknown_phase")
+
+    def test_get_available_phases(self, filter, world_setting):
+        """Get available phases from world setting."""
+        phases = filter.get_available_phases(world_setting)
+        assert "initial" in phases
+        assert "arc_2" in phases
+        # arc_1 and finale are not in this world setting
+        assert "arc_1" not in phases
+        assert "finale" not in phases
+
+    def test_to_context_string(self, filter, world_setting):
+        """Convert filtered world setting to context string."""
+        context = filter.to_context_string(world_setting, "initial")
+        assert "Magic System" in context
+        assert "System" in context
+
+    def test_filter_preserves_other_fields(self, filter, world_setting):
+        """Filter should preserve other fields."""
+        filtered = filter.filter_by_phase(world_setting, "initial")
+        assert filtered.name == world_setting.name
+        assert filtered.category == world_setting.category
+        assert filtered.sections == world_setting.sections
+        assert filtered.created == world_setting.created
+        assert filtered.updated == world_setting.updated

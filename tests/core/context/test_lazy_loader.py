@@ -1,9 +1,14 @@
 """Tests for LazyLoader protocol and related classes."""
 
 import pytest
+from datetime import datetime, timedelta
+from pathlib import Path
+from time import sleep
 from typing import Optional
 
 from src.core.context.lazy_loader import (
+    ContentType,
+    LazyLoadedContent,
     LazyLoader,
     LazyLoadResult,
     LoadPriority,
@@ -190,3 +195,230 @@ class TestLazyLoadResultHelpers:
         result = LazyLoadResult(success=True, data="data")
         assert result.warnings == []
         assert isinstance(result.warnings, list)
+
+
+class TestContentType:
+    """Test ContentType enum."""
+
+    def test_content_type_values(self):
+        """全種別（PLOT, SUMMARY, CHARACTER, WORLD_SETTING, STYLE_GUIDE, FORESHADOWING, REFERENCE）が存在."""
+        assert ContentType.PLOT.value == "plot"
+        assert ContentType.SUMMARY.value == "summary"
+        assert ContentType.CHARACTER.value == "character"
+        assert ContentType.WORLD_SETTING.value == "world_setting"
+        assert ContentType.STYLE_GUIDE.value == "style_guide"
+        assert ContentType.FORESHADOWING.value == "foreshadowing"
+        assert ContentType.REFERENCE.value == "reference"
+
+    def test_all_content_types(self):
+        """全てのコンテンツタイプが定義されている."""
+        content_types = [ct for ct in ContentType]
+        assert len(content_types) == 7
+
+
+class TestLazyLoadedContent:
+    """Test LazyLoadedContent data class."""
+
+    def test_lazy_loaded_content_creation(self):
+        """基本生成（content, source_path, content_type, priority）."""
+        path = Path("/vault/test/characters/hero.md")
+        content = LazyLoadedContent(
+            content="Test content",
+            source_path=path,
+            content_type=ContentType.CHARACTER,
+            priority=LoadPriority.REQUIRED,
+        )
+        assert content.content == "Test content"
+        assert content.source_path == path
+        assert content.content_type == ContentType.CHARACTER
+        assert content.priority == LoadPriority.REQUIRED
+
+    def test_lazy_loaded_content_loaded_at_default(self):
+        """loaded_at が現在時刻で自動設定される."""
+        before = datetime.now()
+        content = LazyLoadedContent(
+            content="Test",
+            source_path=Path("/test.md"),
+            content_type=ContentType.PLOT,
+            priority=LoadPriority.REQUIRED,
+        )
+        after = datetime.now()
+        assert before <= content.loaded_at <= after
+
+    def test_lazy_loaded_content_is_stale_true(self):
+        """古いコンテンツ（max_age_seconds 超過）."""
+        old_time = datetime.now() - timedelta(seconds=10)
+        content = LazyLoadedContent(
+            content="Old content",
+            source_path=Path("/test.md"),
+            content_type=ContentType.SUMMARY,
+            priority=LoadPriority.OPTIONAL,
+            loaded_at=old_time,
+        )
+        # 5秒で古くなると定義
+        assert content.is_stale(max_age_seconds=5.0)
+
+    def test_lazy_loaded_content_is_stale_false(self):
+        """新しいコンテンツ."""
+        content = LazyLoadedContent(
+            content="Fresh content",
+            source_path=Path("/test.md"),
+            content_type=ContentType.CHARACTER,
+            priority=LoadPriority.REQUIRED,
+        )
+        # デフォルト300秒では新しい
+        assert not content.is_stale()
+
+    def test_lazy_loaded_content_get_identifier_with_cache_key(self):
+        """cache_key がある場合."""
+        content = LazyLoadedContent(
+            content="Data",
+            source_path=Path("/vault/test.md"),
+            content_type=ContentType.REFERENCE,
+            priority=LoadPriority.OPTIONAL,
+            cache_key="custom_key_123",
+        )
+        assert content.get_identifier() == "custom_key_123"
+
+    def test_lazy_loaded_content_get_identifier_without_cache_key(self):
+        """cache_key がない場合は source_path."""
+        path = Path("/vault/world/magic.md")
+        content = LazyLoadedContent(
+            content="Magic system",
+            source_path=path,
+            content_type=ContentType.WORLD_SETTING,
+            priority=LoadPriority.REQUIRED,
+        )
+        assert content.get_identifier() == str(path)
+
+    def test_lazy_loaded_content_generic_type(self):
+        """ジェネリック型として動作する."""
+        # str型
+        str_content: LazyLoadedContent[str] = LazyLoadedContent(
+            content="text",
+            source_path=Path("/test.md"),
+            content_type=ContentType.PLOT,
+            priority=LoadPriority.REQUIRED,
+        )
+        assert isinstance(str_content.content, str)
+
+        # dict型
+        dict_content: LazyLoadedContent[dict] = LazyLoadedContent(
+            content={"key": "value"},
+            source_path=Path("/test.yaml"),
+            content_type=ContentType.FORESHADOWING,
+            priority=LoadPriority.OPTIONAL,
+        )
+        assert isinstance(dict_content.content, dict)
+
+
+# --- CacheEntry と FileLazyLoader のテスト ---
+
+
+class TestCacheEntry:
+    """Test CacheEntry data class."""
+
+    def test_create_cache_entry(self):
+        """CacheEntryを作成."""
+        from src.core.context.lazy_loader import CacheEntry
+
+        entry = CacheEntry(
+            data="test content",
+            loaded_at=datetime.now(),
+            source=Path("test.md"),
+        )
+        assert entry.data == "test content"
+
+    def test_is_expired_false(self):
+        """期限切れでない."""
+        from src.core.context.lazy_loader import CacheEntry
+
+        entry = CacheEntry(
+            data="test",
+            loaded_at=datetime.now(),
+            source=Path("test.md"),
+        )
+        assert not entry.is_expired(300.0)
+
+    def test_is_expired_true(self):
+        """期限切れ."""
+        from src.core.context.lazy_loader import CacheEntry
+
+        old_time = datetime.now() - timedelta(seconds=400)
+        entry = CacheEntry(
+            data="test",
+            loaded_at=old_time,
+            source=Path("test.md"),
+        )
+        assert entry.is_expired(300.0)
+
+
+class TestFileLazyLoader:
+    """Test FileLazyLoader implementation."""
+
+    @pytest.fixture
+    def vault_root(self, tmp_path):
+        """テスト用vault."""
+        (tmp_path / "test.md").write_text("Test content", encoding="utf-8")
+        return tmp_path
+
+    @pytest.fixture
+    def loader(self, vault_root):
+        from src.core.context.lazy_loader import FileLazyLoader
+
+        return FileLazyLoader(vault_root, cache_ttl_seconds=300.0)
+
+    def test_load_success(self, loader):
+        """ファイル読み込み成功."""
+        result = loader.load("test.md", LoadPriority.REQUIRED)
+        assert result.success
+        assert result.data == "Test content"
+
+    def test_load_required_not_found(self, loader):
+        """REQUIRED ファイルなし = エラー."""
+        result = loader.load("not_exists.md", LoadPriority.REQUIRED)
+        assert not result.success
+        assert "not found" in result.error.lower()
+
+    def test_load_optional_not_found(self, loader):
+        """OPTIONAL ファイルなし = 警告のみ."""
+        result = loader.load("not_exists.md", LoadPriority.OPTIONAL)
+        assert result.success
+        assert result.data is None
+        assert len(result.warnings) > 0
+
+    def test_is_cached_after_load(self, loader):
+        """読み込み後はキャッシュされる."""
+        assert not loader.is_cached("test.md")
+        loader.load("test.md", LoadPriority.REQUIRED)
+        assert loader.is_cached("test.md")
+
+    def test_cache_hit(self, loader):
+        """キャッシュヒット."""
+        loader.load("test.md", LoadPriority.REQUIRED)
+        # 2回目はキャッシュから
+        result = loader.load("test.md", LoadPriority.REQUIRED)
+        assert result.success
+
+    def test_clear_cache(self, loader):
+        """キャッシュクリア."""
+        loader.load("test.md", LoadPriority.REQUIRED)
+        loader.clear_cache()
+        assert not loader.is_cached("test.md")
+
+    def test_get_cache_stats(self, loader):
+        """キャッシュ統計."""
+        loader.load("test.md", LoadPriority.REQUIRED)
+        stats = loader.get_cache_stats()
+        assert stats["total"] == 1
+        assert stats["expired"] == 0
+
+    def test_evict_expired(self, loader, vault_root):
+        """期限切れ削除."""
+        loader.load("test.md", LoadPriority.REQUIRED)
+        # 手動でキャッシュを古くする
+        loader._cache["test.md"].loaded_at = datetime.now() - timedelta(seconds=400)
+
+        evicted = loader.evict_expired()
+        assert evicted == 1
+        assert not loader.is_cached("test.md")

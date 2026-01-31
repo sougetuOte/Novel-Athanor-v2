@@ -6,7 +6,7 @@
 |------|-----|
 | ID | L3-3-1b |
 | 優先度 | P1 |
-| ステータス | 🔲 backlog |
+| ステータス | ✅ done |
 | 依存タスク | L3-3-1a, L1-2-2 |
 | フェーズ | Phase C（個別機能実装） |
 | 参照仕様 | `docs/specs/novel-generator-v2/03_data-model.md` |
@@ -33,9 +33,10 @@ PhaseFilter プロトコルのキャラクター向け具象実装を作成す�
 
 ### クラス定義
 
+**注意**: 下記コード例は設計参考用です。実際の実装は L1 モデル構造（`phases: list[Phase]`）に合わせています。
+
 ```python
-from typing import Optional
-from src.core.models.character import Character
+from src.core.models.character import Character, Phase
 
 class CharacterPhaseFilter:
     """キャラクター向け Phase フィルタ
@@ -55,17 +56,13 @@ class CharacterPhaseFilter:
         """
         self.phase_order = phase_order
 
-    def filter_by_phase(
-        self,
-        character: Character,
-        phase: str,
-    ) -> Character:
+    def filter_by_phase(self, entity: Character, phase: str) -> Character:
         """キャラクターをフェーズでフィルタリング
 
         指定されたフェーズまでの情報のみを含むキャラクターを返す。
 
         Args:
-            character: フィルタ対象のキャラクター
+            entity: フィルタ対象のキャラクター
             phase: 現在のフェーズ
 
         Returns:
@@ -76,105 +73,65 @@ class CharacterPhaseFilter:
         """
         if phase not in self.phase_order:
             raise InvalidPhaseError(
-                f"Unknown phase: {phase}. "
-                f"Available: {self.phase_order}"
+                f"Unknown phase: {phase}. Available: {self.phase_order}"
             )
 
         # 現在フェーズのインデックスを取得
         phase_idx = self.phase_order.index(phase)
         applicable_phases = set(self.phase_order[:phase_idx + 1])
 
-        # キャラクターの詳細をフィルタリング
-        filtered_details = self._filter_details(
-            character.details,
-            applicable_phases
-        )
+        # phases リストをフィルタリング
+        filtered_phases = [p for p in entity.phases if p.name in applicable_phases]
 
-        # 新しいキャラクターインスタンスを生成
+        # 新しいキャラクターインスタンスを生成（他のフィールドは保持）
         return Character(
-            name=character.name,
-            description=character.description,
-            details=filtered_details,
-            visibility_overrides=character.visibility_overrides,
+            type=entity.type,
+            name=entity.name,
+            phases=filtered_phases,
+            current_phase=entity.current_phase,
+            ai_visibility=entity.ai_visibility,
+            sections=entity.sections,
+            created=entity.created,
+            updated=entity.updated,
+            tags=entity.tags,
         )
 
-    def _filter_details(
-        self,
-        details: dict,
-        applicable_phases: set[str],
-    ) -> dict:
-        """詳細情報をフィルタリング
-
-        詳細情報の構造:
-        {
-            "personality": "基本性格...",
-            "phases": {
-                "initial": {"appearance": "村人の服装"},
-                "arc_1_reveal": {"appearance": "高貴な雰囲気"},
-            }
-        }
-        """
-        result = {}
-
-        for key, value in details.items():
-            if key == "phases":
-                # フェーズ依存の情報
-                filtered_phases = {
-                    p: v for p, v in value.items()
-                    if p in applicable_phases
-                }
-                if filtered_phases:
-                    result[key] = filtered_phases
-            else:
-                # 非フェーズ依存の情報はそのまま
-                result[key] = value
-
-        return result
-
-    def get_available_phases(self, character: Character) -> list[str]:
+    def get_available_phases(self, entity: Character) -> list[str]:
         """キャラクターで利用可能なフェーズ一覧
 
         Args:
-            character: 対象キャラクター
+            entity: 対象キャラクター
 
         Returns:
             フェーズ名のリスト（phase_order の順序を保持）
         """
-        if "phases" not in character.details:
-            return []
-
-        char_phases = set(character.details["phases"].keys())
+        char_phases = {p.name for p in entity.phases}
         return [p for p in self.phase_order if p in char_phases]
 
-    def to_context_string(
-        self,
-        character: Character,
-        phase: str,
-    ) -> str:
+    def to_context_string(self, entity: Character, phase: str) -> str:
         """フィルタ済みキャラクターをコンテキスト文字列に変換
 
         Args:
-            character: キャラクター
+            entity: キャラクター
             phase: 現在のフェーズ
 
         Returns:
             Ghost Writer に渡すコンテキスト文字列
         """
-        filtered = self.filter_by_phase(character, phase)
+        filtered = self.filter_by_phase(entity, phase)
 
         lines = [f"# {filtered.name}"]
-        if filtered.description:
-            lines.append(filtered.description)
 
-        for key, value in filtered.details.items():
-            if key == "phases":
-                for p, phase_data in value.items():
-                    lines.append(f"\n## Phase: {p}")
-                    for k, v in phase_data.items():
-                        lines.append(f"- {k}: {v}")
-            else:
-                lines.append(f"\n## {key}")
-                lines.append(str(value))
+        # sections を出力
+        for section_name, content in filtered.sections.items():
+            lines.append(f"\n## {section_name}")
+            lines.append(content)
+
+        # phases を出力
+        if filtered.phases:
+            lines.append("\n## Phases")
+            for p in filtered.phases:
+                lines.append(f"- {p.name}: episodes {p.episodes}")
 
         return "\n".join(lines)
 ```

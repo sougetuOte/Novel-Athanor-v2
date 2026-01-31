@@ -39,9 +39,9 @@ L2（AI情報制御レイヤー）のサービスを統合し、シーン執筆�
 |----|--------|--------|------|-----------|-------------|
 | L3-1-1a | SceneIdentifier データクラス定義 | P1 | - | ✅ | [L3-1-1a](L3-1-1a_scene-identifier.md) |
 | L3-1-1b | シーン→ファイルパス解決ロジック | P1 | L3-1-1a, L1-3-2 | ✅ | [L3-1-1b](L3-1-1b_scene-file-resolver.md) |
-| L3-1-1c | 関連キャラクター特定ロジック | P1 | L3-1-1b | 🔲 | [L3-1-1c](L3-1-1c_character-identifier.md) |
-| L3-1-1d | 関連世界観設定特定ロジック | P1 | L3-1-1b | 🔲 | [L3-1-1d](L3-1-1d_world-setting-identifier.md) |
-| L3-1-1e | シーン→ファイル特定テスト | P1 | L3-1-1c, L3-1-1d | 🔲 | [L3-1-1e](L3-1-1e_scene-resolver-test.md) |
+| L3-1-1c | 関連キャラクター特定ロジック | P1 | L3-1-1b | ✅ | [L3-1-1c](L3-1-1c_character-identifier.md) |
+| L3-1-1d | 関連世界観設定特定ロジック | P1 | L3-1-1b | ✅ | [L3-1-1d](L3-1-1d_world-setting-identifier.md) |
+| L3-1-1e | シーン→ファイル特定テスト | P1 | L3-1-1c, L3-1-1d | ✅ | [L3-1-1e](L3-1-1e_scene-resolver-test.md) |
 
 ### L3-2: Lazy Loader
 
@@ -50,8 +50,8 @@ L2（AI情報制御レイヤー）のサービスを統合し、シーン執筆�
 | L3-2-1a | LazyLoader プロトコル定義 | P1 | - | ✅ | [L3-2-1a](L3-2-1a_lazy-loader-protocol.md) |
 | L3-2-1b | LazyLoadedContent データクラス | P1 | L3-2-1a | ✅ | [L3-2-1b](L3-2-1b_lazy-loaded-content.md) |
 | L3-2-1c | Lazy読み込み実装（キャッシュ機構） | P1 | L3-2-1b | ✅ | [L3-2-1c](L3-2-1c_lazy-loader-impl.md) |
-| L3-2-1d | Graceful Degradation 実装 | P1 | L3-2-1c | 🔲 | [L3-2-1d](L3-2-1d_graceful-degradation.md) |
-| L3-2-1e | LazyLoader テスト | P1 | L3-2-1d | 🔲 | [L3-2-1e](L3-2-1e_lazy-loader-test.md) |
+| L3-2-1d | Graceful Degradation 実装 | P1 | L3-2-1c | ✅ | [L3-2-1d](L3-2-1d_graceful-degradation.md) |
+| L3-2-1e | LazyLoader テスト | P1 | L3-2-1d | ✅ | [L3-2-1e](L3-2-1e_lazy-loader-test.md) |
 
 ### L3-3: Phase Filter
 
@@ -60,7 +60,7 @@ L2（AI情報制御レイヤー）のサービスを統合し、シーン執筆�
 | L3-3-1a | PhaseFilter プロトコル定義 | P1 | - | ✅ | [L3-3-1a](L3-3-1a_phase-filter-protocol.md) |
 | L3-3-1b | キャラクター Phase フィルタ | P1 | L3-3-1a, L1-2-2 | ✅ | [L3-3-1b](L3-3-1b_character-phase-filter.md) |
 | L3-3-1c | WorldSetting Phase フィルタ | P1 | L3-3-1a, L1-2-3 | ✅ | [L3-3-1c](L3-3-1c_world-setting-phase-filter.md) |
-| L3-3-1d | PhaseFilter テスト | P1 | L3-3-1b, L3-3-1c | 🔲 | [L3-3-1d](L3-3-1d_phase-filter-test.md) |
+| L3-3-1d | PhaseFilter テスト | P1 | L3-3-1b, L3-3-1c | ✅ | [L3-3-1d](L3-3-1d_phase-filter-test.md) |
 
 ### L3-4: Context Integrator（コンテキスト統合）
 
@@ -553,3 +553,4 @@ class ContextBuilder:
 | 2026-01-26 | Phase A 実装完了（119テストパス）、全フェーズのタスクドキュメント作成 |
 | 2026-01-26 | Phase B 実装完了（144テストパス）: LazyLoadedContent, ContextIntegrator, InstructionGenerator |
 | 2026-01-26 | Phase C 主要タスク完了（187テストパス）: SceneResolver, FileLazyLoader, CharacterPhaseFilter, WorldSettingPhaseFilter |
+| 2026-01-31 | Phase C 完了（490テストパス）: キャラクター/世界観特定、GracefulLoader、PhaseFilter テスト |

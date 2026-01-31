@@ -1,0 +1,53 @@
+# Reference Pattern Configuration
+# ================================
+# This file configures how characters and world settings are identified
+# from episode content and plot files.
+#
+# Place this file at: vault/_settings/reference_patterns.yaml
+
+# Character reference patterns
+character_patterns:
+  # Wikilink patterns (regex)
+  wikilinks:
+    - pattern: '\[\[characters/([^\]|]+)(?:\|[^\]]+)?\]\]'
+      description: "Full character wikilink [[characters/name]] or [[characters/name|alias]]"
+    - pattern: '\[\[([^\]/|]+)(?:\|[^\]]+)?\]\]'
+      exclude_prefixes: ["world", "_", "episodes"]
+      description: "Short wikilink [[name]] (assumes characters/)"
+
+  # YAML frontmatter patterns (regex)
+  yaml:
+    - pattern: '^characters:\s*\n((?:\s+-\s*.+\n?)+)'
+      description: "YAML characters list in frontmatter"
+
+  # List header keywords (exact match)
+  # Add your own headers here for custom formats
+  list_headers:
+    - "登場人物"
+    - "登場キャラクター"
+    # Examples of custom headers:
+    # - "キャラクター一覧"
+    # - "出演者"
+    # - "Characters"
+
+# World setting reference patterns
+world_patterns:
+  # Wikilink patterns (regex)
+  wikilinks:
+    - pattern: '\[\[world/([^\]|]+)(?:\|[^\]]+)?\]\]'
+      description: "World setting wikilink [[world/name]] or [[world/category/name]]"
+
+  # YAML frontmatter patterns (regex)
+  yaml:
+    - pattern: '^world_settings:\s*\n((?:\s+-\s*.+\n?)+)'
+      description: "YAML world_settings list in frontmatter"
+
+  # List header keywords (exact match)
+  # Add your own headers here for custom formats
+  list_headers:
+    - "関連設定"
+    - "世界観設定"
+    # Examples of custom headers:
+    # - "舞台設定"
+    # - "設定一覧"
+    # - "World Settings"

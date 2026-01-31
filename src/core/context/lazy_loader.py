@@ -359,3 +359,119 @@ class FileLazyLoader:
         for k in expired_keys:
             del self._cache[k]
         return len(expired_keys)
+
+
+# --- Graceful Degradation (L3-2-1d) ---
+
+
+@dataclass
+class GracefulLoadResult:
+    """Result of graceful degradation loading.
+
+    Attributes:
+        success: Overall success (all required contexts loaded).
+        data: Map of loaded data {name: content}.
+        errors: Fatal errors (required context load failures).
+        warnings: Warnings (optional context load failures).
+        missing_required: List of missing required context names.
+        missing_optional: List of missing optional context names.
+    """
+
+    success: bool
+    data: dict[str, str] = field(default_factory=dict)
+    errors: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    missing_required: list[str] = field(default_factory=list)
+    missing_optional: list[str] = field(default_factory=list)
+
+
+class GracefulLoader:
+    """Graceful degradation loader.
+
+    Distinguishes between required and optional contexts,
+    continuing on optional context failures with warnings.
+
+    Example:
+        >>> loader = GracefulLoader(file_lazy_loader)
+        >>> result = loader.load_with_graceful_degradation(
+        ...     required={"character": "characters/アイラ.md"},
+        ...     optional={"reference": "references/magic.md"},
+        ... )
+        >>> if not result.success:
+        ...     raise FatalContextError(result.missing_required)
+    """
+
+    def __init__(self, base_loader: FileLazyLoader) -> None:
+        """Initialize GracefulLoader.
+
+        Args:
+            base_loader: Base LazyLoader implementation.
+        """
+        self.base_loader = base_loader
+
+    def load_with_graceful_degradation(
+        self,
+        required: dict[str, str],
+        optional: dict[str, str],
+    ) -> GracefulLoadResult:
+        """Load contexts with graceful degradation.
+
+        Args:
+            required: Required contexts {name: path}. Failure results in error.
+            optional: Optional contexts {name: path}. Failure results in warning.
+
+        Returns:
+            GracefulLoadResult with loaded data and any errors/warnings.
+        """
+        result = GracefulLoadResult(success=True)
+
+        # Load required contexts
+        for name, path in required.items():
+            load_result = self.base_loader.load(path, LoadPriority.REQUIRED)
+            if load_result.success and load_result.data is not None:
+                result.data[name] = load_result.data
+            else:
+                result.success = False
+                result.errors.append(
+                    f"必須コンテキスト取得失敗: {name} ({path})"
+                )
+                result.missing_required.append(name)
+
+        # Load optional contexts
+        for name, path in optional.items():
+            load_result = self.base_loader.load(path, LoadPriority.OPTIONAL)
+            if load_result.success and load_result.data is not None:
+                result.data[name] = load_result.data
+            else:
+                result.warnings.append(
+                    f"付加的コンテキスト取得失敗（続行）: {name} ({path})"
+                )
+                result.missing_optional.append(name)
+                # Inherit warnings from base loader
+                result.warnings.extend(load_result.warnings)
+
+        return result
+
+    def load_batch(
+        self,
+        items: list[tuple[str, str, LoadPriority]],
+    ) -> GracefulLoadResult:
+        """Load contexts in batch.
+
+        Args:
+            items: List of (name, path, priority) tuples.
+
+        Returns:
+            GracefulLoadResult with loaded data.
+        """
+        required = {
+            name: path
+            for name, path, priority in items
+            if priority == LoadPriority.REQUIRED
+        }
+        optional = {
+            name: path
+            for name, path, priority in items
+            if priority == LoadPriority.OPTIONAL
+        }
+        return self.load_with_graceful_degradation(required, optional)

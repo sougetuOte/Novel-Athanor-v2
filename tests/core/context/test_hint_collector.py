@@ -183,7 +183,8 @@ class TestHintCollectorCollectAll:
         )
         visibility_context.add_hint(
             VisibilityHint(
-                source_section="character.Alice",
+                category="character",
+                entity_id="Alice",
                 hint_text="Alice has a mysterious past",
                 level=AIVisibilityLevel.AWARE,
             )
@@ -233,7 +234,8 @@ class TestHintCollectorCollectAll:
         )
         visibility_context.add_hint(
             VisibilityHint(
-                source_section="character.Alice",
+                category="character",
+                entity_id="Alice",
                 hint_text="Alice hint",
                 level=AIVisibilityLevel.AWARE,
             )

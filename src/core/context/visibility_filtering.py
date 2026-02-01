@@ -117,7 +117,8 @@ class VisibilityFilteringService:
             for hint_text in filter_result.hints:
                 hints.append(
                     VisibilityHint(
-                        source_section=f"character.{name}",
+                        category="character",
+                        entity_id=name,
                         hint_text=hint_text,
                         level=AIVisibilityLevel.AWARE,
                     )
@@ -159,7 +160,8 @@ class VisibilityFilteringService:
             for hint_text in filter_result.hints:
                 hints.append(
                     VisibilityHint(
-                        source_section=f"world_setting.{name}",
+                        category="world_setting",
+                        entity_id=name,
                         hint_text=hint_text,
                         level=AIVisibilityLevel.AWARE,
                     )

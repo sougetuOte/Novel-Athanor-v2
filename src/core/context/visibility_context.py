@@ -22,21 +22,35 @@ class VisibilityHint:
     without revealing the full information.
 
     Attributes:
-        source_section: The section from which this hint originates.
+        category: The category of the source (e.g., "character", "world_setting").
+        entity_id: The entity identifier within the category (e.g., "alice").
         hint_text: The actual hint text to provide to the AI.
         level: The visibility level of the original content.
 
     Examples:
         >>> hint = VisibilityHint(
-        ...     source_section="character.alice.secret",
+        ...     category="character",
+        ...     entity_id="alice",
         ...     hint_text="Alice carries herself with unexpected grace.",
         ...     level=AIVisibilityLevel.AWARE,
         ... )
     """
 
-    source_section: str
+    category: str
+    entity_id: str
     hint_text: str
     level: AIVisibilityLevel
+
+    @property
+    def source_section(self) -> str:
+        """Get source section in 'category.entity_id' format.
+
+        Provided for backward compatibility.
+
+        Returns:
+            Combined source section string.
+        """
+        return f"{self.category}.{self.entity_id}"
 
 
 @dataclass

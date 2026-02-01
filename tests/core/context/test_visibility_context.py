@@ -16,18 +16,22 @@ class TestVisibilityHint:
     def test_create_basic(self):
         """基本的なヒント生成."""
         hint = VisibilityHint(
-            source_section="character.alice.secret",
+            category="character",
+            entity_id="alice.secret",
             hint_text="There seems to be something hidden about Alice.",
             level=AIVisibilityLevel.AWARE,
         )
-        assert hint.source_section == "character.alice.secret"
+        assert hint.category == "character"
+        assert hint.entity_id == "alice.secret"
+        assert hint.source_section == "character.alice.secret"  # backward compat
         assert hint.hint_text == "There seems to be something hidden about Alice."
         assert hint.level == AIVisibilityLevel.AWARE
 
     def test_create_with_know_level(self):
         """KNOW レベルのヒント."""
         hint = VisibilityHint(
-            source_section="world.kingdom.history",
+            category="world",
+            entity_id="kingdom.history",
             hint_text="The kingdom has a complicated history involving royal succession.",
             level=AIVisibilityLevel.KNOW,
         )
@@ -38,7 +42,8 @@ class TestVisibilityHint:
         for level in [AIVisibilityLevel.HIDDEN, AIVisibilityLevel.AWARE,
                       AIVisibilityLevel.KNOW, AIVisibilityLevel.USE]:
             hint = VisibilityHint(
-                source_section="test",
+                category="test",
+                entity_id="item",
                 hint_text="test hint",
                 level=level,
             )
@@ -65,7 +70,8 @@ class TestVisibilityAwareContextCreation:
             scene_id="ep001/seq_01",
         )
         hint = VisibilityHint(
-            source_section="character.bob",
+            category="character",
+            entity_id="bob",
             hint_text="Bob seems nervous.",
             level=AIVisibilityLevel.AWARE,
         )
@@ -89,9 +95,9 @@ class TestVisibilityAwareContextGetHintsByLevel:
     def test_get_hints_by_level_single_match(self):
         """単一レベルのヒント取得."""
         hints = [
-            VisibilityHint("sec1", "hint1", AIVisibilityLevel.AWARE),
-            VisibilityHint("sec2", "hint2", AIVisibilityLevel.KNOW),
-            VisibilityHint("sec3", "hint3", AIVisibilityLevel.AWARE),
+            VisibilityHint(category="section", entity_id="sec1", hint_text="hint1", level=AIVisibilityLevel.AWARE),
+            VisibilityHint(category="section", entity_id="sec2", hint_text="hint2", level=AIVisibilityLevel.KNOW),
+            VisibilityHint(category="section", entity_id="sec3", hint_text="hint3", level=AIVisibilityLevel.AWARE),
         ]
         ctx = VisibilityAwareContext(
             base_context=FilteredContext(),
@@ -104,7 +110,7 @@ class TestVisibilityAwareContextGetHintsByLevel:
     def test_get_hints_by_level_no_match(self):
         """マッチなしの場合は空リスト."""
         hints = [
-            VisibilityHint("sec1", "hint1", AIVisibilityLevel.AWARE),
+            VisibilityHint(category="section", entity_id="sec1", hint_text="hint1", level=AIVisibilityLevel.AWARE),
         ]
         ctx = VisibilityAwareContext(
             base_context=FilteredContext(),
@@ -125,7 +131,7 @@ class TestVisibilityAwareContextHasHints:
 
     def test_has_hints_true(self):
         """ヒントが存在する場合 True."""
-        hint = VisibilityHint("sec1", "hint1", AIVisibilityLevel.AWARE)
+        hint = VisibilityHint(category="section", entity_id="sec1", hint_text="hint1", level=AIVisibilityLevel.AWARE)
         ctx = VisibilityAwareContext(
             base_context=FilteredContext(),
             hints=[hint],
@@ -161,16 +167,16 @@ class TestVisibilityAwareContextAddHint:
     def test_add_hint_to_empty(self):
         """空リストにヒント追加."""
         ctx = VisibilityAwareContext(base_context=FilteredContext())
-        hint = VisibilityHint("sec1", "hint1", AIVisibilityLevel.AWARE)
+        hint = VisibilityHint(category="section", entity_id="sec1", hint_text="hint1", level=AIVisibilityLevel.AWARE)
         ctx.add_hint(hint)
         assert len(ctx.hints) == 1
-        assert ctx.hints[0].source_section == "sec1"
+        assert ctx.hints[0].source_section == "section.sec1"
 
     def test_add_multiple_hints(self):
         """複数ヒント追加."""
         ctx = VisibilityAwareContext(base_context=FilteredContext())
-        ctx.add_hint(VisibilityHint("sec1", "hint1", AIVisibilityLevel.AWARE))
-        ctx.add_hint(VisibilityHint("sec2", "hint2", AIVisibilityLevel.KNOW))
+        ctx.add_hint(VisibilityHint(category="section", entity_id="sec1", hint_text="hint1", level=AIVisibilityLevel.AWARE))
+        ctx.add_hint(VisibilityHint(category="section", entity_id="sec2", hint_text="hint2", level=AIVisibilityLevel.KNOW))
         assert len(ctx.hints) == 2
 
 
@@ -262,8 +268,8 @@ class TestVisibilityAwareContextToGhostWriterContext:
         ctx = VisibilityAwareContext(
             base_context=base,
             hints=[
-                VisibilityHint("sec1", "Hint about secret", AIVisibilityLevel.AWARE),
-                VisibilityHint("sec2", "Another hint", AIVisibilityLevel.KNOW),
+                VisibilityHint(category="section", entity_id="sec1", hint_text="Hint about secret", level=AIVisibilityLevel.AWARE),
+                VisibilityHint(category="section", entity_id="sec2", hint_text="Another hint", level=AIVisibilityLevel.KNOW),
             ],
         )
         result = ctx.to_ghost_writer_context()
@@ -330,12 +336,14 @@ class TestVisibilityAwareContextIntegration:
 
         # 3. ヒント追加
         ctx.add_hint(VisibilityHint(
-            source_section="character.alice.royal_blood",
+            category="character",
+            entity_id="alice.royal_blood",
             hint_text="Alice carries herself with unexpected grace.",
             level=AIVisibilityLevel.AWARE,
         ))
         ctx.add_hint(VisibilityHint(
-            source_section="world.kingdom.succession",
+            category="world",
+            entity_id="kingdom.succession",
             hint_text="The kingdom's succession rules are complex.",
             level=AIVisibilityLevel.KNOW,
         ))

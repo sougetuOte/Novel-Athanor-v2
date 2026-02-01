@@ -173,17 +173,12 @@ class HintCollector:
         collected: list[CollectedHint] = []
 
         for hint in context.hints:
-            # Parse category and entity from source_section
-            # Format: "category.entity_id" (e.g., "character.Alice")
-            parts = hint.source_section.split(".", 1)
-            category = parts[0] if parts else "unknown"
-            entity_id = parts[1] if len(parts) > 1 else hint.source_section
-
+            # Use structured fields directly (category and entity_id)
             collected.append(
                 CollectedHint(
                     source=HintSource.VISIBILITY,
-                    category=category,
-                    entity_id=entity_id,
+                    category=hint.category,
+                    entity_id=hint.entity_id,
                     hint_text=hint.hint_text,
                     strength=0.5,  # Default strength for visibility hints
                 )

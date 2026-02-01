@@ -68,12 +68,12 @@ L2（AI情報制御レイヤー）のサービスを統合し、シーン執筆�
 |----|--------|--------|------|-----------|-------------|
 | L3-4-1a | FilteredContext データクラス定義 | P1 | - | ✅ | [L3-4-1a](L3-4-1a_filtered-context.md) |
 | L3-4-1b | ContextIntegrator プロトコル定義 | P1 | L3-4-1a | ✅ | [L3-4-1b](L3-4-1b_context-integrator-protocol.md) |
-| L3-4-2a | Plot コンテキスト収集 | P1 | L3-4-1b, L1-2-4 | 🔲 | [L3-4-2a](L3-4-2a_plot-collector.md) |
-| L3-4-2b | Summary コンテキスト収集 | P1 | L3-4-1b, L1-2-5 | 🔲 | [L3-4-2b](L3-4-2b_summary-collector.md) |
-| L3-4-2c | Character コンテキスト収集（Phaseフィルタ適用） | P1 | L3-4-1b, L3-3-1b | 🔲 | [L3-4-2c](L3-4-2c_character-collector.md) |
-| L3-4-2d | WorldSetting コンテキスト収集（Phaseフィルタ適用） | P1 | L3-4-1b, L3-3-1c | 🔲 | [L3-4-2d](L3-4-2d_world-setting-collector.md) |
-| L3-4-2e | StyleGuide コンテキスト収集 | P1 | L3-4-1b, L1-2-9 | 🔲 | [L3-4-2e](L3-4-2e_style-guide-collector.md) |
-| L3-4-3a | ContextIntegrator 統合テスト | P1 | L3-4-2a〜L3-4-2e | 🔲 | [L3-4-3a](L3-4-3a_context-integrator-test.md) |
+| L3-4-2a | Plot コンテキスト収集 | P1 | L3-4-1b, L1-2-4 | ✅ | [L3-4-2a](L3-4-2a_plot-collector.md) |
+| L3-4-2b | Summary コンテキスト収集 | P1 | L3-4-1b, L1-2-5 | ✅ | [L3-4-2b](L3-4-2b_summary-collector.md) |
+| L3-4-2c | Character コンテキスト収集（Phaseフィルタ適用） | P1 | L3-4-1b, L3-3-1b | ✅ | [L3-4-2c](L3-4-2c_character-collector.md) |
+| L3-4-2d | WorldSetting コンテキスト収集（Phaseフィルタ適用） | P1 | L3-4-1b, L3-3-1c | ✅ | [L3-4-2d](L3-4-2d_world-setting-collector.md) |
+| L3-4-2e | StyleGuide コンテキスト収集 | P1 | L3-4-1b, L1-2-9 | ✅ | [L3-4-2e](L3-4-2e_style-guide-collector.md) |
+| L3-4-3a | ContextIntegrator 統合テスト | P1 | L3-4-2a〜L3-4-2e | 📋 | [L3-4-3a](L3-4-3a_context-integrator-test.md) |
 
 ### L3-5: 伏線指示書生成
 
@@ -554,3 +554,4 @@ class ContextBuilder:
 | 2026-01-26 | Phase B 実装完了（144テストパス）: LazyLoadedContent, ContextIntegrator, InstructionGenerator |
 | 2026-01-26 | Phase C 主要タスク完了（187テストパス）: SceneResolver, FileLazyLoader, CharacterPhaseFilter, WorldSettingPhaseFilter |
 | 2026-01-31 | Phase C 完了（490テストパス）: キャラクター/世界観特定、GracefulLoader、PhaseFilter テスト |
+| 2026-02-01 | Phase D Collectors 完了（565テストパス）: Plot/Summary/Character/WorldSetting/StyleGuide Collector |

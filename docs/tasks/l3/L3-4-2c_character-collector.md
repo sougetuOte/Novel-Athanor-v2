@@ -6,7 +6,8 @@
 |------|-----|
 | ID | L3-4-2c |
 | 優先度 | P1 |
-| ステータス | 🔲 backlog |
+| ステータス | ✅ done |
+| 完了日 | 2026-02-01 |
 | 依存タスク | L3-4-1b, L3-3-1b |
 | フェーズ | Phase D（コンテキスト収集） |
 | 参照仕様 | `docs/specs/novel-generator-v2/03_data-model.md` |
@@ -18,12 +19,12 @@
 
 ## 受け入れ条件
 
-- [ ] `CharacterCollector` クラスが実装されている
-- [ ] シーンに関連するキャラクターを特定できる
-- [ ] CharacterPhaseFilter でフィルタリングできる
-- [ ] 複数キャラクターを収集できる
-- [ ] ContextCollector プロトコルに準拠
-- [ ] ユニットテストが存在する
+- [x] `CharacterCollector` クラスが実装されている
+- [x] シーンに関連するキャラクターを特定できる
+- [x] CharacterPhaseFilter でフィルタリングできる
+- [x] 複数キャラクターを収集できる
+- [x] ContextCollector プロトコルに準拠
+- [x] ユニットテストが存在する (12 tests, 100% pass)
 
 ## 技術的詳細
 
@@ -207,3 +208,4 @@ class CharacterCollector:
 | 日付 | 変更内容 |
 |------|---------|
 | 2026-01-26 | 初版作成 |
+| 2026-02-01 | 実装完了（TDD: Red → Green → Refactor、12 tests pass、mypy clean） |

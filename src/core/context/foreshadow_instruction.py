@@ -164,3 +164,17 @@ class ForeshadowInstructions:
         for inst in self.instructions:
             counts[inst.action] = counts.get(inst.action, 0) + 1
         return counts
+
+    def get_for_foreshadowing(self, foreshadowing_id: str) -> ForeshadowInstruction | None:
+        """Get instruction for a specific foreshadowing element.
+
+        Args:
+            foreshadowing_id: The ID of the foreshadowing element.
+
+        Returns:
+            The instruction for this foreshadowing, or None if not found.
+        """
+        for inst in self.instructions:
+            if inst.foreshadowing_id == foreshadowing_id:
+                return inst
+        return None

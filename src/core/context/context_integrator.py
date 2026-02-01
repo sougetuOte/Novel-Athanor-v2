@@ -7,8 +7,10 @@ various context elements (plot, summary, characters, etc.).
 from pathlib import Path
 from typing import Any, Protocol
 
+from .collectors.character_collector import CharacterContext
 from .collectors.plot_collector import PlotContext
 from .collectors.summary_collector import SummaryContext
+from .collectors.world_setting_collector import WorldSettingContext
 from .filtered_context import FilteredContext
 from .scene_identifier import SceneIdentifier
 
@@ -142,16 +144,11 @@ class ContextIntegratorImpl:
 
         # Collect character context
         if character_collector is not None:
-            result = character_collector.collect_as_string(scene)
-            if result:
-                # Parse character context - for now, store as single entry
-                ctx.characters["_all"] = result
+            self._integrate_character(ctx, character_collector, scene)
 
         # Collect world setting context
         if world_collector is not None:
-            result = world_collector.collect_as_string(scene)
-            if result:
-                ctx.world_settings["_all"] = result
+            self._integrate_world_setting(ctx, world_collector, scene)
 
         # Collect style guide context
         if style_collector is not None:
@@ -212,6 +209,64 @@ class ContextIntegratorImpl:
         content = collector.collect_as_string(scene)
         if content:
             ctx.summary_l1 = content
+
+    def _integrate_character(
+        self,
+        ctx: FilteredContext,
+        collector: ContextCollector,
+        scene: SceneIdentifier,
+    ) -> None:
+        """Integrate character context into FilteredContext.
+
+        Args:
+            ctx: The FilteredContext to update.
+            collector: The character collector.
+            scene: The scene identifier.
+        """
+        # Check if collector has collect method returning CharacterContext
+        if hasattr(collector, "collect") and callable(collector.collect):
+            result = collector.collect(scene)
+            if isinstance(result, CharacterContext):
+                # Store each character with its own key
+                for char_name, char_content in result.characters.items():
+                    ctx.characters[char_name] = char_content
+                # Collect warnings
+                ctx.warnings.extend(result.warnings)
+                return
+
+        # Fallback to collect_as_string
+        fallback_content = collector.collect_as_string(scene)
+        if fallback_content is not None:
+            ctx.characters["_all"] = fallback_content
+
+    def _integrate_world_setting(
+        self,
+        ctx: FilteredContext,
+        collector: ContextCollector,
+        scene: SceneIdentifier,
+    ) -> None:
+        """Integrate world setting context into FilteredContext.
+
+        Args:
+            ctx: The FilteredContext to update.
+            collector: The world setting collector.
+            scene: The scene identifier.
+        """
+        # Check if collector has collect method returning WorldSettingContext
+        if hasattr(collector, "collect") and callable(collector.collect):
+            result = collector.collect(scene)
+            if isinstance(result, WorldSettingContext):
+                # Store each setting with its own key
+                for setting_name, setting_content in result.settings.items():
+                    ctx.world_settings[setting_name] = setting_content
+                # Collect warnings
+                ctx.warnings.extend(result.warnings)
+                return
+
+        # Fallback to collect_as_string
+        fallback_content = collector.collect_as_string(scene)
+        if fallback_content is not None:
+            ctx.world_settings["_all"] = fallback_content
 
     def integrate_with_warnings(
         self,

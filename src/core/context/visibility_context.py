@@ -72,6 +72,9 @@ class VisibilityAwareContext:
     excluded_sections: list[str] = field(default_factory=list)
     current_visibility_level: AIVisibilityLevel = AIVisibilityLevel.USE
     forbidden_keywords: list[str] = field(default_factory=list)
+    # Filtered content (after visibility processing)
+    filtered_characters: dict[str, str] = field(default_factory=dict)
+    filtered_world_settings: dict[str, str] = field(default_factory=dict)
 
     def get_hints_by_level(self, level: AIVisibilityLevel) -> list[VisibilityHint]:
         """Get hints filtered by visibility level.

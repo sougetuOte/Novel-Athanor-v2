@@ -339,3 +339,288 @@ class TestInstructionGeneratorProtocol:
         keywords = generator.collect_forbidden_keywords(instructions)
         # Should be deduplicated and sorted
         assert keywords == ["blood", "princess", "royal"]
+
+
+# --- Tests for InstructionGeneratorImpl ---
+
+from datetime import date
+from pathlib import Path
+
+import pytest
+
+from src.core.models.foreshadowing import (
+    Foreshadowing,
+    ForeshadowingAIVisibility,
+    ForeshadowingPayoff,
+    ForeshadowingSeed,
+    ForeshadowingStatus,
+    ForeshadowingType,
+    RelatedElements,
+    TimelineEntry,
+    TimelineInfo,
+)
+from src.core.repositories.foreshadowing import ForeshadowingRepository
+
+
+@pytest.fixture
+def tmp_vault(tmp_path: Path) -> Path:
+    """Create a temporary vault structure."""
+    vault = tmp_path / "vault"
+    (vault / "test_work" / "_foreshadowing").mkdir(parents=True)
+    return vault
+
+
+@pytest.fixture
+def repository(tmp_vault: Path) -> ForeshadowingRepository:
+    """Create a foreshadowing repository."""
+    return ForeshadowingRepository(tmp_vault, "test_work")
+
+
+def create_foreshadowing(
+    fs_id: str,
+    status: ForeshadowingStatus,
+    plant_episode: str | None = None,
+    reinforce_episodes: list[str] | None = None,
+    forbidden_keywords: list[str] | None = None,
+    allowed_expressions: list[str] | None = None,
+    subtlety: int = 5,
+) -> Foreshadowing:
+    """Helper to create foreshadowing."""
+    timeline_events = []
+
+    if plant_episode:
+        timeline_events.append(
+            TimelineEntry(
+                episode=plant_episode,
+                type=ForeshadowingStatus.PLANTED,
+                date=date.today(),
+                expression="planted expression",
+                subtlety=subtlety,
+            )
+        )
+
+    if reinforce_episodes:
+        for ep in reinforce_episodes:
+            timeline_events.append(
+                TimelineEntry(
+                    episode=ep,
+                    type=ForeshadowingStatus.REINFORCED,
+                    date=date.today(),
+                    expression="reinforced expression",
+                    subtlety=subtlety + 1,
+                )
+            )
+
+    return Foreshadowing(
+        id=fs_id,
+        title=f"Foreshadowing {fs_id}",
+        fs_type=ForeshadowingType.PLOT_TWIST,
+        status=status,
+        subtlety_level=subtlety,
+        ai_visibility=ForeshadowingAIVisibility(
+            level=2,
+            forbidden_keywords=forbidden_keywords or [],
+            allowed_expressions=allowed_expressions or [],
+        ),
+        seed=ForeshadowingSeed(content="seed content"),
+        payoff=None,
+        timeline=TimelineInfo(
+            registered_at=date.today(),
+            events=timeline_events,
+        ),
+        related=RelatedElements(),
+    )
+
+
+class TestInstructionGeneratorImplImport:
+    """Test InstructionGeneratorImpl can be imported."""
+
+    def test_import(self):
+        """InstructionGeneratorImpl can be imported."""
+        from src.core.context.instruction_generator import InstructionGeneratorImpl
+
+        assert InstructionGeneratorImpl is not None
+
+
+class TestInstructionGeneratorImplGenerate:
+    """Tests for generate() method."""
+
+    def test_generate_empty_repository(self, repository: ForeshadowingRepository):
+        """Generate returns empty instructions for empty repository."""
+        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
+        from src.core.context.instruction_generator import InstructionGeneratorImpl
+
+        identifier = ForeshadowingIdentifier(repository)
+        generator = InstructionGeneratorImpl(repository, identifier)
+
+        scene = SceneIdentifier(episode_id="010")
+        result = generator.generate(scene)
+
+        assert isinstance(result, ForeshadowInstructions)
+        assert len(result.instructions) == 0
+
+    def test_generate_plant_instruction(self, repository: ForeshadowingRepository):
+        """Generate PLANT instruction."""
+        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
+        from src.core.context.instruction_generator import InstructionGeneratorImpl
+
+        fs = create_foreshadowing(
+            fs_id="FS-010-secret",
+            status=ForeshadowingStatus.REGISTERED,
+            forbidden_keywords=["truth", "reveal"],
+            allowed_expressions=["mysterious", "shadow"],
+        )
+        repository.create(fs)
+
+        identifier = ForeshadowingIdentifier(repository)
+        generator = InstructionGeneratorImpl(repository, identifier)
+
+        scene = SceneIdentifier(episode_id="010")
+        result = generator.generate(scene)
+
+        assert len(result.instructions) == 1
+        inst = result.instructions[0]
+        assert inst.foreshadowing_id == "FS-010-secret"
+        assert inst.action == InstructionAction.PLANT
+        assert "truth" in inst.forbidden_expressions
+        assert "mysterious" in inst.allowed_expressions
+
+    def test_generate_reinforce_instruction(self, repository: ForeshadowingRepository):
+        """Generate REINFORCE instruction."""
+        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
+        from src.core.context.instruction_generator import InstructionGeneratorImpl
+
+        fs = create_foreshadowing(
+            fs_id="FS-005-mystery",
+            status=ForeshadowingStatus.PLANTED,
+            plant_episode="005",
+            reinforce_episodes=["010", "015"],
+        )
+        repository.create(fs)
+
+        identifier = ForeshadowingIdentifier(repository)
+        generator = InstructionGeneratorImpl(repository, identifier)
+
+        scene = SceneIdentifier(episode_id="010")
+        result = generator.generate(scene)
+
+        assert len(result.instructions) == 1
+        inst = result.instructions[0]
+        assert inst.action == InstructionAction.REINFORCE
+
+    def test_generate_multiple_instructions(self, repository: ForeshadowingRepository):
+        """Generate multiple instructions."""
+        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
+        from src.core.context.instruction_generator import InstructionGeneratorImpl
+
+        # One for planting
+        fs1 = create_foreshadowing(
+            fs_id="FS-010-secret",
+            status=ForeshadowingStatus.REGISTERED,
+        )
+        repository.create(fs1)
+
+        # One for reinforcing
+        fs2 = create_foreshadowing(
+            fs_id="FS-005-mystery",
+            status=ForeshadowingStatus.PLANTED,
+            plant_episode="005",
+            reinforce_episodes=["010"],
+        )
+        repository.create(fs2)
+
+        identifier = ForeshadowingIdentifier(repository)
+        generator = InstructionGeneratorImpl(repository, identifier)
+
+        scene = SceneIdentifier(episode_id="010")
+        result = generator.generate(scene)
+
+        assert len(result.instructions) == 2
+        actions = {inst.action for inst in result.instructions}
+        assert InstructionAction.PLANT in actions
+        assert InstructionAction.REINFORCE in actions
+
+
+class TestInstructionGeneratorImplSubtlety:
+    """Tests for subtlety_target calculation."""
+
+    def test_plant_subtlety(self, repository: ForeshadowingRepository):
+        """PLANT gets lower subtlety (more obvious)."""
+        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
+        from src.core.context.instruction_generator import InstructionGeneratorImpl
+
+        fs = create_foreshadowing(
+            fs_id="FS-010-secret",
+            status=ForeshadowingStatus.REGISTERED,
+            subtlety=5,
+        )
+        repository.create(fs)
+
+        identifier = ForeshadowingIdentifier(repository)
+        generator = InstructionGeneratorImpl(repository, identifier)
+
+        scene = SceneIdentifier(episode_id="010")
+        result = generator.generate(scene)
+
+        inst = result.instructions[0]
+        # PLANT subtlety should be around 4 (more obvious)
+        assert 1 <= inst.subtlety_target <= 6
+
+    def test_hint_subtlety(self, repository: ForeshadowingRepository):
+        """HINT gets higher subtlety (more subtle)."""
+        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
+        from src.core.context.instruction_generator import InstructionGeneratorImpl
+
+        fs = create_foreshadowing(
+            fs_id="FS-005-secret",
+            status=ForeshadowingStatus.PLANTED,
+            plant_episode="005",
+        )
+        repository.create(fs)
+
+        identifier = ForeshadowingIdentifier(repository)
+        generator = InstructionGeneratorImpl(repository, identifier)
+
+        scene = SceneIdentifier(episode_id="010")
+        result = generator.generate(scene, appearing_characters=["Hero"])
+
+        # Should not have HINT without related characters
+        hint_insts = [i for i in result.instructions if i.action == InstructionAction.HINT]
+        # HINT subtlety should be around 8 (more subtle)
+        for inst in hint_insts:
+            assert inst.subtlety_target >= 6
+
+
+class TestInstructionGeneratorImplForbiddenKeywords:
+    """Tests for forbidden keywords collection."""
+
+    def test_collect_from_instructions(self, repository: ForeshadowingRepository):
+        """Collect forbidden keywords from all instructions."""
+        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
+        from src.core.context.instruction_generator import InstructionGeneratorImpl
+
+        fs1 = create_foreshadowing(
+            fs_id="FS-010-secret1",
+            status=ForeshadowingStatus.REGISTERED,
+            forbidden_keywords=["truth", "reveal"],
+        )
+        fs2 = create_foreshadowing(
+            fs_id="FS-010-secret2",
+            status=ForeshadowingStatus.REGISTERED,
+            forbidden_keywords=["mystery", "truth"],  # "truth" duplicated
+        )
+        repository.create(fs1)
+        repository.create(fs2)
+
+        identifier = ForeshadowingIdentifier(repository)
+        generator = InstructionGeneratorImpl(repository, identifier)
+
+        scene = SceneIdentifier(episode_id="010")
+        result = generator.generate(scene)
+
+        keywords = generator.collect_forbidden_keywords(result)
+        # Should be deduplicated
+        assert "truth" in keywords
+        assert "reveal" in keywords
+        assert "mystery" in keywords
+        assert len([k for k in keywords if k == "truth"]) == 1  # No duplicates

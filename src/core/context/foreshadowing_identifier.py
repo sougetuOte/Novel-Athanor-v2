@@ -110,7 +110,7 @@ class ForeshadowingIdentifier:
         if appearing_characters:
             for fs in all_foreshadowings:
                 if fs.id not in already_identified_ids and self._should_hint(
-                    fs, scene, appearing_characters
+                    fs, appearing_characters
                 ):
                     results.append(
                         IdentifiedForeshadowing(
@@ -169,32 +169,29 @@ class ForeshadowingIdentifier:
             True if this foreshadowing should be reinforced.
         """
         # Only planted or reinforced can be reinforced further
-        if fs.status not in (
-            ForeshadowingStatus.PLANTED,
-            ForeshadowingStatus.REINFORCED,
-        ):
+        reinforceable_statuses = (ForeshadowingStatus.PLANTED, ForeshadowingStatus.REINFORCED)
+        if fs.status not in reinforceable_statuses:
             return False
 
         # Check timeline for reinforce events matching this episode
-        if fs.timeline and fs.timeline.events:
-            for event in fs.timeline.events:
-                if event.type == ForeshadowingStatus.REINFORCED:
-                    if self._episode_matches(event.episode, scene.episode_id):
-                        return True
+        if not fs.timeline or not fs.timeline.events:
+            return False
 
-        return False
+        return any(
+            event.type == ForeshadowingStatus.REINFORCED
+            and self._episode_matches(event.episode, scene.episode_id)
+            for event in fs.timeline.events
+        )
 
     def _should_hint(
         self,
         fs: Foreshadowing,
-        scene: SceneIdentifier,
         appearing_characters: list[str],
     ) -> bool:
         """Check if a hint should be given for this foreshadowing.
 
         Args:
             fs: Foreshadowing to check.
-            scene: Scene identifier.
             appearing_characters: Characters appearing in the scene.
 
         Returns:
@@ -206,9 +203,8 @@ class ForeshadowingIdentifier:
 
         # Check if any related character appears
         if fs.related and fs.related.characters:
-            for char in fs.related.characters:
-                if char in appearing_characters:
-                    return True
+            related_chars = set(fs.related.characters)
+            return bool(related_chars & set(appearing_characters))
 
         return False
 
@@ -241,9 +237,7 @@ class ForeshadowingIdentifier:
             Episode string, or None if not found.
         """
         match = self._ID_PATTERN.match(fs_id)
-        if match:
-            return match.group(1)
-        return None
+        return match.group(1) if match else None
 
     def _episode_matches(self, ep1: str, ep2: str) -> bool:
         """Check if two episode identifiers match.

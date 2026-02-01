@@ -29,13 +29,13 @@ class InstructionGenerator(Protocol):
     def generate(
         self,
         scene: SceneIdentifier,
-        foreshadowings: list[dict[str, Any]],
+        appearing_characters: list[str] | None = None,
     ) -> ForeshadowInstructions:
         """Generate foreshadowing instructions for a scene.
 
         Args:
             scene: The scene identifier.
-            foreshadowings: List of foreshadowing data from L2 ForeshadowingManager.
+            appearing_characters: Characters appearing in the scene (for HINT detection).
 
         Returns:
             Generated ForeshadowInstructions.
@@ -94,6 +94,22 @@ class InstructionGeneratorImpl:
         identifier: Foreshadowing identifier for scene analysis.
     """
 
+    # Instruction notes by action type
+    _ACTION_NOTES: dict[InstructionAction, str] = {
+        InstructionAction.PLANT: "伏線の初回設置。",
+        InstructionAction.REINFORCE: "伏線の強化。控えめに想起させてください。",
+        InstructionAction.HINT: "非常に控えめなヒントのみ。気づかなくても問題ない程度に。",
+        InstructionAction.NONE: "この伏線には今回触れないでください。",
+    }
+
+    # Base subtlety values by action type
+    _BASE_SUBTLETY: dict[InstructionAction, int] = {
+        InstructionAction.PLANT: 4,
+        InstructionAction.REINFORCE: 6,
+        InstructionAction.HINT: 8,
+        InstructionAction.NONE: 10,
+    }
+
     def __init__(
         self,
         repository: ForeshadowingRepository,
@@ -130,116 +146,45 @@ class InstructionGeneratorImpl:
         # Generate instruction for each identified element
         for item in identified:
             instruction = self._generate_instruction(item)
-            instructions.add_instruction(instruction)
+            if instruction is not None:
+                instructions.add_instruction(instruction)
 
         return instructions
 
     def _generate_instruction(
         self,
         identified: IdentifiedForeshadowing,
-    ) -> ForeshadowInstruction:
+    ) -> ForeshadowInstruction | None:
         """Generate a single instruction from identified foreshadowing.
 
         Args:
             identified: Identified foreshadowing element.
 
         Returns:
-            Generated instruction.
+            Generated instruction, or None if foreshadowing not found.
         """
-        # Get full foreshadowing data
-        fs = self.repository.read(identified.foreshadowing_id)
+        try:
+            fs = self.repository.read(identified.foreshadowing_id)
+        except (KeyError, FileNotFoundError):
+            # Foreshadowing was identified but no longer exists in repository
+            return None
+        action = identified.suggested_action
 
-        # Generate instruction based on action
-        if identified.suggested_action == InstructionAction.PLANT:
-            return self._generate_plant_instruction(fs)
-        elif identified.suggested_action == InstructionAction.REINFORCE:
-            return self._generate_reinforce_instruction(fs)
-        elif identified.suggested_action == InstructionAction.HINT:
-            return self._generate_hint_instruction(fs)
-        else:
-            return self._generate_none_instruction(fs)
+        # Build note (PLANT may include seed description)
+        note = self._ACTION_NOTES[action]
+        if action == InstructionAction.PLANT and fs.seed and fs.seed.description:
+            note = f"{note} {fs.seed.description}"
 
-    def _generate_plant_instruction(self, fs: Foreshadowing) -> ForeshadowInstruction:
-        """Generate PLANT instruction.
-
-        For first-time placement, use clearer descriptions.
-
-        Args:
-            fs: Foreshadowing data.
-
-        Returns:
-            PLANT instruction.
-        """
-        note = "伏線の初回設置。"
-        if fs.seed and fs.seed.description:
-            note += f" {fs.seed.description}"
+        # NONE action doesn't use allowed_expressions
+        allowed = [] if action == InstructionAction.NONE else list(fs.ai_visibility.allowed_expressions)
 
         return ForeshadowInstruction(
             foreshadowing_id=fs.id,
-            action=InstructionAction.PLANT,
-            allowed_expressions=list(fs.ai_visibility.allowed_expressions),
+            action=action,
+            allowed_expressions=allowed,
             forbidden_expressions=list(fs.ai_visibility.forbidden_keywords),
             note=note,
-            subtlety_target=self._calculate_subtlety(fs, InstructionAction.PLANT),
-        )
-
-    def _generate_reinforce_instruction(self, fs: Foreshadowing) -> ForeshadowInstruction:
-        """Generate REINFORCE instruction.
-
-        For reinforcement, be more subtle than planting.
-
-        Args:
-            fs: Foreshadowing data.
-
-        Returns:
-            REINFORCE instruction.
-        """
-        return ForeshadowInstruction(
-            foreshadowing_id=fs.id,
-            action=InstructionAction.REINFORCE,
-            allowed_expressions=list(fs.ai_visibility.allowed_expressions),
-            forbidden_expressions=list(fs.ai_visibility.forbidden_keywords),
-            note="伏線の強化。控えめに想起させてください。",
-            subtlety_target=self._calculate_subtlety(fs, InstructionAction.REINFORCE),
-        )
-
-    def _generate_hint_instruction(self, fs: Foreshadowing) -> ForeshadowInstruction:
-        """Generate HINT instruction.
-
-        For hints, be very subtle.
-
-        Args:
-            fs: Foreshadowing data.
-
-        Returns:
-            HINT instruction.
-        """
-        return ForeshadowInstruction(
-            foreshadowing_id=fs.id,
-            action=InstructionAction.HINT,
-            allowed_expressions=list(fs.ai_visibility.allowed_expressions),
-            forbidden_expressions=list(fs.ai_visibility.forbidden_keywords),
-            note="非常に控えめなヒントのみ。気づかなくても問題ない程度に。",
-            subtlety_target=self._calculate_subtlety(fs, InstructionAction.HINT),
-        )
-
-    def _generate_none_instruction(self, fs: Foreshadowing) -> ForeshadowInstruction:
-        """Generate NONE instruction.
-
-        For revealed or otherwise inactive foreshadowing.
-
-        Args:
-            fs: Foreshadowing data.
-
-        Returns:
-            NONE instruction.
-        """
-        return ForeshadowInstruction(
-            foreshadowing_id=fs.id,
-            action=InstructionAction.NONE,
-            forbidden_expressions=list(fs.ai_visibility.forbidden_keywords),
-            note="この伏線には今回触れないでください。",
-            subtlety_target=10,
+            subtlety_target=self._calculate_subtlety(fs, action),
         )
 
     def _calculate_subtlety(
@@ -256,24 +201,17 @@ class InstructionGeneratorImpl:
         Returns:
             Subtlety target (1-10).
         """
-        # Base values by action type
-        base_subtlety = {
-            InstructionAction.PLANT: 4,
-            InstructionAction.REINFORCE: 6,
-            InstructionAction.HINT: 8,
-            InstructionAction.NONE: 10,
-        }
-
-        subtlety = base_subtlety.get(action, 5)
+        base = self._BASE_SUBTLETY.get(action, 5)
 
         # Adjust based on foreshadowing's own subtlety_level
-        # If foreshadowing is meant to be more subtle, increase target
         if fs.subtlety_level >= 7:
-            subtlety = min(10, subtlety + 2)
+            adjustment = 2
         elif fs.subtlety_level <= 3:
-            subtlety = max(1, subtlety - 2)
+            adjustment = -2
+        else:
+            adjustment = 0
 
-        return subtlety
+        return max(1, min(10, base + adjustment))
 
     def determine_action(
         self,
@@ -282,19 +220,47 @@ class InstructionGeneratorImpl:
     ) -> InstructionAction:
         """Determine action for a foreshadowing element (Protocol method).
 
+        This method determines the action for a single foreshadowing element
+        by reading it from the repository and checking its status and timeline
+        against the scene.
+
         Args:
-            foreshadowing: Foreshadowing data as dict.
+            foreshadowing: Foreshadowing data as dict (must have 'id' key).
             scene: Scene identifier.
 
         Returns:
             Determined action.
         """
-        # Use identifier to find action
-        identified = self.identifier.identify(scene)
+        fs_id = foreshadowing.get("id")
+        if not fs_id:
+            return InstructionAction.NONE
 
-        for item in identified:
-            if item.foreshadowing_id == foreshadowing.get("id"):
-                return item.suggested_action
+        try:
+            fs = self.repository.read(fs_id)
+        except (KeyError, FileNotFoundError):
+            return InstructionAction.NONE
+
+        # Check status and determine action directly
+        from src.core.models.foreshadowing import ForeshadowingStatus
+
+        # REGISTERED -> check if this is plant episode
+        if fs.status == ForeshadowingStatus.REGISTERED:
+            plant_episode = self.identifier._extract_episode_from_id(fs_id)
+            if plant_episode and self.identifier._episode_matches(plant_episode, scene.episode_id):
+                return InstructionAction.PLANT
+
+        # PLANTED/REINFORCED -> check for reinforce timeline
+        if fs.status in (ForeshadowingStatus.PLANTED, ForeshadowingStatus.REINFORCED):
+            if fs.timeline and fs.timeline.events:
+                for event in fs.timeline.events:
+                    if event.type == ForeshadowingStatus.REINFORCED:
+                        if self.identifier._episode_matches(event.episode, scene.episode_id):
+                            return InstructionAction.REINFORCE
+
+        # Check if reveal episode
+        if fs.payoff and fs.payoff.planned_episode:
+            if self.identifier._episode_matches(fs.payoff.planned_episode, scene.episode_id):
+                return InstructionAction.REINFORCE
 
         return InstructionAction.NONE
 

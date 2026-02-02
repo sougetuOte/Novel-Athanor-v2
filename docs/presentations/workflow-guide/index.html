@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>執筆ワークフローガイド - Novel-Athanor-v2</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div class="presentation">
+
+    <!-- Slide 1: Title -->
+    <section class="slide slide-title active" data-slide="1">
+      <h1>執筆ワークフローガイド</h1>
+      <p class="subtitle">Novel-Athanor-v2</p>
+      <p class="tagline">AIと協力して物語を紡ぐ</p>
+    </section>
+
+    <!-- Slide 2: Concept -->
+    <section class="slide" data-slide="2">
+      <h2>AIとの協調的創作とは</h2>
+
+      <div class="concept-box">
+        <h3>完全自動ではない、あなたが主役の創作</h3>
+        <p class="lead">AIは「優秀なアシスタント」として、あなたの創造性をサポートします</p>
+      </div>
+
+      <div class="content-grid">
+        <div class="card">
+          <h3>あなたの役割</h3>
+          <ul>
+            <li>物語の方向性を決める</li>
+            <li>キャラクターに命を吹き込む</li>
+            <li>伏線のアイデアを出す</li>
+            <li>最終的な判断を下す</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>AIの役割</h3>
+          <ul>
+            <li>設定の整合性をチェック</li>
+            <li>下書きを生成</li>
+            <li>伏線の管理を支援</li>
+            <li>品質をスコアリング</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 3: Overall Flow -->
+    <section class="slide" data-slide="3">
+      <h2>全体フロー</h2>
+      <p>創作は3つのフェーズで進みます</p>
+
+      <div class="flow-horizontal">
+        <div class="flow-step planning">
+          PLANNING<br>
+          <small>企画・設計</small>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="gate">承認</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step building">
+          BUILDING<br>
+          <small>執筆</small>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="gate">承認</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step auditing">
+          AUDITING<br>
+          <small>レビュー</small>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step complete">
+          完了
+        </div>
+      </div>
+
+      <div class="content-grid" style="margin-top:2rem">
+        <div class="card">
+          <h3><span class="phase-badge planning">PLANNING</span></h3>
+          <p>プロット作成、キャラクター設定、世界観構築、伏線登録</p>
+        </div>
+        <div class="card">
+          <h3><span class="phase-badge building">BUILDING</span></h3>
+          <p>実際の執筆作業。下書き生成→レビュー→修正のサイクル</p>
+        </div>
+        <div class="card">
+          <h3><span class="phase-badge auditing">AUDITING</span></h3>
+          <p>全体の品質チェック、整合性確認、最終調整</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 4: The Relay Overview -->
+    <section class="slide" data-slide="4">
+      <h2>The Relay とは</h2>
+      <p>5人のAIエージェントがリレー形式で協力する執筆ワークフロー</p>
+
+      <div class="flow-horizontal" style="margin:2rem 0">
+        <div class="flow-step chief">Chief Editor</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step continuity">Continuity Director</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step ghost">Ghost Writer</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step reviewer">Reviewer</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step quality">Quality Agent</div>
+      </div>
+
+      <div class="summary-box">
+        <h3>なぜリレー形式なのか？</h3>
+        <ul>
+          <li><strong>専門性</strong>：各エージェントが得意分野に集中</li>
+          <li><strong>品質保証</strong>：複数の目でチェック</li>
+          <li><strong>情報制御</strong>：ネタバレを防ぐフィルタリング</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Slide 5: The Relay Agents -->
+    <section class="slide" data-slide="5">
+      <h2>5人のエージェント</h2>
+
+      <div class="content-grid">
+        <div class="agent-card chief">
+          <div class="agent-icon">👔</div>
+          <div class="agent-name">Chief Editor</div>
+          <div class="agent-role">編集長 - 全体統括</div>
+          <p style="font-size:0.9rem;margin-top:0.5rem;color:var(--text-muted)">
+            あなたの指示を解釈し、他のエージェントに仕事を振り分けます
+          </p>
+        </div>
+        <div class="agent-card continuity">
+          <div class="agent-icon">📚</div>
+          <div class="agent-name">Continuity Director</div>
+          <div class="agent-role">記録係 - 情報管理</div>
+          <p style="font-size:0.9rem;margin-top:0.5rem;color:var(--text-muted)">
+            設定やこれまでの流れを整理し、必要な情報だけを渡します
+          </p>
+        </div>
+        <div class="agent-card ghost">
+          <div class="agent-icon">✍️</div>
+          <div class="agent-name">Ghost Writer</div>
+          <div class="agent-role">執筆担当 - 文章生成</div>
+          <p style="font-size:0.9rem;margin-top:0.5rem;color:var(--text-muted)">
+            与えられた情報をもとに、実際の文章を書きます
+          </p>
+        </div>
+        <div class="agent-card reviewer">
+          <div class="agent-icon">🔍</div>
+          <div class="agent-name">Reviewer</div>
+          <div class="agent-role">校閲担当 - 漏洩チェック</div>
+          <p style="font-size:0.9rem;margin-top:0.5rem;color:var(--text-muted)">
+            秘密情報が漏れていないかチェックします
+          </p>
+        </div>
+        <div class="agent-card quality">
+          <div class="agent-icon">⭐</div>
+          <div class="agent-name">Quality Agent</div>
+          <div class="agent-role">品質管理 - スコアリング</div>
+          <p style="font-size:0.9rem;margin-top:0.5rem;color:var(--text-muted)">
+            文章の品質を評価し、改善点を提案します
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 6: New Work Flow -->
+    <section class="slide" data-slide="6">
+      <h2>新作開始フロー</h2>
+      <p>新しい作品を始めるときの流れ</p>
+
+      <div class="content-split">
+        <div>
+          <div class="flow-vertical">
+            <div class="flow-step planning" style="width:200px">L1プロット作成</div>
+            <span class="flow-arrow-down">↓</span>
+            <div class="gate approved">承認</div>
+            <span class="flow-arrow-down">↓</span>
+            <div class="flow-step planning" style="width:200px">キャラクター設定</div>
+            <span class="flow-arrow-down">↓</span>
+            <div class="flow-step planning" style="width:200px">世界観設定</div>
+            <span class="flow-arrow-down">↓</span>
+            <div class="flow-step planning" style="width:200px">伏線登録</div>
+            <span class="flow-arrow-down">↓</span>
+            <div class="flow-step planning" style="width:200px">L2/L3プロット</div>
+            <span class="flow-arrow-down">↓</span>
+            <div class="gate approved">承認</div>
+            <span class="flow-arrow-down">↓</span>
+            <div class="flow-step building" style="width:200px">執筆開始！</div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:1rem">
+            <h3>L1/L2/L3 プロットとは？</h3>
+            <ul>
+              <li><strong>L1</strong>：全体テーマ、結末</li>
+              <li><strong>L2</strong>：章ごとの目的</li>
+              <li><strong>L3</strong>：シーンごとの構成</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>ポイント</h3>
+            <ul>
+              <li>各ステップで「承認」があなたの判断ポイント</li>
+              <li>納得いくまで修正可能</li>
+              <li>伏線は最初から登録しておくと管理が楽</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 7: Continuous Writing Flow -->
+    <section class="slide" data-slide="7">
+      <h2>連載継続フロー</h2>
+      <p>日々の執筆作業の流れ</p>
+
+      <div class="flow-horizontal">
+        <div class="flow-step building">執筆開始</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step continuity">状態確認</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step ghost">下書き生成</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step reviewer">レビュー</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step quality">品質チェック</div>
+      </div>
+
+      <div class="content-grid" style="margin-top:2rem">
+        <div class="card">
+          <h3>1. 状態確認</h3>
+          <p>伏線アラートがあれば対応。前回の流れを確認。</p>
+        </div>
+        <div class="card">
+          <h3>2. 下書き生成</h3>
+          <p>The Relay が自動実行。伏線指示に従って執筆。</p>
+        </div>
+        <div class="card">
+          <h3>3. レビュー</h3>
+          <p>ネタバレがないかチェック。問題があれば修正。</p>
+        </div>
+        <div class="card">
+          <h3>4. 品質チェック</h3>
+          <p>スコアを確認し、必要なら改善。あなたが最終判断。</p>
+        </div>
+      </div>
+
+      <div class="summary-box">
+        <p><strong>承認後</strong>：サマリが自動更新され、伏線ステータスも更新されます</p>
+      </div>
+    </section>
+
+    <!-- Slide 8: Phase-Gate-Approval -->
+    <section class="slide" data-slide="8">
+      <h2>承認ゲート</h2>
+      <p>Phase-Gate-Approval：あなたの「OK」がないと先に進みません</p>
+
+      <div class="concept-box">
+        <p class="lead">AIが勝手に進めない。あなたが常にコントロール。</p>
+      </div>
+
+      <div class="content-grid">
+        <div class="card">
+          <h3>PLANNINGフェーズの承認</h3>
+          <div class="flow-vertical" style="margin:1rem 0">
+            <span>要件定義 → <strong>承認</strong></span>
+            <span>↓</span>
+            <span>設計 → <strong>承認</strong></span>
+            <span>↓</span>
+            <span>タスク分解 → <strong>承認</strong></span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>BUILDINGフェーズの承認</h3>
+          <div class="flow-vertical" style="margin:1rem 0">
+            <span>下書き生成</span>
+            <span>↓</span>
+            <span>レビュー → 警告があれば修正</span>
+            <span>↓</span>
+            <span>品質チェック → <strong>承認</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-box">
+        <h3>承認の意味</h3>
+        <p>「これでOK」と言うまで、システムは次のステップに進みません。<br>
+        不満があれば何度でも修正を依頼できます。</p>
+      </div>
+    </section>
+
+    <!-- Slide 9: Foreshadowing Flow -->
+    <section class="slide" data-slide="9">
+      <h2>伏線管理フロー</h2>
+      <p>Chekhov's Gun Tracker：登録した伏線は必ず回収</p>
+
+      <div class="lifecycle">
+        <div class="lifecycle-stage stage-registered">
+          registered<br>
+          <small>登録済み</small>
+        </div>
+        <span class="lifecycle-arrow">→</span>
+        <div class="lifecycle-stage stage-planted">
+          planted<br>
+          <small>設置完了</small>
+        </div>
+        <span class="lifecycle-arrow">→</span>
+        <div class="lifecycle-stage stage-reinforced">
+          reinforced<br>
+          <small>強化済み</small>
+        </div>
+        <span class="lifecycle-arrow">→</span>
+        <div class="lifecycle-stage stage-resolved">
+          resolved<br>
+          <small>回収完了</small>
+        </div>
+      </div>
+
+      <div class="content-split" style="margin-top:2rem">
+        <div class="card">
+          <h3>伏線の設置と強化</h3>
+          <ul>
+            <li><strong>設置（PLANT）</strong>：さりげなく伏線を仕込む</li>
+            <li><strong>強化（REINFORCE）</strong>：読者に思い出させる</li>
+            <li><strong>ヒント（HINT）</strong>：より明確な手がかりを出す</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>微細度スケール（1-10）</h3>
+          <ul>
+            <li><strong>1-3</strong>：ほぼ気づかない暗示</li>
+            <li><strong>4-6</strong>：注意深い読者が気づく</li>
+            <li><strong>7-9</strong>：多くの読者が気づく</li>
+            <li><strong>10</strong>：明示的な言及</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 10: Quality Check -->
+    <section class="slide" data-slide="10">
+      <h2>品質チェック</h2>
+      <p>AIが複数の観点から文章を評価します</p>
+
+      <div class="content-grid">
+        <div class="card">
+          <h3>評価項目</h3>
+          <table>
+            <tr><th>項目</th><th>内容</th></tr>
+            <tr><td>coherence</td><td>一貫性</td></tr>
+            <tr><td>pacing</td><td>テンポ</td></tr>
+            <tr><td>prose</td><td>文章力</td></tr>
+            <tr><td>character_score</td><td>キャラクター描写</td></tr>
+            <tr><td>style</td><td>文体の一貫性</td></tr>
+            <tr><td>reader_excitement</td><td>読者の興奮度</td></tr>
+            <tr><td>emotional_resonance</td><td>感情的共鳴</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3>スコアの目安</h3>
+          <ul>
+            <li><strong>0.8以上</strong>：優秀</li>
+            <li><strong>0.6-0.8</strong>：良好</li>
+            <li><strong>0.6未満</strong>：改善推奨</li>
+          </ul>
+          <p style="margin-top:1rem;font-size:0.95rem">
+            スコアはあくまで参考。最終判断はあなたが行います。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 11: Error Handling -->
+    <section class="slide" data-slide="11">
+      <h2>エラー対応</h2>
+      <p>問題が発生したときの流れ</p>
+
+      <div class="content-grid">
+        <div class="card">
+          <h3>Reviewer が警告を出したとき</h3>
+          <div class="flow-vertical" style="margin:1rem 0">
+            <span style="color:var(--status-warning)">⚠️ 警告検出</span>
+            <span>↓</span>
+            <span>Ghost Writer が自動修正</span>
+            <span>↓</span>
+            <span>再レビュー（最大3回）</span>
+            <span>↓</span>
+            <span style="color:var(--status-error)">3回失敗 → あなたに差し戻し</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Human Fallback</h3>
+          <p>AIが3回修正しても解決しない場合、<br>
+          <strong>「手動での確認が必要です」</strong><br>
+          とメッセージが表示されます。</p>
+          <p style="margin-top:1rem">
+            これはAIの限界を認め、あなたの判断を求めるサインです。
+          </p>
+        </div>
+      </div>
+
+      <div class="summary-box">
+        <h3>データ復旧</h3>
+        <p>作業開始時に自動でチェックポイントが作成されます。<br>
+        問題が起きても <code>/athanor rollback</code> で直前の状態に戻せます。</p>
+      </div>
+    </section>
+
+    <!-- Slide 12: Summary -->
+    <section class="slide" data-slide="12">
+      <h2>まとめ</h2>
+
+      <div class="concept-box">
+        <h3>ワークフローの全体像</h3>
+      </div>
+
+      <div class="content-split">
+        <div>
+          <h3>3つのフェーズ</h3>
+          <ul>
+            <li><span class="phase-badge planning">PLANNING</span> 企画・設計</li>
+            <li><span class="phase-badge building">BUILDING</span> 執筆</li>
+            <li><span class="phase-badge auditing">AUDITING</span> レビュー</li>
+          </ul>
+
+          <h3 style="margin-top:1.5rem">The Relay</h3>
+          <ul>
+            <li>5人のエージェントが協力</li>
+            <li>専門性を活かした分業</li>
+            <li>情報漏洩を防ぐフィルタリング</li>
+          </ul>
+        </div>
+        <div>
+          <h3>あなたの役割</h3>
+          <ul>
+            <li>承認ゲートで最終判断</li>
+            <li>創作の方向性を決定</li>
+            <li>AIの提案を採用するかどうか</li>
+          </ul>
+
+          <h3 style="margin-top:1.5rem">AIの役割</h3>
+          <ul>
+            <li>整合性チェック</li>
+            <li>下書き生成</li>
+            <li>品質スコアリング</li>
+            <li>伏線管理の支援</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="summary-box" style="text-align:center">
+        <p class="lead">あなたが主役、AIはアシスタント</p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <button class="nav-btn" id="prev-btn" aria-label="前のスライド">←</button>
+    <span class="nav-counter"><span id="current-slide">1</span> / <span id="total-slides">12</span></span>
+    <button class="nav-btn" id="next-btn" aria-label="次のスライド">→</button>
+  </nav>
+
+  <!-- Slide Indicators -->
+  <div class="indicators" id="indicators"></div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 1;
+
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const currentSlideSpan = document.getElementById('current-slide');
+    const totalSlidesSpan = document.getElementById('total-slides');
+    const indicatorsContainer = document.getElementById('indicators');
+
+    totalSlidesSpan.textContent = totalSlides;
+
+    for (let i = 1; i <= totalSlides; i++) {
+      const indicator = document.createElement('div');
+      indicator.className = 'indicator' + (i === 1 ? ' active' : '');
+      indicator.dataset.slide = i;
+      indicator.addEventListener('click', () => goToSlide(i));
+      indicatorsContainer.appendChild(indicator);
+    }
+
+    function updateSlide() {
+      slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index + 1 === currentSlide);
+      });
+      document.querySelectorAll('.indicator').forEach((ind, index) => {
+        ind.classList.toggle('active', index + 1 === currentSlide);
+      });
+      currentSlideSpan.textContent = currentSlide;
+      prevBtn.disabled = currentSlide === 1;
+      nextBtn.disabled = currentSlide === totalSlides;
+    }
+
+    function goToSlide(n) {
+      currentSlide = Math.max(1, Math.min(n, totalSlides));
+      updateSlide();
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) { currentSlide++; updateSlide(); }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) { currentSlide--; updateSlide(); }
+    }
+
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); goToSlide(1); }
+      else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides); }
+    });
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; });
+    document.addEventListener('touchend', (e) => {
+      const diff = touchStartX - e.changedTouches[0].screenX;
+      if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+    });
+  </script>
+</body>
+</html>

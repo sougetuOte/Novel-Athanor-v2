@@ -78,7 +78,8 @@
       "Bash(git -C C:/work3/Novel-Athanor-v2 log --oneline -5)",
       "Bash(git -C C:/work3/Novel-Athanor-v2 status --short)",
       "Bash(git -C C:/work3/Novel-Athanor-v2 add .claude/settings.local.json \"docs/memo/2026-01-26-プロンプト下書き.md\" .serena/memories/session-2026-01-26-l3-building-phase-bc.md)",
-      "Bash(git -C C:/work3/Novel-Athanor-v2 commit -m \"$\\(cat <<''EOF''\nchore: save session state and local settings\n\n- Update .claude/settings.local.json\n- Add session memo for 2026-01-26\n- Save Serena memory for L3 building progress\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(git -C C:/work3/Novel-Athanor-v2 commit -m \"$\\(cat <<''EOF''\nchore: save session state and local settings\n\n- Update .claude/settings.local.json\n- Add session memo for 2026-01-26\n- Save Serena memory for L3 building progress\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git remote add:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

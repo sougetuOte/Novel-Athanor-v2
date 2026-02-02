@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>キャラクター設定 - 作品初回登録ガイド</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a href="index.html" class="home-link">← 目次に戻る</a>
+
+  <div class="presentation">
+
+    <!-- Slide 1: Title -->
+    <section class="slide slide-title active" data-slide="1">
+      <h1>キャラクター設定</h1>
+      <p class="subtitle">作品初回登録ガイド Part 4</p>
+      <p class="tagline">物語を動かす人物を定義する</p>
+    </section>
+
+    <!-- Slide 2: What is Character Setting -->
+    <section class="slide" data-slide="2">
+      <h2>キャラクター設定とは？</h2>
+
+      <div class="concept-box">
+        <h3>登場人物の「設計図」</h3>
+        <p class="lead">外見、性格、背景、関係性...キャラクターを立体的に定義します</p>
+      </div>
+
+      <div class="content-grid">
+        <div class="card">
+          <h3>基本情報</h3>
+          <ul>
+            <li><strong>名前</strong>：フルネーム、ニックネーム</li>
+            <li><strong>外見</strong>：容姿、特徴</li>
+            <li><strong>性格</strong>：性格特性、口調</li>
+            <li><strong>立場</strong>：職業、社会的地位</li>
+            <li><strong>能力</strong>：スキル、特技</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>物語上の役割</h3>
+          <ul>
+            <li><strong>役割</strong>：主人公、敵、メンターなど</li>
+            <li><strong>目的</strong>：何を求めているか</li>
+            <li><strong>葛藤</strong>：内面の課題</li>
+            <li><strong>アーク</strong>：成長の方向性</li>
+            <li><strong>関係</strong>：他キャラとの関係</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Novel-Athanor-v2 の特徴</h3>
+          <ul>
+            <li><strong>フェーズ管理</strong>：成長を段階管理</li>
+            <li><strong>AI可視性</strong>：隠し設定の制御</li>
+            <li><strong>伏線連携</strong>：キャラに紐づく伏線</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 3: File Format -->
+    <section class="slide" data-slide="3">
+      <h2>キャラクター設定のファイル形式</h2>
+
+      <div class="content-split">
+        <div>
+          <h4>ファイルパス</h4>
+          <div class="example-box">vault/{作品名}/characters/{キャラ名}.md</div>
+
+          <div class="card" style="margin-top: 1rem;">
+            <h4>基本構造</h4>
+            <div class="example-box" style="font-size: 0.85rem;">---
+type: character
+name: "キャラクター名"
+phases:
+  - name: "物語開始時"
+    episodes: "1-10"
+  - name: "覚醒後"
+    episodes: "11-"
+current_phase: "物語開始時"
+ai_visibility:
+  default: 3
+  hidden_section: 0
+tags:
+  - character
+  - protagonist
+---</div>
+          </div>
+        </div>
+
+        <div>
+          <h4>本文構造</h4>
+          <div class="example-box" style="font-size: 0.8rem;">## 現在の状態
+（current_phaseの状態を記述）
+
+## フェーズ別記録
+
+### 物語開始時
+#### 外見
+16歳の少女。茶髪のショートヘア。
+村の普通の服を着ている。
+
+#### 性格
+内向的で人見知り。でも好奇心旺盛。
+
+#### 立場
+孤児院で暮らす身寄りのない少女。
+
+#### 能力
+特になし（本人も気づいていない）
+
+#### 関係
+- 院長：育ての親
+- 村人：距離を置かれている
+
+### 覚醒後
+（同様の構造で変化を記述）
+
+## 隠し設定
+<!-- ai_visibility: 0 -->
+- 実は失われた王族の末裔
+- 体内に封印された魔力がある</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 4: Phase Management -->
+    <section class="slide" data-slide="4">
+      <h2>フェーズ管理</h2>
+      <p>キャラクターの成長・変化を段階的に管理します</p>
+
+      <div class="concept-box">
+        <h3>なぜフェーズ管理？</h3>
+        <p class="lead">「今の主人公」と「成長後の主人公」は別人のように振る舞うことがある</p>
+      </div>
+
+      <div class="content-split">
+        <div>
+          <div class="card">
+            <h4>フェーズ設定例</h4>
+            <div class="example-box" style="font-size: 0.85rem;">phases:
+  - name: "物語開始時"
+    episodes: "1-10"
+    # EP1〜10ではこの設定を参照
+
+  - name: "師匠との修行中"
+    episodes: "11-25"
+    # EP11〜25ではこの設定を参照
+
+  - name: "覚醒後"
+    episodes: "26-"
+    # EP26以降はこの設定を参照
+
+current_phase: "物語開始時"
+# 現在の執筆位置のフェーズ</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h4>AIの動作</h4>
+            <ul>
+              <li>AIは <code>current_phase</code> の設定を参照</li>
+              <li>過去フェーズは「思い出」として参照可能</li>
+              <li>未来フェーズは参照不可（ネタバレ防止）</li>
+            </ul>
+          </div>
+
+          <div class="card" style="margin-top: 1rem;">
+            <h4>フェーズ切替のタイミング</h4>
+            <ul>
+              <li>大きな成長イベント後</li>
+              <li>性格や能力の変化時</li>
+              <li>立場や関係性の変化時</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 5: AI Visibility -->
+    <section class="slide" data-slide="5">
+      <h2>キャラクターのAI可視性</h2>
+      <p>隠し設定やサプライズを守る</p>
+
+      <div class="content-grid">
+        <div class="card">
+          <h4><span class="vis-badge level-3">Level 3</span> 公開情報</h4>
+          <p>AIが執筆に使える情報</p>
+          <ul>
+            <li>外見、公開された性格</li>
+            <li>キャラが自覚している能力</li>
+            <li>他キャラも知っている情報</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h4><span class="vis-badge level-2">Level 2</span> 暗示のみ</h4>
+          <p>AIは知っているが直接書かない</p>
+          <ul>
+            <li>伏線として仕込む秘密</li>
+            <li>後で明かす過去</li>
+            <li>暗示だけ許可する情報</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h4><span class="vis-badge level-1">Level 1</span> 存在のみ</h4>
+          <p>AIは「何かある」と知るだけ</p>
+          <ul>
+            <li>「過去に何かあった」程度</li>
+            <li>詳細は伏せたい秘密</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h4><span class="vis-badge level-0">Level 0</span> 完全秘匿</h4>
+          <p>AIは存在を知らない</p>
+          <ul>
+            <li>最大のサプライズ</li>
+            <li>真の正体</li>
+            <li>黒幕であることなど</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 6: Secret Settings -->
+    <section class="slide" data-slide="6">
+      <h2>隠し設定の登録</h2>
+
+      <div class="content-split">
+        <div>
+          <div class="card card-highlight">
+            <h4>隠し設定の書き方</h4>
+            <div class="example-box" style="font-size: 0.85rem;">## 隠し設定
+<!-- ai_visibility: 0 -->
+
+### 真の正体
+実は失われた王族の末裔。
+幼少期に王城から連れ出された。
+
+### 封印された力
+体内に古代の魔力が封印されている。
+極度のストレスで発現する可能性。
+
+### 関係の秘密
+院長は実は王家の忠臣で、
+主人公を守るために孤児院を営んでいる。</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card card-warning">
+            <h4>よくある間違い</h4>
+            <ul>
+              <li>Level 0 にしたのに、本文で言及してしまう</li>
+              <li>フェーズを切り替え忘れる</li>
+              <li>全部隠してしまいAIが何も書けない</li>
+            </ul>
+          </div>
+
+          <div class="card" style="margin-top: 1rem;">
+            <h4>ベストプラクティス</h4>
+            <ul>
+              <li>公開情報を十分に用意する</li>
+              <li>隠し設定は本当に必要なものだけ</li>
+              <li>伏線は Level 2 で暗示を許可</li>
+              <li>Level 0 は最重要秘密だけ</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 7: Relationships -->
+    <section class="slide" data-slide="7">
+      <h2>キャラクター間の関係</h2>
+
+      <div class="content-split">
+        <div>
+          <div class="card">
+            <h4>関係の記述方法</h4>
+            <div class="example-box" style="font-size: 0.85rem;">#### 関係
+<!-- ai_visibility: 3 -->
+- **院長**: 育ての親。厳しいが愛情深い
+- **村人A**: 幼馴染。唯一の友人
+- **謎の老人**: 師匠。魔法を教えてくれる
+
+<!-- ai_visibility: 2 -->
+- **国王**: （本人は知らないが）
+  王を倒そうとする敵対者
+
+<!-- ai_visibility: 0 -->
+- **院長**: 実は王家の忠臣で
+  主人公の正体を知っている</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h4>関係の種類</h4>
+            <table>
+              <tr><th>種類</th><th>例</th></tr>
+              <tr><td>家族</td><td>親、兄弟、養親</td></tr>
+              <tr><td>友人</td><td>幼馴染、親友</td></tr>
+              <tr><td>師弟</td><td>師匠、弟子</td></tr>
+              <tr><td>恋愛</td><td>恋人、片思い</td></tr>
+              <tr><td>敵対</td><td>ライバル、宿敵</td></tr>
+              <tr><td>主従</td><td>主人、従者</td></tr>
+            </table>
+          </div>
+
+          <div class="summary-box" style="margin-top: 1rem;">
+            <p><strong>ポイント</strong>：関係性にもAI可視性を設定できます。「本当の関係」を隠し、「表向きの関係」だけAIに見せることが可能。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 8: Practical Example -->
+    <section class="slide" data-slide="8">
+      <h2>実践例：主人公の登録</h2>
+
+      <div class="content-split">
+        <div>
+          <h4>対話例</h4>
+          <div class="card">
+            <p><strong>あなた：</strong></p>
+            <p style="background: var(--bg-card); padding: 1rem; border-radius: 0.5rem; font-size: 0.9rem;">
+              主人公を登録したい。<br>
+              名前はアイラ、16歳の孤児の少女。<br>
+              内向的だけど好奇心旺盛。<br>
+              実は王族の血筋だけど、それは最終盤まで秘密。<br>
+              物語を通じて自信をつけていく。
+            </p>
+          </div>
+
+          <div class="card" style="margin-top: 1rem;">
+            <p><strong>AI：</strong></p>
+            <p style="background: var(--bg-card); padding: 1rem; border-radius: 0.5rem; font-size: 0.9rem;">
+              承知しました。以下の構成で登録します：<br><br>
+              <strong>フェーズ：</strong><br>
+              1. 物語開始時（内向的）<br>
+              2. 修行中（成長中）<br>
+              3. 覚醒後（自信を持った）<br><br>
+              <strong>AI可視性：</strong><br>
+              ・基本情報 → Level 3<br>
+              ・王族の血筋 → Level 0<br><br>
+              よろしいですか？
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <h4>確認ポイント</h4>
+          <div class="card">
+            <ul class="checklist">
+              <li>名前は正しいか</li>
+              <li>フェーズの区切りは適切か</li>
+              <li>AI可視性は意図通りか</li>
+              <li>関係性は網羅されているか</li>
+              <li>足りない情報はないか</li>
+            </ul>
+          </div>
+
+          <div class="exception-box" style="margin-top: 1rem;">
+            <h4>後から追加・修正OK</h4>
+            <p>最初は最小限でも大丈夫。執筆しながら情報を追加していけます。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 9: Exception Cases -->
+    <section class="slide" data-slide="9">
+      <h2>例外ケース：キャラクター設定</h2>
+
+      <div class="content-grid">
+        <div class="exception-box">
+          <h4>モブキャラも登録必要？</h4>
+          <p>名前付きで複数回登場するなら登録推奨。一度だけの通行人Aは不要です。</p>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">後から重要になったら、その時点で登録すればOK。</p>
+        </div>
+
+        <div class="exception-box">
+          <h4>キャラが死亡する場合</h4>
+          <p>フェーズに「死亡」を追加し、以降のエピソードではAI参照対象外になります。回想で登場する場合は「過去フェーズ」として参照。</p>
+        </div>
+
+        <div class="exception-box">
+          <h4>複数名義のキャラ</h4>
+          <p>例：「仮面の騎士」と「王子」が同一人物の場合、両方の名義で登録し、関連付けをLevel 0で設定します。</p>
+          <div class="example-box" style="font-size: 0.8rem; margin-top: 0.5rem;">## 隠し設定
+<!-- ai_visibility: 0 -->
+正体は [[王子アレクス]] と同一人物</div>
+        </div>
+
+        <div class="exception-box">
+          <h4>キャラの設定が未定</h4>
+          <p>「未定」として登録し、Level 0に。執筆しながら固まったら詳細を追加し、可視性を上げます。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 10: Summary -->
+    <section class="slide" data-slide="10">
+      <h2>まとめ - キャラクター設定</h2>
+
+      <div class="content-split">
+        <div>
+          <h3>このセクションで学んだこと</h3>
+          <ul>
+            <li>キャラクター設定の構造</li>
+            <li>フェーズ管理の使い方</li>
+            <li>AI可視性の設定方法</li>
+            <li>隠し設定の登録</li>
+            <li>キャラクター間の関係</li>
+          </ul>
+
+          <div class="card" style="margin-top: 1.5rem;">
+            <h4>登録の優先順位</h4>
+            <ol>
+              <li>主人公</li>
+              <li>メインキャラ（ヒロイン、敵など）</li>
+              <li>重要サブキャラ</li>
+              <li>その他（後から追加可）</li>
+            </ol>
+          </div>
+        </div>
+
+        <div>
+          <h3>次のセクション</h3>
+          <div class="card card-success">
+            <h4>→ 伏線とAI情報制御</h4>
+            <p>伏線の登録方法とAI可視性の詳細設定を学びます。</p>
+            <a href="05-foreshadowing.html" style="color: var(--accent); font-weight: 600;">伏線設定へ進む →</a>
+          </div>
+
+          <div class="card" style="margin-top: 1rem;">
+            <h4>前のセクション</h4>
+            <a href="03-world-settings.html" style="color: var(--text-muted);">← ワールド設定</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <button class="nav-btn" id="prev-btn" aria-label="前のスライド">←</button>
+    <span class="nav-counter"><span id="current-slide">1</span> / <span id="total-slides">10</span></span>
+    <button class="nav-btn" id="next-btn" aria-label="次のスライド">→</button>
+  </nav>
+
+  <div class="indicators" id="indicators"></div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 1;
+
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const currentSlideSpan = document.getElementById('current-slide');
+    const totalSlidesSpan = document.getElementById('total-slides');
+    const indicatorsContainer = document.getElementById('indicators');
+
+    totalSlidesSpan.textContent = totalSlides;
+
+    for (let i = 1; i <= totalSlides; i++) {
+      const indicator = document.createElement('div');
+      indicator.className = 'indicator' + (i === 1 ? ' active' : '');
+      indicator.dataset.slide = i;
+      indicator.addEventListener('click', () => goToSlide(i));
+      indicatorsContainer.appendChild(indicator);
+    }
+
+    function updateSlide() {
+      slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index + 1 === currentSlide);
+      });
+      document.querySelectorAll('.indicator').forEach((ind, index) => {
+        ind.classList.toggle('active', index + 1 === currentSlide);
+      });
+      currentSlideSpan.textContent = currentSlide;
+      prevBtn.disabled = currentSlide === 1;
+      nextBtn.disabled = currentSlide === totalSlides;
+    }
+
+    function goToSlide(n) {
+      currentSlide = Math.max(1, Math.min(n, totalSlides));
+      updateSlide();
+    }
+
+    function nextSlide() { if (currentSlide < totalSlides) { currentSlide++; updateSlide(); } }
+    function prevSlide() { if (currentSlide > 1) { currentSlide--; updateSlide(); } }
+
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); goToSlide(1); }
+      else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides); }
+    });
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; });
+    document.addEventListener('touchend', (e) => {
+      const diff = touchStartX - e.changedTouches[0].screenX;
+      if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+    });
+  </script>
+</body>
+</html>

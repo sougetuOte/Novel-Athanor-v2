@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novel-Athanor-v2 Architecture Overview</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <div class="presentation">
+
+    <!-- Slide 1: Title -->
+    <section class="slide slide-title active" data-slide="1">
+      <h1>Novel-Athanor-v2</h1>
+      <p class="subtitle">半自動小説生成システム アーキテクチャ概要</p>
+      <p class="tagline">AIとユーザーの協調的な創作支援</p>
+    </section>
+
+    <!-- Slide 2: Background -->
+    <section class="slide" data-slide="2">
+      <h2>プロジェクト背景</h2>
+      <p>3つの既存プロジェクトの長所を統合し、新しい創作支援システムを構築</p>
+
+      <div class="content-grid">
+        <div class="card">
+          <h3>Novel-Athanor</h3>
+          <ul>
+            <li>設定管理システム</li>
+            <li>フェーズ管理機能</li>
+            <li>Obsidian連携</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>NovelWriter</h3>
+          <ul>
+            <li>マルチエージェント設計</li>
+            <li>自動生成機能</li>
+            <li>品質管理ワークフロー</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>302_novel_writing</h3>
+          <ul>
+            <li>Web UIインターフェース</li>
+            <li>多言語対応</li>
+            <li>API設計</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 3: Differentiation -->
+    <section class="slide" data-slide="3">
+      <h2>差別化ポイント</h2>
+      <p>既存プロジェクトにない革新的機能を追加</p>
+
+      <div class="content-grid">
+        <div class="card card-highlight">
+          <h3>AI情報制御</h3>
+          <p>4段階可視性レベルによるネタバレ防止</p>
+          <span class="status-badge status-in-progress">
+            <span class="status-dot"></span>
+            実装中
+          </span>
+        </div>
+        <div class="card card-highlight">
+          <h3>伏線管理システム</h3>
+          <p>Chekhov's Gun Tracker（微細度スケール1-10付き）</p>
+          <span class="status-badge status-in-progress">
+            <span class="status-dot"></span>
+            実装中
+          </span>
+        </div>
+        <div class="card card-highlight">
+          <h3>半自動ワークフロー</h3>
+          <p>Phase-Gate-Approval + The Relay</p>
+          <span class="status-badge status-pending">
+            <span class="status-dot"></span>
+            未着手
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 4: Architecture Overview -->
+    <section class="slide" data-slide="4">
+      <h2>5層アーキテクチャ</h2>
+      <p>責務を明確に分離した階層構造</p>
+
+      <div class="architecture-stack">
+        <div class="layer layer-l5">
+          <span class="layer-label">L5</span>
+          <span class="layer-name">Orchestration Layer（統制レイヤー）</span>
+          <span class="layer-components">Chief Editor, Phase-Gate-Approval</span>
+        </div>
+        <div class="layer layer-l4">
+          <span class="layer-label">L4</span>
+          <span class="layer-name">Agent Layer（エージェントレイヤー）</span>
+          <span class="layer-components">The Relay: Continuity → Ghost Writer → Reviewer</span>
+        </div>
+        <div class="layer layer-l3">
+          <span class="layer-label">L3</span>
+          <span class="layer-name">AI Information Control Layer（AI情報制御）</span>
+          <span class="layer-components">Visibility Controller, Expression Filter, Foreshadow Manager</span>
+        </div>
+        <div class="layer layer-l2">
+          <span class="layer-label">L2</span>
+          <span class="layer-name">Context Builder（コンテキスト構築）</span>
+          <span class="layer-components">Lazy Loader, Phase Filter, Collectors</span>
+        </div>
+        <div class="layer layer-l1">
+          <span class="layer-label">L1</span>
+          <span class="layer-name">Data Layer（データレイヤー）</span>
+          <span class="layer-components">Vault: Episodes, Characters, World, Plot, Foreshadow</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 5: L1 Data Layer -->
+    <section class="slide" data-slide="5">
+      <h2>L1: Data Layer</h2>
+      <span class="status-badge status-complete"><span class="status-dot"></span>実装完了</span>
+
+      <div class="content-split">
+        <div>
+          <h3>Vault構造（Obsidian互換）</h3>
+          <pre><code>vault/{作品名}/
+├── episodes/         # エピソード本文
+├── characters/       # キャラクター設定
+├── world/            # 世界観設定
+├── _plot/            # L1/L2/L3 プロット
+├── _summary/         # L1/L2/L3 サマリ
+├── _foreshadowing/   # 伏線管理
+├── _ai_control/      # AI制御設定
+├── _settings/        # 作品設定
+└── _style_guides/    # 文体ガイド</code></pre>
+        </div>
+        <div>
+          <h3>データモデル</h3>
+          <table>
+            <tr><th>モデル</th><th>役割</th></tr>
+            <tr><td><code>Character</code></td><td>キャラクター設定（フェーズ管理）</td></tr>
+            <tr><td><code>Episode</code></td><td>エピソード本文</td></tr>
+            <tr><td><code>Plot</code></td><td>L1/L2/L3 プロット構造</td></tr>
+            <tr><td><code>Foreshadowing</code></td><td>伏線定義と状態</td></tr>
+            <tr><td><code>WorldSetting</code></td><td>世界観設定</td></tr>
+            <tr><td><code>Secret</code></td><td>秘密情報（AI制御対象）</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 6: L2 Context Builder -->
+    <section class="slide" data-slide="6">
+      <h2>L2: Context Builder</h2>
+      <span class="status-badge status-complete"><span class="status-dot"></span>実装完了</span>
+
+      <div class="content-split">
+        <div>
+          <h3>コンポーネント</h3>
+          <div class="card">
+            <h3>Lazy Loader</h3>
+            <p>必要最小限のデータを遅延読み込み</p>
+          </div>
+          <div class="card" style="margin-top:1rem">
+            <h3>Phase Filter</h3>
+            <p>current_phaseに基づく情報フィルタリング</p>
+          </div>
+        </div>
+        <div>
+          <h3>Context Collectors（AoT並列収集）</h3>
+          <table>
+            <tr><th>Collector</th><th>収集対象</th></tr>
+            <tr><td><code>PlotCollector</code></td><td>L1/L2/L3 プロット</td></tr>
+            <tr><td><code>SummaryCollector</code></td><td>L1/L2/L3 サマリー</td></tr>
+            <tr><td><code>CharacterCollector</code></td><td>キャラクター設定</td></tr>
+            <tr><td><code>WorldSettingCollector</code></td><td>世界観設定</td></tr>
+            <tr><td><code>StyleGuideCollector</code></td><td>文体ガイド</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 7: L3 AI Information Control -->
+    <section class="slide" data-slide="7">
+      <h2>L3: AI Information Control Layer</h2>
+      <span class="status-badge status-in-progress"><span class="status-dot"></span>Phase E 進行中</span>
+
+      <div class="content-grid">
+        <div class="card">
+          <h3>Visibility Controller</h3>
+          <p>Level 0-3 の可視性判定を行い、AIに渡す情報を制御</p>
+          <span class="status-badge status-complete"><span class="status-dot"></span>完了</span>
+        </div>
+        <div class="card">
+          <h3>Expression Filter</h3>
+          <p>禁止キーワード検出、類似度チェック</p>
+          <span class="status-badge status-complete"><span class="status-dot"></span>完了</span>
+        </div>
+        <div class="card">
+          <h3>Foreshadowing Manager</h3>
+          <p>伏線ライフサイクル管理（登録→設置→強化→回収）</p>
+          <span class="status-badge status-complete"><span class="status-dot"></span>完了</span>
+        </div>
+        <div class="card">
+          <h3>Instruction Generator</h3>
+          <p>伏線指示書の自動生成</p>
+          <span class="status-badge status-in-progress"><span class="status-dot"></span>進行中</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 8: L4 Agent Layer -->
+    <section class="slide" data-slide="8">
+      <h2>L4: Agent Layer - The Relay</h2>
+      <span class="status-badge status-pending"><span class="status-dot"></span>未着手</span>
+
+      <p>エージェント間のリレー形式による協調処理</p>
+
+      <div class="lifecycle">
+        <div class="lifecycle-stage stage-registered">
+          Continuity Director<br>
+          <small>コンテキスト構築</small>
+        </div>
+        <span class="lifecycle-arrow">→</span>
+        <div class="lifecycle-stage stage-planted">
+          Ghost Writer<br>
+          <small>テキスト生成</small>
+        </div>
+        <span class="lifecycle-arrow">→</span>
+        <div class="lifecycle-stage stage-reinforced">
+          Reviewer Agent<br>
+          <small>情報漏洩チェック</small>
+        </div>
+        <span class="lifecycle-arrow">→</span>
+        <div class="lifecycle-stage stage-resolved">
+          Quality Agent<br>
+          <small>品質スコアリング</small>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:2rem">
+        <h3>設計方針</h3>
+        <ul>
+          <li>各エージェントは単一責務を持つ</li>
+          <li>入出力が明確に定義されている</li>
+          <li>L3層を通じて情報制御が適用される</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Slide 9: L5 Orchestration Layer -->
+    <section class="slide" data-slide="9">
+      <h2>L5: Orchestration Layer</h2>
+      <span class="status-badge status-pending"><span class="status-dot"></span>未着手</span>
+
+      <div class="content-split">
+        <div>
+          <div class="card">
+            <h3>Chief Editor</h3>
+            <p>全体統括エージェント</p>
+            <ul>
+              <li>タスク分解と割り当て</li>
+              <li>エージェント間の調整</li>
+              <li>結果の統合と品質保証</li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <h3>Phase-Gate-Approval</h3>
+            <p>承認ゲート管理</p>
+            <ul>
+              <li>フェーズ遷移の制御</li>
+              <li>ユーザー承認の取得</li>
+              <li>状態の永続化</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:2rem">
+        <h3>ワークフロー</h3>
+        <pre><code>Planning → [承認] → Building → [承認] → Review → [承認] → Complete</code></pre>
+      </div>
+    </section>
+
+    <!-- Slide 10: AI Visibility System -->
+    <section class="slide" data-slide="10">
+      <h2>4段階AI可視性システム</h2>
+      <p>AIに渡す情報を段階的に制御し、ネタバレを防止</p>
+
+      <div class="visibility-grid">
+        <div class="visibility-card level-0">
+          <div class="visibility-level">0</div>
+          <div class="visibility-name">完全秘匿</div>
+          <div class="visibility-desc">
+            <strong>AIの認識:</strong> 存在すら知らない<br>
+            <strong>AIの行動:</strong> 言及不可
+          </div>
+        </div>
+        <div class="visibility-card level-1">
+          <div class="visibility-level">1</div>
+          <div class="visibility-name">認識のみ</div>
+          <div class="visibility-desc">
+            <strong>AIの認識:</strong>「何かある」と知る<br>
+            <strong>AIの行動:</strong> 匂わせのみ
+          </div>
+        </div>
+        <div class="visibility-card level-2">
+          <div class="visibility-level">2</div>
+          <div class="visibility-name">内容認識</div>
+          <div class="visibility-desc">
+            <strong>AIの認識:</strong> 内容を知っている<br>
+            <strong>AIの行動:</strong> 直接言及禁止
+          </div>
+        </div>
+        <div class="visibility-card level-3">
+          <div class="visibility-level">3</div>
+          <div class="visibility-name">使用可能</div>
+          <div class="visibility-desc">
+            <strong>AIの認識:</strong> 完全に把握<br>
+            <strong>AIの行動:</strong> 自由に使用
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 11: Foreshadowing System -->
+    <section class="slide" data-slide="11">
+      <h2>伏線管理システム</h2>
+      <p>Chekhov's Gun Tracker - 伏線のライフサイクルを追跡</p>
+
+      <div class="lifecycle">
+        <div class="lifecycle-stage stage-registered">
+          registered<br>
+          <small>登録済み</small>
+        </div>
+        <span class="lifecycle-arrow">→</span>
+        <div class="lifecycle-stage stage-planted">
+          planted<br>
+          <small>設置完了</small>
+        </div>
+        <span class="lifecycle-arrow">→</span>
+        <div class="lifecycle-stage stage-reinforced">
+          reinforced<br>
+          <small>強化済み</small>
+        </div>
+        <span class="lifecycle-arrow">→</span>
+        <div class="lifecycle-stage stage-resolved">
+          resolved<br>
+          <small>回収完了</small>
+        </div>
+      </div>
+
+      <div class="content-split" style="margin-top:2rem">
+        <div class="card">
+          <h3>伏線指示タイプ</h3>
+          <table>
+            <tr><th>タイプ</th><th>説明</th><th>微細度</th></tr>
+            <tr><td><code>PLANT</code></td><td>伏線を設置</td><td>4（控えめ）</td></tr>
+            <tr><td><code>REINFORCE</code></td><td>伏線を強化</td><td>6（中程度）</td></tr>
+            <tr><td><code>HINT</code></td><td>ヒントを提示</td><td>8（明示的）</td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <h3>微細度スケール（1-10）</h3>
+          <ul>
+            <li><strong>1-3:</strong> ほぼ気づかない暗示</li>
+            <li><strong>4-6:</strong> 注意深い読者が気づく</li>
+            <li><strong>7-9:</strong> 多くの読者が気づく</li>
+            <li><strong>10:</strong> 明示的な言及</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 12: Implementation Status -->
+    <section class="slide" data-slide="12">
+      <h2>実装状況サマリー</h2>
+
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress-segment progress-complete" style="width: 45%">L1-L2 完了</div>
+          <div class="progress-segment progress-in-progress" style="width: 25%">L3 進行中</div>
+          <div class="progress-segment progress-pending" style="width: 30%">L4-L5 未着手</div>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <div class="card">
+          <h3>完了 (45%)</h3>
+          <ul>
+            <li>L1: Data Layer 全機能</li>
+            <li>L2: Context Builder 全機能</li>
+            <li>L3: Phase A-D</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>進行中 (25%)</h3>
+          <ul>
+            <li>L3: Phase E（伏線・Visibility統合）</li>
+            <li>L3: Phase F（指示生成）</li>
+            <li>L3: Phase G（統合テスト）</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>未着手 (30%)</h3>
+          <ul>
+            <li>L4: Agent Layer</li>
+            <li>L5: Orchestration Layer</li>
+            <li>CLI インターフェース</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:2rem">
+        <h3>品質指標</h3>
+        <p>テスト: <strong>576件以上</strong> 全パス | mypy: エラー 0 | ruff: エラー 0</p>
+      </div>
+    </section>
+
+    <!-- Slide 13: Roadmap -->
+    <section class="slide" data-slide="13">
+      <h2>今後のロードマップ</h2>
+
+      <table>
+        <tr>
+          <th>フェーズ</th>
+          <th>内容</th>
+          <th>状態</th>
+        </tr>
+        <tr>
+          <td>L3 Phase E</td>
+          <td>伏線・Visibility統合、ContextBuilder統合ファサード</td>
+          <td><span class="status-badge status-in-progress"><span class="status-dot"></span>進行中</span></td>
+        </tr>
+        <tr>
+          <td>L3 Phase F</td>
+          <td>指示生成（InstructionGenerator完成）</td>
+          <td><span class="status-badge status-pending"><span class="status-dot"></span>未着手</span></td>
+        </tr>
+        <tr>
+          <td>L3 Phase G</td>
+          <td>L3レイヤー統合テスト</td>
+          <td><span class="status-badge status-pending"><span class="status-dot"></span>未着手</span></td>
+        </tr>
+        <tr>
+          <td>L4 実装</td>
+          <td>The Relay エージェント群の実装</td>
+          <td><span class="status-badge status-pending"><span class="status-dot"></span>未着手</span></td>
+        </tr>
+        <tr>
+          <td>L5 実装</td>
+          <td>Chief Editor、Phase-Gate-Approval</td>
+          <td><span class="status-badge status-pending"><span class="status-dot"></span>未着手</span></td>
+        </tr>
+        <tr>
+          <td>CLI/UI</td>
+          <td>コマンドラインインターフェース</td>
+          <td><span class="status-badge status-pending"><span class="status-dot"></span>未着手</span></td>
+        </tr>
+      </table>
+    </section>
+
+    <!-- Slide 14: Tech Stack -->
+    <section class="slide" data-slide="14">
+      <h2>技術スタック</h2>
+
+      <div class="tech-grid">
+        <div class="tech-item">
+          <div class="tech-icon">🐍</div>
+          <div>
+            <div class="tech-name">Python 3.10+</div>
+            <div class="tech-desc">コア実装言語</div>
+          </div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon">🤖</div>
+          <div>
+            <div class="tech-name">Claude (Opus/Sonnet)</div>
+            <div class="tech-desc">AI エンジン</div>
+          </div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon">📝</div>
+          <div>
+            <div class="tech-name">Obsidian</div>
+            <div class="tech-desc">データ管理（Vault構造）</div>
+          </div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon">💻</div>
+          <div>
+            <div class="tech-name">Claude Code</div>
+            <div class="tech-desc">開発・実行環境</div>
+          </div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon">📄</div>
+          <div>
+            <div class="tech-name">Markdown + YAML</div>
+            <div class="tech-desc">データフォーマット</div>
+          </div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-icon">🔤</div>
+          <div>
+            <div class="tech-name">fugashi + unidic-lite</div>
+            <div class="tech-desc">日本語形態素解析</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:3rem;text-align:center">
+        <h3>設計原則</h3>
+        <p style="font-size:1.1rem">
+          情報制御優先 | ツール強制 | 人間最終判断 | 段階的実装 | LLM非依存コア
+        </p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <button class="nav-btn" id="prev-btn" aria-label="前のスライド">←</button>
+    <span class="nav-counter"><span id="current-slide">1</span> / <span id="total-slides">14</span></span>
+    <button class="nav-btn" id="next-btn" aria-label="次のスライド">→</button>
+  </nav>
+
+  <!-- Slide Indicators -->
+  <div class="indicators" id="indicators"></div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 1;
+
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const currentSlideSpan = document.getElementById('current-slide');
+    const totalSlidesSpan = document.getElementById('total-slides');
+    const indicatorsContainer = document.getElementById('indicators');
+
+    // Initialize
+    totalSlidesSpan.textContent = totalSlides;
+
+    // Create indicators
+    for (let i = 1; i <= totalSlides; i++) {
+      const indicator = document.createElement('div');
+      indicator.className = 'indicator' + (i === 1 ? ' active' : '');
+      indicator.dataset.slide = i;
+      indicator.addEventListener('click', () => goToSlide(i));
+      indicatorsContainer.appendChild(indicator);
+    }
+
+    function updateSlide() {
+      slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index + 1 === currentSlide);
+      });
+
+      document.querySelectorAll('.indicator').forEach((ind, index) => {
+        ind.classList.toggle('active', index + 1 === currentSlide);
+      });
+
+      currentSlideSpan.textContent = currentSlide;
+      prevBtn.disabled = currentSlide === 1;
+      nextBtn.disabled = currentSlide === totalSlides;
+    }
+
+    function goToSlide(n) {
+      currentSlide = Math.max(1, Math.min(n, totalSlides));
+      updateSlide();
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    // Event listeners
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        goToSlide(1);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        goToSlide(totalSlides);
+      }
+    });
+
+    // Touch support
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    document.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) nextSlide();
+        else prevSlide();
+      }
+    });
+  </script>
+</body>
+</html>

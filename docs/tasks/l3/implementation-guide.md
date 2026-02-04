@@ -73,7 +73,7 @@ L2（AI情報制御レイヤー）のサービスを統合し、シーン執筆�
 | L3-4-2c | Character コンテキスト収集（Phaseフィルタ適用） | P1 | L3-4-1b, L3-3-1b | ✅ | [L3-4-2c](L3-4-2c_character-collector.md) |
 | L3-4-2d | WorldSetting コンテキスト収集（Phaseフィルタ適用） | P1 | L3-4-1b, L3-3-1c | ✅ | [L3-4-2d](L3-4-2d_world-setting-collector.md) |
 | L3-4-2e | StyleGuide コンテキスト収集 | P1 | L3-4-1b, L1-2-9 | ✅ | [L3-4-2e](L3-4-2e_style-guide-collector.md) |
-| L3-4-3a | ContextIntegrator 統合テスト | P1 | L3-4-2a〜L3-4-2e | 📋 | [L3-4-3a](L3-4-3a_context-integrator-test.md) |
+| L3-4-3a | ContextIntegrator 統合テスト | P1 | L3-4-2a〜L3-4-2e | ✅ | [L3-4-3a](L3-4-3a_context-integrator-test.md) |
 
 ### L3-5: 伏線指示書生成
 
@@ -81,30 +81,30 @@ L2（AI情報制御レイヤー）のサービスを統合し、シーン執筆�
 |----|--------|--------|------|-----------|-------------|
 | L3-5-1a | ForeshadowInstruction データクラス | P1 | - | ✅ | [L3-5-1a](L3-5-1a_foreshadow-instruction.md) |
 | L3-5-1b | InstructionGenerator プロトコル | P1 | L3-5-1a | ✅ | [L3-5-1b](L3-5-1b_instruction-generator-protocol.md) |
-| L3-5-2a | シーン→関連伏線特定 | P1 | L3-5-1b, L2-3-1 | 🔲 | [L3-5-2a](L3-5-2a_scene-foreshadowing-identifier.md) |
-| L3-5-2b | 伏線ステータス別指示生成 | P1 | L3-5-2a | 🔲 | [L3-5-2b](L3-5-2b_instruction-generator-impl.md) |
-| L3-5-2c | 禁止キーワード収集 | P1 | L3-5-2b, L2-2-1 | 🔲 | [L3-5-2c](L3-5-2c_forbidden-keyword-collector.md) |
+| L3-5-2a | シーン→関連伏線特定 | P1 | L3-5-1b, L2-3-1 | ✅ | [L3-5-2a](L3-5-2a_scene-foreshadowing-identifier.md) |
+| L3-5-2b | 伏線ステータス別指示生成 | P1 | L3-5-2a | ✅ | [L3-5-2b](L3-5-2b_instruction-generator-impl.md) |
+| L3-5-2c | 禁止キーワード収集 | P1 | L3-5-2b, L2-2-1 | ✅ | [L3-5-2c](L3-5-2c_forbidden-keyword-collector.md) |
 | L3-5-2d | 許可表現リスト収集 | P2 | L3-5-2b | 🔲 | [L3-5-2d](L3-5-2d_allowed-expression-collector.md) |
-| L3-5-3a | 伏線指示書生成テスト | P1 | L3-5-2c | 🔲 | [L3-5-3a](L3-5-3a_foreshadow-instruction-test.md) |
+| L3-5-3a | 伏線指示書生成テスト | P1 | L3-5-2c | ✅ | [L3-5-3a](L3-5-3a_foreshadow-instruction-test.md) |
 
 ### L3-6: Visibility 統合
 
 | ID | タスク | 優先度 | 依存 | ステータス | ドキュメント |
 |----|--------|--------|------|-----------|-------------|
 | L3-6-1a | VisibilityAwareContext データクラス | P1 | L3-4-1a | ✅ | [L3-6-1a](L3-6-1a_visibility-aware-context.md) |
-| L3-6-1b | Visibility フィルタリング統合 | P1 | L3-6-1a, L2-1-4 | 🔲 | [L3-6-1b](L3-6-1b_visibility-filtering-integration.md) |
-| L3-6-1c | Hint 収集・統合 | P1 | L3-6-1b | 🔲 | [L3-6-1c](L3-6-1c_hint-collection.md) |
-| L3-6-1d | Visibility統合テスト | P1 | L3-6-1c | 🔲 | [L3-6-1d](L3-6-1d_visibility-integration-test.md) |
+| L3-6-1b | Visibility フィルタリング統合 | P1 | L3-6-1a, L2-1-4 | ✅ | [L3-6-1b](L3-6-1b_visibility-filtering-integration.md) |
+| L3-6-1c | Hint 収集・統合 | P1 | L3-6-1b | ✅ | [L3-6-1c](L3-6-1c_hint-collection.md) |
+| L3-6-1d | Visibility統合テスト | P1 | L3-6-1c | ✅ | [L3-6-1d](L3-6-1d_visibility-integration-test.md) |
 
 ### L3-7: Context Builder ファサード
 
 | ID | タスク | 優先度 | 依存 | ステータス | ドキュメント |
 |----|--------|--------|------|-----------|-------------|
-| L3-7-1a | ContextBuilder クラス定義 | P1 | L3-2-1c, L3-3-1b, L3-4-1b | 🔲 | [L3-7-1a](L3-7-1a_context-builder-facade.md) |
-| L3-7-1b | build_context() メソッド実装 | P1 | L3-7-1a, L3-6-1b | 🔲 | [L3-7-1b](L3-7-1b_build-context-impl.md) |
-| L3-7-1c | get_foreshadow_instructions() 実装 | P1 | L3-7-1a, L3-5-2b | 🔲 | [L3-7-1c](L3-7-1c_get-foreshadow-instructions-impl.md) |
-| L3-7-1d | get_forbidden_keywords() 実装 | P1 | L3-7-1a, L3-5-2c | 🔲 | [L3-7-1d](L3-7-1d_get-forbidden-keywords-impl.md) |
-| L3-7-2a | ContextBuilder 統合テスト | P1 | L3-7-1b, L3-7-1c, L3-7-1d | 🔲 | [L3-7-2a](L3-7-2a_context-builder-test.md) |
+| L3-7-1a | ContextBuilder クラス定義 | P1 | L3-2-1c, L3-3-1b, L3-4-1b | ✅ | [L3-7-1a](L3-7-1a_context-builder-facade.md) |
+| L3-7-1b | build_context() メソッド実装 | P1 | L3-7-1a, L3-6-1b | ✅ | [L3-7-1b](L3-7-1b_build-context-impl.md) |
+| L3-7-1c | get_foreshadow_instructions() 実装 | P1 | L3-7-1a, L3-5-2b | ✅ | [L3-7-1c](L3-7-1c_get-foreshadow-instructions-impl.md) |
+| L3-7-1d | get_forbidden_keywords() 実装 | P1 | L3-7-1a, L3-5-2c | ✅ | [L3-7-1d](L3-7-1d_get-forbidden-keywords-impl.md) |
+| L3-7-2a | ContextBuilder 統合テスト | P1 | L3-7-1b, L3-7-1c, L3-7-1d | ✅ | [L3-7-2a](L3-7-2a_context-builder-test.md) |
 
 ### L3-8: AoT Parallel Collector（P2 - 将来実装）
 
@@ -555,3 +555,5 @@ class ContextBuilder:
 | 2026-01-26 | Phase C 主要タスク完了（187テストパス）: SceneResolver, FileLazyLoader, CharacterPhaseFilter, WorldSettingPhaseFilter |
 | 2026-01-31 | Phase C 完了（490テストパス）: キャラクター/世界観特定、GracefulLoader、PhaseFilter テスト |
 | 2026-02-01 | Phase D Collectors 完了（565テストパス）: Plot/Summary/Character/WorldSetting/StyleGuide Collector |
+| 2026-02-01 | Phase E 完了（655テストパス）: 伏線指示書生成、Visibility統合、ForbiddenKeywordCollector、HintCollector |
+| 2026-02-04 | Phase F 完了（726テストパス）: ContextBuilder ファサード、build_context、foreshadow_instructions、forbidden_keywords、統合テスト |

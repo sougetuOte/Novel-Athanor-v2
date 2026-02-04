@@ -5,6 +5,9 @@ It integrates L2 services (visibility control, expression filter, foreshadowing 
 to construct the appropriate context for each scene.
 """
 
+# Phase F: Context Builder Facade
+from .context_builder import ContextBuilder, ContextBuildResult
+
 # Phase A: Data classes and protocols
 from .context_integrator import ContextCollector, ContextIntegrator
 from .filtered_context import FilteredContext
@@ -71,4 +74,7 @@ __all__ = [
     # Context integration
     "ContextCollector",
     "ContextIntegrator",
+    # Context Builder (L3-7 Facade)
+    "ContextBuilder",
+    "ContextBuildResult",
 ]

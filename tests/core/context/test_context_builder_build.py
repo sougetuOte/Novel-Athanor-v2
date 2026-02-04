@@ -58,6 +58,47 @@ class TestBuildContext:
         assert isinstance(result.warnings, list)
 
 
+class TestBuildContextErrors:
+    """Tests for build_context() error classification (SHORT-01)."""
+
+    def test_integration_failure_recorded_as_error(self, tmp_path, scene):
+        """Integration failure is recorded in errors (not warnings) with success=False."""
+        from unittest.mock import MagicMock
+
+        builder = ContextBuilder(vault_root=tmp_path)
+        # Replace integrator with one that raises
+        mock_integrator = MagicMock()
+        mock_integrator.integrate_with_warnings.side_effect = ValueError("integration failed")
+        builder._integrator = mock_integrator
+
+        result = builder.build_context(scene)
+
+        assert result.success is False
+        assert result.has_errors() is True
+        assert any("integration failed" in e for e in result.errors)
+        # Should still return a valid (empty) FilteredContext
+        assert isinstance(result.context, FilteredContext)
+
+    def test_optional_failures_remain_warnings(self, tmp_path, scene):
+        """Optional component failures are recorded as warnings, not errors."""
+        from unittest.mock import MagicMock
+
+        from src.core.services.visibility_controller import VisibilityController
+
+        vc = VisibilityController()
+        builder = ContextBuilder(vault_root=tmp_path, visibility_controller=vc)
+        # Replace visibility filtering with one that raises
+        mock_filter = MagicMock()
+        mock_filter.filter_context.side_effect = ValueError("visibility failed")
+        builder._visibility_filtering_service = mock_filter
+
+        result = builder.build_context(scene)
+
+        assert result.success is True
+        assert result.has_errors() is False
+        assert any("visibility failed" in w for w in result.warnings)
+
+
 class TestBuildContextSimple:
     """Tests for build_context_simple() method."""
 

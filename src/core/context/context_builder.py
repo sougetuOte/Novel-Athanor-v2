@@ -11,6 +11,7 @@ Usage:
 
 from __future__ import annotations
 
+import logging
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -84,6 +85,9 @@ class ContextBuildResult:
             True if there are warnings.
         """
         return len(self.warnings) > 0
+
+
+logger = logging.getLogger(__name__)
 
 
 class ContextBuilder:
@@ -224,17 +228,23 @@ class ContextBuilder:
         """
         warnings: list[str] = []
         errors: list[str] = []
+        logger.debug("Building context for scene %s:%s", scene.episode_id, scene.sequence_id)
 
         # 1. Context integration (collect all context data)
-        context, integration_warnings = self._integrator.integrate_with_warnings(
-            scene,
-            plot_collector=self._plot_collector,
-            summary_collector=self._summary_collector,
-            character_collector=self._character_collector,
-            world_collector=self._world_collector,
-            style_collector=self._style_collector,
-        )
-        warnings.extend(integration_warnings)
+        try:
+            context, integration_warnings = self._integrator.integrate_with_warnings(
+                scene,
+                plot_collector=self._plot_collector,
+                summary_collector=self._summary_collector,
+                character_collector=self._character_collector,
+                world_collector=self._world_collector,
+                style_collector=self._style_collector,
+            )
+            warnings.extend(integration_warnings)
+        except (OSError, ValueError, KeyError, TypeError) as e:
+            logger.error("Context integration failed: %s", e)
+            errors.append(f"Context integration failed: {e}")
+            context = FilteredContext()
 
         # 2. Foreshadowing instructions (optional)
         foreshadow_instructions = self.get_foreshadow_instructions(scene)
@@ -243,6 +253,7 @@ class ContextBuilder:
         try:
             forbidden_keywords = self.get_forbidden_keywords(scene)
         except (OSError, ValueError, KeyError, TypeError) as e:
+            logger.warning("Forbidden keyword collection failed: %s", e)
             warnings.append(f"Forbidden keyword collection failed: {e}")
             forbidden_keywords = []
 
@@ -254,6 +265,7 @@ class ContextBuilder:
                     self._visibility_filtering_service.filter_context(context)
                 )
             except (OSError, ValueError, KeyError, TypeError) as e:
+                logger.warning("Visibility filtering failed: %s", e)
                 warnings.append(f"Visibility filtering failed: {e}")
 
         # 5. Hint collection
@@ -262,13 +274,19 @@ class ContextBuilder:
             foreshadow_instructions=foreshadow_instructions,
         )
 
+        success = len(errors) == 0
+        if success:
+            logger.debug("Context build succeeded for %s:%s", scene.episode_id, scene.sequence_id)
+        else:
+            logger.warning("Context build completed with %d error(s)", len(errors))
+
         return ContextBuildResult(
             context=context,
             visibility_context=visibility_context,
             foreshadow_instructions=foreshadow_instructions,
             forbidden_keywords=forbidden_keywords,
             hints=hints,
-            success=len(errors) == 0,
+            success=success,
             errors=errors,
             warnings=warnings,
         )
@@ -303,6 +321,7 @@ class ContextBuilder:
         cache_key = f"{scene.episode_id}:{scene.sequence_id}"
 
         if use_cache and cache_key in self._instruction_cache:
+            logger.debug("Instruction cache hit for %s", cache_key)
             return self._instruction_cache[cache_key]
 
         if self._instruction_generator is None:
@@ -311,8 +330,8 @@ class ContextBuilder:
             try:
                 instructions = self._instruction_generator.generate(scene)
             except (OSError, ValueError, KeyError, TypeError) as e:
+                logger.warning("Instruction generation failed for %s: %s", cache_key, e)
                 instructions = ForeshadowInstructions()
-                # Record the error for debugging (logged via build_context warnings)
                 self._last_instruction_error = e
 
         self._cache_put(self._instruction_cache, cache_key, instructions)
@@ -333,6 +352,7 @@ class ContextBuilder:
         cache_key = f"{scene.episode_id}:{scene.sequence_id}"
 
         if use_cache and cache_key in self._forbidden_cache:
+            logger.debug("Forbidden keyword cache hit for %s", cache_key)
             return self._forbidden_cache[cache_key]
 
         # Get foreshadowing instructions for forbidden expressions
@@ -341,6 +361,7 @@ class ContextBuilder:
         # Collect forbidden keywords from all sources
         result = self._forbidden_keyword_collector.collect(scene, foreshadow_instructions)
         keywords = result.keywords
+        logger.debug("Collected %d forbidden keywords for %s", len(keywords), cache_key)
 
         self._cache_put(self._forbidden_cache, cache_key, keywords)
         self._cache_put(self._forbidden_result_cache, cache_key, result)

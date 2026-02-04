@@ -7,7 +7,7 @@ as well as the concrete implementation.
 
 from typing import Any, Protocol
 
-from src.core.models.foreshadowing import Foreshadowing
+from src.core.models.foreshadowing import Foreshadowing, ForeshadowingStatus
 from src.core.repositories.foreshadowing import ForeshadowingRepository
 
 from .foreshadow_instruction import (
@@ -241,8 +241,6 @@ class InstructionGeneratorImpl:
             return InstructionAction.NONE
 
         # Check status and determine action directly
-        from src.core.models.foreshadowing import ForeshadowingStatus
-
         # REGISTERED -> check if this is plant episode
         if fs.status == ForeshadowingStatus.REGISTERED:
             plant_episode = self.identifier._extract_episode_from_id(fs_id)

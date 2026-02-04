@@ -4,10 +4,16 @@ This module collects and integrates hints from various sources
 (visibility, foreshadowing) for the Ghost Writer.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum
 
-from .foreshadow_instruction import ForeshadowInstructions, InstructionAction
+from .foreshadow_instruction import (
+    ForeshadowInstruction,
+    ForeshadowInstructions,
+    InstructionAction,
+)
 from .visibility_context import VisibilityAwareContext
 
 
@@ -218,7 +224,7 @@ class HintCollector:
 
         return collected
 
-    def _generate_hint_text(self, inst: "ForeshadowInstruction") -> str:  # noqa: F821
+    def _generate_hint_text(self, inst: ForeshadowInstruction) -> str:
         """Generate hint text from instruction.
 
         Args:
@@ -312,7 +318,3 @@ class HintCollector:
             result[category] = "\n".join(lines)
 
         return result
-
-
-# Import for type annotation
-from .foreshadow_instruction import ForeshadowInstruction  # noqa: E402

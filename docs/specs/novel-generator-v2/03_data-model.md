@@ -79,7 +79,7 @@ erDiagram
         string name PK
         array phases
         string current_phase
-        int default_visibility
+        AIVisibilitySettings ai_visibility
     }
 
     WorldSetting {
@@ -87,7 +87,7 @@ erDiagram
         string category
         array phases
         string current_phase
-        int default_visibility
+        AIVisibilitySettings ai_visibility
     }
 
     Phase {
@@ -130,6 +130,15 @@ erDiagram
         int level
     }
 ```
+
+> **注記: AIVisibilitySettings の定義**
+>
+> `Character` および `WorldSetting` の `ai_visibility` フィールドは `AIVisibilitySettings` 型であり、以下のフィールドを持つ:
+> - `default`: int (0-3) -- セクション未指定時のデフォルト可視性
+> - `hidden_section`: int (0-3) -- 「隠し設定」セクションの可視性
+>
+> 実装: `src/core/models/character.py` の `AIVisibilitySettings` クラス。
+> `WorldSetting` は同クラスを共有（`src/core/models/world_setting.py` 参照）。
 
 ---
 
@@ -346,6 +355,18 @@ work: "作品名"
   3. AI参照時は current_phase のみ使用
 ```
 
+#### フェーズ管理の層別責務
+
+| レイヤー | 責務 | 具体的な処理 |
+|---------|------|------------|
+| **L1 (Data)** | フェーズデータの保持 | `phases` 配列と `current_phase` の管理 |
+| **L2 (AI Control)** | (使用せず) | フェーズフィルタリングはAI情報制御とは独立 |
+| **L3 (Context)** | フェーズフィルタリング実行 | `PhaseFilter` が `current_phase` に基づいてコンテンツをフィルタ |
+| **L4 (Agent)** | `current_phase` の指定 | `SceneIdentifier.current_phase` でフェーズを伝達 |
+
+> **注**: L1 はフェーズのメタデータ管理のみを行い、
+> フィルタリングロジック自体は L3 のコンテキスト構築時に実行される。
+
 ---
 
 ## 5. ストレージ形式
@@ -369,6 +390,9 @@ work: "作品名"
 
 ### 6.1 Volume（巻）単位のディレクトリ分割
 
+> **実装ステータス**: 将来実装予定。現行バージョンでは未実装。
+> 100EP以上の大規模作品対応時に実装する計画。
+
 100エピソード以上の大規模作品では、Volume単位でディレクトリを分割する。
 
 ```
@@ -390,6 +414,9 @@ vault/{作品名}/
 ```
 
 ### 6.2 過去参照（スナップショット）
+
+> **実装ステータス**: 将来実装予定。現行バージョンでは未実装。
+> 大規模作品（100EP以上）対応時に実装する計画。
 
 「重要イベントサマリ」を維持し、過去の状態を参照可能にする。
 
@@ -413,6 +440,14 @@ event_snapshots:
 ## 7. データ堅牢性
 
 ### 7.1 循環参照対策
+
+> **実装方針**: 循環参照対策は2段階で実装する:
+> 1. L1 パーサーに `parse_with_depth_limit()` を追加（YAML/frontmatter の再帰パース制限）
+> 2. L3 コンテキスト構築時の参照解決制限（Markdown の `[[リンク]]` 循環検出）
+>
+> 現在の実装では Markdown リンクの深追い解決は行わないため、
+> 循環参照による無限ループリスクは低い。ただし、YAML構造の深い入れ子には
+> 深度制限を設けることを推奨する。
 
 Markdownリンクレベルでの循環参照は許容するが、JSONパース時に再帰深度制限を設ける。
 
@@ -461,6 +496,9 @@ def load_entity_with_fallback(file_path):
 ```
 
 ### 7.3 設定共有機能
+
+> **実装ステータス**: 将来実装予定。現行バージョンでは未実装。
+> 複数作品管理機能の導入時に実装する計画。
 
 複数作品間で共通設定（魔法体系、世界観など）を共有する。
 

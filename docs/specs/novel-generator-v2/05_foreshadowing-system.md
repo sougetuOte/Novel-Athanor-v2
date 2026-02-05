@@ -381,7 +381,31 @@ output:
   archived: true
 ```
 
-### 4.5 伏線確認（下書き生成前）
+### 4.5 伏線指示書アクション（InstructionAction）
+
+伏線指示書で使用するアクションの定義。Ghost Writer に対して、各伏線をどう扱うかを指示する。
+
+| アクション | 値 | 説明 | 使用場面 |
+|-----------|---|------|---------|
+| **PLANT** | `plant` | 伏線を新規設置する指示 | status=registered の伏線を本文中に初めて設置する |
+| **REINFORCE** | `reinforce` | 既存伏線を強化する指示 | status=planted/reinforced の伏線を再度言及して印象を深める |
+| **HINT** | `hint` | 伏線の存在を暗示する指示（微細度が高い場合） | 関連キャラクターが登場するシーンで、非常に控えめに想起させる |
+| **NONE** | `none` | 指示なし（コンテキストのみ提供） | 該当シーンでは伏線に触れない。コンテキスト情報として保持するのみ |
+
+**アクション決定ロジック**:
+
+```
+registered + 設置予定エピソード一致 → PLANT
+planted/reinforced + 強化タイムラインに該当 → REINFORCE
+planted + 関連キャラクター登場 → HINT
+上記以外 / revealed → NONE
+```
+
+**HINT と REINFORCE の違い**:
+- **REINFORCE**: 意図的に伏線を強化する。読者の記憶に残ることを期待する。
+- **HINT**: 関連キャラクターの登場に合わせた最小限の暗示。気づかなくても物語に影響しない。
+
+### 4.6 伏線確認（下書き生成前）
 
 ```yaml
 command: check_foreshadowing_for_scene
@@ -427,11 +451,13 @@ def get_foreshadowing_context(episode, scene):
     result = {
         'hints': [],       # Level 1-2 の暗示指示
         'available': [],   # Level 3 の使用可能情報
-        'forbidden': []    # 禁止キーワード
+        'forbidden': [],   # 禁止キーワード
+        'instructions': [] # 伏線指示書（InstructionAction 別）
     }
 
     for fs in load_foreshadowing():
         if fs.status == 'revealed':
+            # NONE: 回収済みは自由に使用可能
             result['available'].append(fs)
         elif fs.status in ['planted', 'reinforced']:
             if fs.ai_visibility.level == 2:
@@ -440,10 +466,39 @@ def get_foreshadowing_context(episode, scene):
                     'allowed_expressions': fs.ai_visibility.allowed_expressions
                 })
             result['forbidden'].extend(fs.ai_visibility.forbidden_keywords)
-        # registered, abandoned は何も追加しない
+
+            # REINFORCE/HINT の判定
+            action = determine_action(fs, episode, scene)
+            if action in ['reinforce', 'hint']:
+                result['instructions'].append({
+                    'id': fs.id,
+                    'action': action,
+                    'allowed_expressions': fs.ai_visibility.allowed_expressions,
+                    'forbidden_keywords': fs.ai_visibility.forbidden_keywords,
+                    'subtlety_target': calculate_subtlety(fs, action),
+                })
+        elif fs.status == 'registered':
+            # PLANT: 設置予定エピソードに該当すれば指示書を生成
+            if should_plant_in_episode(fs, episode):
+                result['instructions'].append({
+                    'id': fs.id,
+                    'action': 'plant',
+                    'seed_description': fs.seed.description,
+                    'subtlety_target': calculate_subtlety(fs, 'plant'),
+                })
+        # abandoned は何も追加しない（NONE 扱い）
 
     return result
 ```
+
+**InstructionAction 別のフィルタリング動作**:
+
+| アクション | フィルタリング動作 |
+|-----------|----------------|
+| PLANT | `instructions` に設置指示を追加。seed の description と allowed_expressions を含める |
+| REINFORCE | `instructions` に強化指示を追加。`forbidden` にキーワード追加。`hints` に暗示許可表現を追加 |
+| HINT | `instructions` にヒント指示を追加（subtlety 高め）。`forbidden` にキーワード追加 |
+| NONE | 何も追加しない。ただし revealed の場合は `available` に追加（自由使用可能） |
 
 ---
 

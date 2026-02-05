@@ -41,36 +41,77 @@ AIが設定情報をどの程度認識・使用できるかを制御し、**ネ�
 AI認識: 存在自体を知らない
 ```
 
-#### Level 1: 認識のみ
-
-```yaml
-# ⚠️ Pink Elephant Paradox 対策
-# 「〜について言及するな」という否定命令はハルシネーションを誘発する
-# 代わりに「情報の不在」を淡々と伝える
-
-system_prompt_injection: |
-  {character_name}の背景の一部は、現在のコンテキストには含まれていません。
-  提示された情報のみに基づいて描写してください。
-```
+#### Level 1: 認識のみ — プロンプトテンプレート
 
 **設計根拠**: 「ピンクの象について考えないで」と言われると考えてしまう現象（Pink Elephant Paradox）を回避するため、否定命令ではなく「コンテキスト外の要素がある」と淡々と伝える設計を採用。
 
-#### Level 2: 内容認識
+**テンプレート変数**:
+
+| 変数 | 説明 | 例 |
+|------|------|-----|
+| `{entity_type}` | エンティティ種別 | character, world_setting 等 |
+| `{entity_name}` | エンティティ名 | アイラ, 魔法体系 等 |
+| `{section_name}` | セクション名 | 隠し設定, 禁忌の魔法 等 |
+| `{hint_text}` | 存在通知テキスト（カスタマイズ可能） | ※省略時はデフォルト文を使用 |
+
+**デフォルトテンプレート**:
 
 ```yaml
-system_prompt_injection: |
-  【秘密情報（執筆時は使用禁止）】
-  秘密の内容: {secret_content}
+# テンプレートファイル: vault/{作品名}/_ai_control/templates/level1_hint.yaml
+template_id: level1_default
+version: "1.0"
+description: "Level 1 認識のみ — 情報不在通知テンプレート"
 
-  この情報を使って緊張感や暗示を作ることは許可されますが、
-  以下の表現は絶対に使用禁止です:
-  - 禁止キーワード: {forbidden_keywords}
-  - 秘密を直接述べる表現
-  - 読者が秘密を推測できる具体的な描写
-
-  許可される表現:
-  - {allowed_expressions}
+prompt_template: |
+  {entity_name}の{section_name}に関する一部の情報は、
+  現在のコンテキストには含まれていません。
+  提示された情報のみに基づいて描写してください。
 ```
+
+**Pink Elephant 回避原則**:
+- NG: 「{entity_name}の秘密について触れないでください」（否定命令 → ハルシネーション誘発）
+- OK: 「情報が不在である」という事実の提示のみ
+
+#### Level 2: 内容認識 — プロンプトテンプレート
+
+**テンプレート変数**:
+
+| 変数 | 説明 | 例 |
+|------|------|-----|
+| `{entity_name}` | エンティティ名 | アイラ |
+| `{secret_id}` | 秘密ID | SEC-001 |
+| `{secret_content}` | 秘密の内容 | アイラは実は王族の血筋 |
+| `{forbidden_keywords}` | 禁止キーワードリスト | 王族, 血筋, 高貴, 王家 |
+| `{allowed_expressions}` | 許可表現リスト | ※下記参照 |
+| `{subtlety_level}` | 微細度 (1-10) | 5 |
+| `{subtlety_guideline}` | 微細度に応じた執筆指針 | ※`05_foreshadowing-system.md` Section 2.3 参照 |
+
+**デフォルトテンプレート**:
+
+```yaml
+# テンプレートファイル: vault/{作品名}/_ai_control/templates/level2_secret.yaml
+template_id: level2_default
+version: "1.0"
+description: "Level 2 内容認識 — 秘密情報制御テンプレート"
+
+prompt_template: |
+  【執筆参考情報（文章への直接使用禁止）】
+  以下の情報は物語の暗示や緊張感の構築に活用できますが、
+  明示的に述べることは禁止されています。
+
+  参考情報: {secret_content}
+
+  使用禁止キーワード: {forbidden_keywords}
+
+  許可される表現パターン:
+  {allowed_expressions}
+
+  微細度指針: {subtlety_guideline}
+```
+
+**Pink Elephant 回避原則（Level 2 固有）**:
+- NG: 「{entity_name}が王族であることを書かないでください」（否定命令 → 逆に意識させる）
+- OK: 許可表現リストで「書いてよいもの」を明示し、それ以外は自然と排除される設計
 
 #### Level 3: 使用可能
 
@@ -80,9 +121,66 @@ AI認識: 完全に把握
 制限: なし
 ```
 
+### 2.3 プロンプトテンプレート管理
+
+#### テンプレート管理ファイルパス
+
+```
+vault/{作品名}/_ai_control/templates/
+  level1_hint.yaml          # Level 1 用テンプレート
+  level2_secret.yaml        # Level 2 用テンプレート
+  custom/                   # 作品固有のカスタムテンプレート
+    level1_mystery.yaml     # 例: ミステリー向けカスタム
+    level2_fantasy.yaml     # 例: ファンタジー向けカスタム
+```
+
+#### テンプレート構造 (YAML)
+
+```yaml
+# テンプレート共通構造
+template_id: string         # テンプレート識別子（一意）
+version: string             # テンプレートバージョン
+description: string         # テンプレートの説明
+level: int                  # 対象可視性レベル (1 or 2)
+
+# テンプレート本体
+prompt_template: string     # プロンプトテンプレート文字列（変数埋め込み対応）
+
+# メタデータ（オプション）
+metadata:
+  author: string            # テンプレート作成者
+  genre: string             # 推奨ジャンル
+  notes: string             # 使用上の注意
+```
+
+#### デフォルトテンプレートの提供
+
+システムはLevel 1およびLevel 2のデフォルトテンプレートを内蔵する。
+ユーザーが `_ai_control/templates/` にカスタムテンプレートを配置した場合、
+そちらが優先的に使用される。
+
+**テンプレート解決順序**:
+1. エンティティ固有テンプレート（visibility.yaml で `template_id` 指定時）
+2. 作品カスタムテンプレート（`_ai_control/templates/custom/`）
+3. 作品デフォルトテンプレート（`_ai_control/templates/`）
+4. システム内蔵テンプレート（フォールバック）
+
 ---
 
 ## 3. データ構造
+
+### 3.0 デフォルト可視性ポリシー
+
+本システムは **Secure by Default** 原則（Section 2.1）に基づき、すべての情報を秘匿状態から開始する。
+
+| 場面 | デフォルト値 | 理由 |
+|------|------------|------|
+| 新規エンティティ | HIDDEN (0) | Secure by Default 原則 |
+| 既存作品インポート | HIDDEN (0) | 安全側にデフォルト |
+| ユーザー指定 | 任意 (0-3) | visibility.yaml で明示的に設定 |
+
+**注意**: `default_visibility: 3` を設定することでオープンポリシーに切り替え可能だが、
+秘密情報の漏洩リスクを十分に理解した上で設定すること。
 
 ### 3.1 可視性設定ファイル
 
@@ -93,7 +191,8 @@ AI認識: 完全に把握
 version: "1.0"
 
 # デフォルト可視性（新規設定のデフォルト値）
-default_visibility: 3
+# Secure by Default: 明示的に公開設定しない限り秘匿
+default_visibility: 0
 
 # エンティティ別可視性設定
 entities:

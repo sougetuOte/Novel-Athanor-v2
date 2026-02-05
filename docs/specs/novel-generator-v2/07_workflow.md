@@ -51,10 +51,10 @@ sequenceDiagram
 
     Note over CE,CD: Phase 1: Preparation
     CE->>CD: コンテキスト構築依頼
-    CD->>CD: get_filtered_context()
+    CD->>CD: build_context(scene: SceneIdentifier)
     CD->>CD: AI Information Control 適用
     CD->>CD: 伏線指示書作成
-    CD-->>CE: フィルタ済みコンテキスト
+    CD-->>CE: ContextBuildResult
 
     Note over CE,GW: Phase 2: Drafting
     CE->>GW: 執筆依頼
@@ -90,7 +90,7 @@ The Relay では、特定のツールの呼び出しが必須化されている�
 
 | ツール | 呼び出し元 | 説明 |
 |--------|-----------|------|
-| `get_filtered_context()` | Continuity Director | コンテキスト構築（スキップ不可） |
+| `build_context(scene)` | Continuity Director | コンテキスト構築（スキップ不可） |
 | `review_draft()` | Reviewer | 漏洩チェック（スキップ不可） |
 
 **目的**: ツール必須化により、情報フィルタリングと漏洩チェックを確実に実行する。

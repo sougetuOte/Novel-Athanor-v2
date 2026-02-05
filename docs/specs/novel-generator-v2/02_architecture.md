@@ -87,6 +87,39 @@
 | **Lazy Loader** | 必要最小限のデータ読み込み | NFR-001 |
 | **Phase Filter** | current_phase に基づくフィルタ | FR-004 |
 | **AoT Parallel Collector** | 並列コンテキスト収集 | NFR-003 |
+| **VisibilityAwareContext** | 可視性フィルタリング後のコンテキスト出力型 | FR-002 |
+
+#### VisibilityAwareContext
+
+L3 Context Builder の出力型の一つ。`VisibilityFilteringService` が `FilteredContext` に
+可視性フィルタリングを適用した結果を格納する。L4 エージェント（特に Ghost Writer）が
+使用するコンテキスト情報を統合的に提供する。
+
+```python
+@dataclass
+class VisibilityAwareContext:
+    """可視性フィルタリング済みコンテキスト。
+
+    FilteredContext（基本コンテキスト）に以下の可視性関連情報を付加:
+    - hints: Level 1-2 コンテンツの間接的ヒント
+    - excluded_sections: Level 0 で除外されたセクション名
+    - forbidden_keywords: 生成テキストに含めてはならないキーワード
+    - filtered_characters / filtered_world_settings: フィルター済みデータ
+    """
+    base_context: FilteredContext
+    hints: list[VisibilityHint] = []
+    excluded_sections: list[str] = []
+    current_visibility_level: AIVisibilityLevel = USE
+    forbidden_keywords: list[str] = []
+    filtered_characters: dict[str, str] = {}
+    filtered_world_settings: dict[str, str] = {}
+
+    # Ghost Writer 用変換メソッド
+    def to_ghost_writer_context(self) -> dict[str, Any]: ...
+```
+
+`ContextBuildResult.visibility_context` フィールドとして L4 に渡される。
+`VisibilityController` が未設定の場合は `None` となる。
 
 ### 2.5 Data Layer（データレイヤー）
 
@@ -131,20 +164,18 @@ vault/{作品名}/
 
 ```
 責務:
-  - 情報制御レイヤーを経由したコンテキスト構築
+  - L3 ContextBuilder を経由したコンテキスト構築
   - Level 0-2 の秘密をフィルタリング
   - 伏線挿入指示書の作成
 
 入力:
-  - シーン指定（L3 sequence）
-  - 現在のフェーズ
+  - SceneIdentifier（episode_id, sequence_id, chapter_id, current_phase）
 
 出力:
-  - フィルタ済みコンテキスト
-  - 伏線指示書（Level 2 の匂わせ指示）
+  - ContextBuildResult（フィルタ済みコンテキスト + 伏線指示書 + 禁止KW + ヒント）
 
 ツール:
-  - get_filtered_context(scene_id) 【必須呼び出し】
+  - build_context(scene: SceneIdentifier) → ContextBuildResult 【必須呼び出し】
 ```
 
 ### 3.3 Ghost Writer（執筆担当）
@@ -232,11 +263,11 @@ sequenceDiagram
     C->>D: コンテキスト構築依頼
 
     Note over D: AI Information Control Layer
-    D->>D: get_filtered_context(scene)
+    D->>D: build_context(scene: SceneIdentifier)
     D->>D: Level 0: 除外
     D->>D: Level 1-2: 伏線指示書作成
     D->>D: Level 3: 通常コンテキスト
-    D-->>C: フィルタ済みコンテキスト + 伏線指示書
+    D-->>C: ContextBuildResult（コンテキスト + 伏線指示書 + 禁止KW + ヒント）
 
     C->>W: 執筆依頼
     W-->>C: 下書き
@@ -257,7 +288,7 @@ sequenceDiagram
     C-->>U: 下書き + 品質レポート
 ```
 
-### 4.2 AoT 並列コンテキスト収集
+### 4.2 AoT コンテキスト収集
 
 ```
 Atom 1: Plot L1     → テーマ、全体方向性
@@ -269,7 +300,8 @@ Atom 6: WorldSetting→ current_phase の状態（フィルタ済み）
 Atom 7: StyleGuide  → 声、対話パターン
 Atom 8: Foreshadow  → 伏線指示（Level別）
 
-※ 全Atom独立・並列実行可能
+※ 全Atom独立（相互依存なし）
+※ 現在は順次実行。将来的に asyncio / concurrent.futures で並列化予定
 ※ AI Information Control Layer 経由でフィルタリング
 ```
 

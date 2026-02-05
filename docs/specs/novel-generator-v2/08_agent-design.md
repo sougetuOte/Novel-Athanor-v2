@@ -60,7 +60,7 @@ name: Continuity Director
 role: 情報制御・整合性管理
 implementation: .claude/agents/continuity-director.md
 tools:
-  - get_filtered_context  # 必須ツール
+  - build_context  # L3 ContextBuilder.build_context(scene) を呼び出す必須ツール
 ```
 
 ### 3.2 責務
@@ -70,100 +70,231 @@ tools:
 3. **伏線指示書**の作成（Level 2 の暗示指示）
 4. **フェーズフィルタリング**（current_phase のみ）
 
-### 3.3 内部ロジック分割
+### 3.3 SceneIdentifier 型定義
 
-責務過多を避けるため、内部ロジックを2つのサブコンポーネントに分割する。
+L3 コンテキスト構築のシーン識別に使用する不変データクラス。
+
+```python
+@dataclass(frozen=True)
+class SceneIdentifier:
+    """シーンを一意に識別する不変データクラス。
+
+    episode_id のみ必須。その他はオプション。
+    """
+    episode_id: str                 # 必須。例: "010", "ep010"
+    sequence_id: str | None = None  # 例: "seq_01"
+    chapter_id: str | None = None   # 例: "ch_03"
+    current_phase: str | None = None  # 例: "initial", "development", "climax", "resolution"
+
+    # __str__() → "ep:010/seq:seq_01/ch:ch_03" 形式
+```
+
+### 3.4 ContextBuildResult 型定義
+
+`ContextBuilder.build_context()` の戻り値型。L4 エージェントが使用する全コンテキスト情報を含む。
+
+```python
+@dataclass
+class ContextBuildResult:
+    """コンテキスト構築の完全な結果。
+
+    L4 エージェント（Continuity Director, Ghost Writer 等）が
+    必要とする全情報をまとめた型。
+    """
+    context: FilteredContext                         # 統合フィルター済みコンテキスト
+    visibility_context: VisibilityAwareContext | None # 可視性フィルター済みコンテキスト（コントローラ未設定時 None）
+    foreshadow_instructions: ForeshadowInstructions  # 伏線指示書
+    forbidden_keywords: list[str]                    # 全ソース統合済み禁止キーワード
+    hints: HintCollection                            # ヒント集約（可視性 + 伏線）
+    success: bool = True                             # 構築成功フラグ
+    errors: list[str] = field(default_factory=list)  # エラーメッセージ（L4で停止判定に使用）
+    warnings: list[str] = field(default_factory=list)  # 警告メッセージ
+
+    def has_errors(self) -> bool: ...
+    def has_warnings(self) -> bool: ...
+```
+
+### 3.5 L3 ContextBuilder（統合ファサード）
+
+L3 Context Builder は収集・可視性フィルタリング・伏線指示書生成・禁止キーワード収集・ヒント収集を
+すべて統合したファサードとして動作する。仕様初期の ContextBuilder + InformationController の
+2コンポーネント分割は採用せず、単一の `ContextBuilder` クラスに統合している。
 
 ```
-Continuity Director
-├── Context Builder（収集）
-│   └── 関連ファイルの特定と読み込み
-└── Information Controller（フィルタリング）
-    └── AI可視性に基づくフィルタリング
+ContextBuilder（L3 統合ファサード）
+├── ContextIntegrator → FilteredContext
+│   ├── PlotCollector
+│   ├── SummaryCollector
+│   ├── CharacterCollector + CharacterPhaseFilter
+│   ├── WorldSettingCollector + WorldSettingPhaseFilter
+│   └── StyleGuideCollector
+├── VisibilityFilteringService → VisibilityAwareContext
+│   └── L2: VisibilityController
+├── InstructionGenerator → ForeshadowInstructions
+│   ├── ForeshadowingIdentifier
+│   └── L1: ForeshadowingRepository
+├── ForbiddenKeywordCollector → ForbiddenKeywordResult
+└── HintCollector → HintCollection
 ```
 
 ```python
-class ContinuityDirector:
-    def __init__(self):
-        self.context_builder = ContextBuilder()
-        self.info_controller = InformationController()
+# L3 ContextBuilder の初期化と使用
+builder = ContextBuilder(
+    vault_root=Path("vault/作品名"),
+    work_name="作品名",
+    visibility_controller=visibility_controller,      # L2（オプション）
+    foreshadowing_repository=foreshadowing_repo,       # L1（オプション）
+    phase_order=["initial", "development", "climax", "resolution"]
+)
 
-    def build_context(self, scene_id):
-        # Step 1: 収集（Context Builder）
-        raw_context = self.context_builder.gather(scene_id)
+# 主要メソッド: build_context
+scene = SceneIdentifier(
+    episode_id="010",
+    sequence_id="seq_01",
+    current_phase="development"
+)
+result: ContextBuildResult = builder.build_context(scene)
+# result.context          → FilteredContext（基本コンテキスト）
+# result.visibility_context → VisibilityAwareContext | None
+# result.foreshadow_instructions → ForeshadowInstructions
+# result.forbidden_keywords → list[str]
+# result.hints            → HintCollection
+# result.success          → bool
+# result.errors           → list[str]
+# result.warnings         → list[str]
+```
 
-        # Step 2: フィルタリング（Information Controller）
-        filtered_context = self.info_controller.filter(
-            raw_context,
-            visibility_config=self.load_visibility_config()
+### 3.6 処理フロー
+
+`ContextBuilder.build_context(scene)` の内部処理フロー:
+
+```python
+def build_context(scene: SceneIdentifier) -> ContextBuildResult:
+    warnings: list[str] = []
+    errors: list[str] = []
+
+    # Step 1: コンテキスト統合（各 Collector を順次実行）
+    #   - PlotCollector: L1/L2/L3 プロット収集
+    #   - SummaryCollector: L1/L2/L3 要約収集
+    #   - CharacterCollector: フェーズフィルタ済みキャラクター収集
+    #   - WorldSettingCollector: フェーズフィルタ済み世界観設定収集
+    #   - StyleGuideCollector: スタイルガイド収集
+    try:
+        context, integration_warnings = integrator.integrate_with_warnings(
+            scene, **collectors
         )
+        warnings.extend(integration_warnings)
+    except (OSError, ValueError, KeyError, TypeError) as e:
+        errors.append(f"Context integration failed: {e}")
+        context = FilteredContext()
 
-        return filtered_context
-```
+    # Step 2: 伏線指示書生成（LRUキャッシュ付き）
+    foreshadow_instructions = get_foreshadow_instructions(scene)
 
-### 3.4 処理フロー
+    # Step 3: 禁止キーワード収集（LRUキャッシュ付き）
+    #   ソース: visibility設定、伏線のforbidden_expressions、グローバル禁止
+    forbidden_keywords = get_forbidden_keywords(scene)
 
-```python
-def process(scene_id):
-    # 1. 対象ファイル特定
-    files = identify_relevant_files(scene_id)
+    # Step 4: 可視性フィルタリング（VisibilityController設定時のみ）
+    visibility_context = visibility_filtering_service.filter_context(context)
 
-    # 2. AI可視性設定読み込み
-    visibility_config = load_visibility_config()
-
-    # 3. フィルタリング
-    context = {}
-    hints = []
-    forbidden = []
-
-    for file in files:
-        filtered = apply_visibility_filter(file, visibility_config)
-        context.update(filtered['context'])
-        hints.extend(filtered['hints'])
-        forbidden.extend(filtered['forbidden'])
-
-    # 4. フェーズフィルタリング
-    context = apply_phase_filter(context, current_phase)
-
-    # 5. 伏線指示書作成
-    foreshadow_instructions = create_foreshadow_instructions(
-        scene_id, hints
+    # Step 5: ヒント収集（可視性ヒント + 伏線ヒントを統合）
+    hints = hint_collector.collect_all(
+        visibility_context=visibility_context,
+        foreshadow_instructions=foreshadow_instructions
     )
 
-    return {
-        'context': context,
-        'foreshadow_instructions': foreshadow_instructions,
-        'forbidden_keywords': forbidden
-    }
+    return ContextBuildResult(
+        context=context,
+        visibility_context=visibility_context,
+        foreshadow_instructions=foreshadow_instructions,
+        forbidden_keywords=forbidden_keywords,
+        hints=hints,
+        success=(len(errors) == 0),
+        errors=errors,
+        warnings=warnings,
+    )
 ```
 
-### 3.5 出力
+### 3.7 出力例
+
+`ContextBuildResult` のフィールドに対応した出力例:
 
 ```yaml
-filtered_context:
+# result.context (FilteredContext)
+context:
   plot_l1: "テーマと全体方向性..."
   plot_l2: "章の目的..."
   plot_l3: "シーン構成..."
-  summary: "これまでの流れ..."
+  summary_l1: "全体の流れ..."
+  summary_l2: "章の要約..."
+  summary_l3: "直近のあらすじ..."
   characters:
-    アイラ: "現在の状態（フィルタ済み）..."
+    アイラ: "現在の状態（フェーズフィルタ済み）..."
   world_settings:
-    魔法体系: "概要（フィルタ済み）..."
+    魔法体系: "概要（フェーズフィルタ済み）..."
   style_guide: "文体ガイド..."
+  scene_id: "ep:010/seq:seq_01"
+  current_phase: "development"
 
+# result.visibility_context (VisibilityAwareContext | None)
+visibility_context:
+  base_context: "(上記 context と同一)"
+  hints:
+    - category: "character"
+      entity_id: "アイラ"
+      hint_text: "アイラには隠された背景がある"
+      level: AWARE  # Level 1
+  excluded_sections:
+    - "character.闇の王"     # Level 0: HIDDEN → 除外
+  forbidden_keywords:
+    - "王族"
+    - "血筋"
+  filtered_characters:
+    アイラ: "フィルター済みテキスト..."
+  filtered_world_settings:
+    魔法体系: "フィルター済みテキスト..."
+
+# result.foreshadow_instructions (ForeshadowInstructions)
 foreshadow_instructions:
-  - id: FS-001
-    action: "reinforce"
-    allowed_expressions:
-      - "彼女の瞳には見覚えのある光があった"
-    forbidden_expressions:
-      - "王族"
-      - "血筋"
+  instructions:
+    - foreshadowing_id: "FS-001"
+      action: "reinforce"
+      allowed_expressions:
+        - "彼女の瞳には見覚えのある光があった"
+      forbidden_expressions:
+        - "王族"
+        - "血筋"
+      note: "第3章の伏線を強化する暗示を挿入"
+      subtlety_target: 7
+  global_forbidden_keywords:
+    - "禁忌の魔法"
 
+# result.forbidden_keywords (list[str])
 forbidden_keywords:
   - "王族"
   - "血筋"
   - "禁忌の魔法"
+
+# result.hints (HintCollection)
+hints:
+  hints:
+    - source: "visibility"
+      category: "character"
+      entity_id: "アイラ"
+      hint_text: "アイラには隠された背景がある"
+      strength: 0.5
+    - source: "foreshadowing"
+      category: "foreshadowing"
+      entity_id: "FS-001"
+      hint_text: "彼女の瞳には見覚えのある光があった"
+      strength: 0.7
+
+# result.success / errors / warnings
+success: true
+errors: []
+warnings:
+  - "Summary L3 not found for ep:010"
 ```
 
 ---
@@ -426,20 +557,28 @@ functions:
 
 ```python
 # パイプライン処理モデル
-def execute_draft_pipeline(scene_id):
-    # Step 1: コンテキスト構築（Continuity Director）
-    context = continuity_director.build_context(scene_id)
+def execute_draft_pipeline(scene: SceneIdentifier):
+    # Step 1: コンテキスト構築（Continuity Director → L3 ContextBuilder）
+    result: ContextBuildResult = context_builder.build_context(scene)
+
+    # L4 停止判定: L3 は全エラーを warning/error として収集するのみ。
+    # 必須コンテキスト失敗（result.errors 非空）の場合は L4 が停止を判定する。
+    if result.has_errors():
+        raise FatalContextError(
+            f"必須コンテキスト取得失敗: {result.errors}"
+        )
 
     # Step 2: 下書き生成（Ghost Writer）
-    # → コンテキストを直接注入（YAML通信なし）
+    # → ContextBuildResult のフィールドを直接注入（YAML通信なし）
     draft = ghost_writer.generate(
-        context=context['filtered_context'],
-        foreshadow_instructions=context['foreshadow_instructions'],
-        forbidden_keywords=context['forbidden_keywords']
+        context=result.visibility_context or result.context,
+        foreshadow_instructions=result.foreshadow_instructions,
+        forbidden_keywords=result.forbidden_keywords,
+        hints=result.hints,
     )
 
     # Step 3: レビュー（Reviewer）
-    review_result = reviewer.check(draft, context['secrets'])
+    review_result = reviewer.check(draft, result.forbidden_keywords)
 
     # Step 4: 品質チェック（Quality Agent）
     quality_result = quality_agent.evaluate(draft)
@@ -447,7 +586,8 @@ def execute_draft_pipeline(scene_id):
     return {
         'draft': draft,
         'review': review_result,
-        'quality': quality_result
+        'quality': quality_result,
+        'context_warnings': result.warnings,
     }
 ```
 
@@ -472,12 +612,35 @@ pipeline_execution:
       tokens_used: 2500
 ```
 
-### 8.3 Prompt Caching 活用
+### 8.3 Prompt Caching 活用（層別役割分担）
 
-共通コンテキスト（世界観、スタイルガイド等）は Prompt Caching 機能を利用し、全エージェントで共有キャッシュヒットを狙う。
+キャッシュ戦略を L3（ローカル）と L4（API）の2層で管理する。
+
+#### L3: ローカル LRU キャッシュ
+
+L3 ContextBuilder は内部に OrderedDict ベースの LRU キャッシュを保持し、
+同一シーンの繰り返しアクセスを高速化する。キャッシュ上限は `_MAX_CACHE_SIZE = 128`。
 
 ```python
-# キャッシュ戦略
+# L3 ローカルキャッシュ（ContextBuilder 内部）
+# キー: "{episode_id}:{sequence_id}" 形式
+_instruction_cache: OrderedDict[str, ForeshadowInstructions]  # 伏線指示書キャッシュ
+_forbidden_cache: OrderedDict[str, list[str]]                  # 禁止キーワードキャッシュ
+_forbidden_result_cache: OrderedDict[str, ForbiddenKeywordResult]  # ソース付き禁止KWキャッシュ
+
+# キャッシュ制御メソッド
+builder.clear_instruction_cache()   # 伏線指示書キャッシュクリア
+builder.clear_forbidden_cache()     # 禁止キーワードキャッシュクリア
+builder.clear_all_caches()          # 全キャッシュクリア
+```
+
+#### L4: Claude API Prompt Caching
+
+共通コンテキスト（世界観、スタイルガイド等）は Claude API の Prompt Caching 機能を利用し、
+全エージェントで共有キャッシュヒットを狙う。
+
+```python
+# L4 API レベルキャッシュ戦略
 CACHED_CONTEXT = {
     'world_settings': True,   # キャッシュ対象（変更頻度低）
     'style_guide': True,      # キャッシュ対象（変更頻度低）
@@ -486,39 +649,55 @@ CACHED_CONTEXT = {
 }
 ```
 
-### 8.4 Graceful Degradation（段階的劣化）
+### 8.4 Graceful Degradation（段階的劣化 — 層別責務分担）
 
-コンテキスト取得に失敗した場合の挙動を、コンテキストの重要度で分ける。
+エラーハンドリングを L3 と L4 の層別責務で分担する。
 
-| コンテキスト種別 | 重要度 | 取得失敗時の挙動 |
-|-----------------|--------|-----------------|
-| キャラ設定 | **必須** | エラー停止 |
-| プロット情報 | **必須** | エラー停止 |
-| スタイルガイド | **必須** | エラー停止 |
-| 参考資料 | 付加的 | 警告付きで続行 |
-| 過去サマリ | 付加的 | 警告付きで続行 |
+#### L3 の責務: warning/error 収集（停止しない）
+
+L3 ContextBuilder は全てのコンテキスト収集失敗を **warning または error として記録し、
+処理を続行する**（liberal graceful degradation）。L3 自体は停止判定を行わない。
 
 ```python
-def gather_context_with_graceful_degradation(scene_id):
-    context = {}
-    warnings = []
+# L3 ContextBuilder.build_context() 内部の挙動
+# - 各 Collector の失敗 → warnings に追加して続行
+# - ContextIntegrator の致命的失敗 → errors に追加、空 FilteredContext で続行
+# - 可視性フィルタリング失敗 → warnings に追加して続行
+# - 禁止キーワード収集失敗 → warnings に追加、空リストで続行
+#
+# 結果: ContextBuildResult.errors / warnings に全情報を格納
+```
 
-    # 必須コンテキスト（失敗時はエラー）
-    for required in ['characters', 'plot', 'style_guide']:
-        try:
-            context[required] = load_context(required, scene_id)
-        except ContextLoadError as e:
-            raise FatalContextError(f"必須コンテキスト取得失敗: {required}")
+#### L4 の責務: 停止判定
 
-    # 付加的コンテキスト（失敗時は警告して続行）
-    for optional in ['references', 'past_summaries']:
-        try:
-            context[optional] = load_context(optional, scene_id)
-        except ContextLoadError as e:
-            warnings.append(f"付加的コンテキスト取得失敗: {optional}")
-            context[optional] = None  # デフォルト値
+L4 エージェント（Continuity Director / Chief Editor）が `ContextBuildResult` の
+`errors` フィールドを評価し、必須コンテキスト失敗時にはエラー停止を判定する。
 
-    return {'context': context, 'warnings': warnings}
+| コンテキスト種別 | 重要度 | L3 の挙動 | L4 の判定 |
+|-----------------|--------|----------|----------|
+| キャラ設定 | **必須** | error 記録 + 続行 | errors 非空 → 停止 |
+| プロット情報 | **必須** | error 記録 + 続行 | errors 非空 → 停止 |
+| スタイルガイド | **必須** | error 記録 + 続行 | errors 非空 → 停止 |
+| 伏線指示書 | 付加的 | warning 記録 + 空指示で続行 | warnings をログ出力 |
+| 禁止キーワード | 付加的 | warning 記録 + 空リストで続行 | warnings をログ出力 |
+| 可視性フィルタ | 付加的 | warning 記録 + None で続行 | warnings をログ出力 |
+| 参考資料 | 付加的 | warning 記録 + 続行 | warnings をログ出力 |
+| 過去サマリ | 付加的 | warning 記録 + 続行 | warnings をログ出力 |
+
+```python
+# L4 パイプラインでの停止判定
+result: ContextBuildResult = context_builder.build_context(scene)
+
+if result.has_errors():
+    # L4 が停止を判定
+    raise FatalContextError(
+        f"必須コンテキスト取得失敗: {result.errors}"
+    )
+
+if result.has_warnings():
+    # 警告はログ出力して続行
+    for w in result.warnings:
+        logger.warning("Context warning: %s", w)
 ```
 
 ---

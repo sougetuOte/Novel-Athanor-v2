@@ -70,6 +70,12 @@
 
 詳細は `.claude/rules/phase-*.md` を参照。
 
+## Cost Management
+
+- **サブエージェント（Task）はデフォルトで `model: "sonnet"` を使用する**
+- Opus は設計・監査など深い推論が必要な場合のみ使用
+- Haiku は単純な検索・確認タスクに使用可
+
 ## References
 
 | カテゴリ | 場所 |

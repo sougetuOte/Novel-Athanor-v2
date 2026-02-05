@@ -51,9 +51,6 @@ erDiagram
 
     Character ||--o{ Phase : has
     WorldSetting ||--o{ Phase : has
-    Character ||--o{ Secret : has
-    WorldSetting ||--o{ Secret : has
-
     Foreshadowing ||--|| ForeshadowTimeline : tracks
     Foreshadowing }o--o{ Character : involves
     Foreshadowing }o--o{ WorldSetting : involves
@@ -101,6 +98,7 @@ erDiagram
         int visibility_level
         array forbidden_keywords
         array allowed_expressions
+        string __note__ "概念エンティティ（注記参照）"
     }
 
     Foreshadowing {
@@ -130,6 +128,16 @@ erDiagram
         int level
     }
 ```
+
+> **注記: Secret の実装形態**
+>
+> ER図の `Secret` は概念エンティティである。実装では独立モデルとして存在せず、以下の形で分散管理される:
+> - **Secret ID**: `EntityVisibilityConfig.secrets: list[str]` に格納（`VisibilityConfig` 経由）
+> - **Secret 内容**: Character/WorldSetting の Markdown 内 `<!-- ai_visibility: 0 -->` セクションとして埋め込み
+> - **禁止キーワード**: `ForbiddenKeywordCollector` が EntityVisibilityConfig + 伏線 + グローバル設定から統合収集
+>
+> ER図上の `Character → Secret` / `WorldSetting → Secret` の直接リレーションは
+> 実装では `AIVisibility (VisibilityConfig) → EntityVisibilityConfig → secrets` の間接参照に置き換わっている。
 
 > **注記: AIVisibilitySettings の定義**
 >

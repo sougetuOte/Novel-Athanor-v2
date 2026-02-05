@@ -132,7 +132,7 @@ ContextBuilder（L3 統合ファサード）
 │   └── L2: VisibilityController
 ├── InstructionGenerator → ForeshadowInstructions
 │   ├── ForeshadowingIdentifier
-│   └── L1: ForeshadowingRepository
+│   └── ForeshadowingReader Protocol (L1 ForeshadowingRepository を DI 注入)
 ├── ForbiddenKeywordCollector → ForbiddenKeywordResult
 └── HintCollector → HintCollection
 ```
@@ -143,7 +143,7 @@ builder = ContextBuilder(
     vault_root=Path("vault/作品名"),
     work_name="作品名",
     visibility_controller=visibility_controller,      # L2（オプション）
-    foreshadowing_repository=foreshadowing_repo,       # L1（オプション）
+    foreshadowing_reader=foreshadowing_reader,           # ForeshadowingReader Protocol（オプション）
     phase_order=["initial", "development", "climax", "resolution"]
 )
 

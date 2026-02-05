@@ -1,28 +1,29 @@
 {
   "feature": "novel-generator",
   "description": "AIとユーザーが協力して小説を作成する半自動生成システム",
-  "phase": "BUILDING",
-  "subPhase": "implementation",
+  "phase": "PLANNING",
+  "subPhase": "requirements",
   "status": {
-    "requirements": "approved",
-    "design": "approved",
-    "tasks": "approved"
+    "requirements": "in_progress",
+    "design": "pending",
+    "tasks": "pending"
   },
   "approvals": {
-    "requirements": "2026-01-24T12:40:00Z",
-    "design": "2026-01-26T00:00:00Z",
-    "tasks": "2026-01-26T00:00:00Z"
+    "requirements": null,
+    "design": null,
+    "tasks": null
   },
-  "currentActivity": "L3 Phase E 完了 - Phase F (ファサード統合) 待ち",
+  "currentActivity": "L4 Agent Layer PLANNING 開始",
   "l3Progress": {
     "phaseA": "completed",
     "phaseB": "completed",
     "phaseC": "completed",
     "phaseD": "completed",
     "phaseE": "completed",
-    "phaseF": "pending",
-    "phaseG": "pending"
+    "phaseF": "completed",
+    "phaseG": "skipped"
   },
+  "l4Progress": {},
   "artifacts": {
     "analysisTarget": [
       "docs/Novel-Athanor-main",
@@ -36,15 +37,16 @@
     ],
     "implementation": [
       "src/core/context/"
-    ]
+    ],
+    "roadmap": "docs/memos/2026-02-04-future-roadmap.md"
   },
   "qualityMetrics": {
-    "tests": 655,
+    "tests": 730,
     "mypy": 0,
     "ruff": 0,
-    "lastAudit": "2026-02-01",
+    "lastAudit": "2026-02-04",
     "auditGrade": "A"
   },
   "createdAt": "2026-01-24T00:00:00Z",
-  "updatedAt": "2026-02-01T00:00:00Z"
+  "updatedAt": "2026-02-05T00:00:00Z"
 }

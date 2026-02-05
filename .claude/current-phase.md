@@ -5,9 +5,9 @@
 _TDD実装フェーズ_
 
 ## Current Context
-- Feature: L3 (Context Builder Layer)
-- Started: 2026-01-26
-- Focus: Phase D 実装中（Collectors）
+- Feature: Issue Resolution Wave 2 + Wave 3
+- Started: 2026-02-05
+- Focus: 小規模修正 + L1 基盤構築
 
 ---
 

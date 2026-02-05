@@ -3,7 +3,6 @@
 禁止キーワードマッチャーのテスト。
 """
 
-import pytest
 
 from src.core.services.expression_filter import (
     KeywordViolation,
@@ -85,6 +84,11 @@ class TestCheckForbiddenKeywords:
         assert "王族" in violations[0].context
         # コンテキストには前後の文字が含まれる
         assert len(violations[0].context) > len("王族")
+
+    def test_none_text_returns_empty(self) -> None:
+        """None のテキストは空リストを返す."""
+        violations = check_forbidden_keywords(None, ["王族"])  # type: ignore
+        assert violations == []
 
 
 class TestCheckTextSafety:

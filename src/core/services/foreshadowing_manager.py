@@ -48,6 +48,7 @@ STATUS_VISIBILITY_MAP: dict[ForeshadowingStatus, AIVisibilityLevel] = {
     ForeshadowingStatus.PLANTED: AIVisibilityLevel.KNOW,
     ForeshadowingStatus.REINFORCED: AIVisibilityLevel.KNOW,
     ForeshadowingStatus.REVEALED: AIVisibilityLevel.USE,
+    ForeshadowingStatus.ABANDONED: AIVisibilityLevel.HIDDEN,
 }
 
 

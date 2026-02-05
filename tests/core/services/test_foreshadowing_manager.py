@@ -21,7 +21,7 @@ from src.core.services.foreshadowing_manager import (
 
 
 def _create_foreshadowing(
-    id: str = "FS-001",
+    id: str = "FS-001-test",
     title: str = "テスト伏線",
     fs_type: ForeshadowingType = ForeshadowingType.PLOT_TWIST,
     status: ForeshadowingStatus = ForeshadowingStatus.REGISTERED,
@@ -121,6 +121,11 @@ class TestGetRecommendedVisibility:
         """revealed は USE を推奨."""
         result = get_recommended_visibility(ForeshadowingStatus.REVEALED)
         assert result == AIVisibilityLevel.USE
+
+    def test_abandoned_returns_hidden(self) -> None:
+        """abandoned は HIDDEN を推奨."""
+        result = get_recommended_visibility(ForeshadowingStatus.ABANDONED)
+        assert result == AIVisibilityLevel.HIDDEN
 
 
 class TestGetVisibilityFromSubtlety:

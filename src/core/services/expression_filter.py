@@ -57,6 +57,9 @@ def check_forbidden_keywords(
     Returns:
         検出された違反のリスト
     """
+    if text is None:
+        return []
+
     violations: list[KeywordViolation] = []
 
     for keyword in forbidden_keywords:

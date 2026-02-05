@@ -201,3 +201,86 @@ class TestVisibilityConfig:
 
         not_found = config.get_entity("character", "存在しない")
         assert not_found is None
+
+    def test_entity_with_secrets_field(self) -> None:
+        """EntityVisibilityConfig に secrets フィールドがある."""
+        entity = EntityVisibilityConfig(
+            entity_type="character",
+            entity_name="アイラ",
+            secrets=["SEC-001", "SEC-002"],
+        )
+
+        assert entity.secrets == ["SEC-001", "SEC-002"]
+
+    def test_entity_secrets_default_empty(self) -> None:
+        """secrets フィールドはデフォルトで空リスト."""
+        entity = EntityVisibilityConfig(
+            entity_type="character",
+            entity_name="test",
+        )
+
+        assert entity.secrets == []
+
+    def test_collect_forbidden_keywords(self) -> None:
+        """VisibilityConfig.collect_forbidden_keywords() が動作する."""
+        config = VisibilityConfig(
+            entities=[
+                EntityVisibilityConfig(
+                    entity_type="character",
+                    entity_name="アイラ",
+                    sections=[
+                        SectionVisibility(
+                            section_name="秘密設定",
+                            level=AIVisibilityLevel.KNOW,
+                            forbidden_keywords=["王族", "血筋"],
+                        ),
+                        SectionVisibility(
+                            section_name="隠し設定",
+                            level=AIVisibilityLevel.KNOW,
+                            forbidden_keywords=["魔王"],
+                        ),
+                    ],
+                ),
+                EntityVisibilityConfig(
+                    entity_type="world",
+                    entity_name="魔法体系",
+                    sections=[
+                        SectionVisibility(
+                            section_name="禁忌",
+                            level=AIVisibilityLevel.HIDDEN,
+                            forbidden_keywords=["禁忌の魔法"],
+                        ),
+                    ],
+                ),
+            ]
+        )
+
+        keywords = config.collect_forbidden_keywords()
+
+        # All keywords should be collected
+        assert "王族" in keywords
+        assert "血筋" in keywords
+        assert "魔王" in keywords
+        assert "禁忌の魔法" in keywords
+        # No duplicates
+        assert len(keywords) == len(set(keywords))
+
+    def test_collect_forbidden_keywords_empty(self) -> None:
+        """禁止キーワードがない場合は空リストを返す."""
+        config = VisibilityConfig(
+            entities=[
+                EntityVisibilityConfig(
+                    entity_type="character",
+                    entity_name="test",
+                    sections=[
+                        SectionVisibility(
+                            section_name="公開",
+                            level=AIVisibilityLevel.USE,
+                        ),
+                    ],
+                ),
+            ]
+        )
+
+        keywords = config.collect_forbidden_keywords()
+        assert keywords == []

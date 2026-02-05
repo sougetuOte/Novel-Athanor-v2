@@ -6,7 +6,6 @@ from pathlib import Path
 import pytest
 
 from src.core.models.episode import Episode
-from src.core.parsers.frontmatter import parse_frontmatter
 from src.core.repositories.base import (
     BaseRepository,
     EntityExistsError,

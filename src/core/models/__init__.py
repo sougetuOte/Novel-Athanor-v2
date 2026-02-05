@@ -23,6 +23,7 @@ from src.core.models.foreshadowing import (
 )
 from src.core.models.plot import PlotBase, PlotL1, PlotL2, PlotL3
 from src.core.models.secret import Secret, SecretImportance
+from src.core.models.settings import Settings
 from src.core.models.style import (
     DialogueStyle,
     POVType,
@@ -58,6 +59,7 @@ __all__ = [
     "Secret",
     "SecretImportance",
     "SectionVisibility",
+    "Settings",
     "StyleGuide",
     "StyleProfile",
     "SummaryBase",

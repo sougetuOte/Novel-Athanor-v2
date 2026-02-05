@@ -98,7 +98,7 @@ class Foreshadowing(BaseModel):
     例: FS-03-rocket（第3話で植えたロケットの伏線）
     """
 
-    id: str
+    id: str = Field(pattern=r"^FS-\d+-[a-z0-9-]+$")
     title: str
     fs_type: ForeshadowingType
     status: ForeshadowingStatus

@@ -288,3 +288,42 @@ class TestForeshadowing:
             subtlety_level=5,
         )
         assert foreshadowing.id == "FS-03-rocket"
+
+    def test_valid_foreshadowing_id_format(self) -> None:
+        """有効な ID 形式をバリデーションできる."""
+        # FS-{数字}-{小文字とハイフン}
+        valid_ids = [
+            "FS-001-mysterious-letter",
+            "FS-999-test",
+            "FS-03-rocket",
+            "FS-1-a",
+        ]
+        for valid_id in valid_ids:
+            foreshadowing = Foreshadowing(
+                id=valid_id,
+                title="テスト",
+                fs_type=ForeshadowingType.PLOT_TWIST,
+                status=ForeshadowingStatus.REGISTERED,
+                subtlety_level=5,
+            )
+            assert foreshadowing.id == valid_id
+
+    def test_invalid_foreshadowing_id_format(self) -> None:
+        """無効な ID 形式はエラーを出す."""
+        invalid_ids = [
+            "invalid",
+            "FS001",
+            "FS-abc-test",
+            "fs-001-test",  # 小文字の FS
+            "FS-001-TEST",  # 大文字の slug
+            "FS-001-test_name",  # アンダースコア
+        ]
+        for invalid_id in invalid_ids:
+            with pytest.raises(ValidationError):
+                Foreshadowing(
+                    id=invalid_id,
+                    title="テスト",
+                    fs_type=ForeshadowingType.PLOT_TWIST,
+                    status=ForeshadowingStatus.REGISTERED,
+                    subtlety_level=5,
+                )

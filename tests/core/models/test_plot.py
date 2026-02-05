@@ -1,6 +1,6 @@
 """Tests for Plot models."""
 
-from src.core.models.plot import PlotBase, PlotL1, PlotL2, PlotL3
+from src.core.models.plot import PlotL1, PlotL2, PlotL3
 
 
 class TestPlotL1:

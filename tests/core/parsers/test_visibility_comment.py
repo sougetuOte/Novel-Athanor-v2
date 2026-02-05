@@ -8,8 +8,8 @@ import pytest
 from src.core.models.ai_visibility import AIVisibilityLevel
 from src.core.parsers.visibility_comment import (
     VisibilityMarker,
-    parse_visibility_comments,
     extract_section_visibility,
+    parse_visibility_comments,
 )
 
 

@@ -96,6 +96,7 @@ class EntityVisibilityConfig(BaseModel):
     entity_name: str
     default_level: AIVisibilityLevel = AIVisibilityLevel.HIDDEN
     sections: list[SectionVisibility] = Field(default_factory=list)
+    secrets: list[str] = Field(default_factory=list)  # Secret IDs
 
 
 class VisibilityConfig(BaseModel):
@@ -124,3 +125,18 @@ class VisibilityConfig(BaseModel):
             if entity.entity_type == entity_type and entity.entity_name == entity_name:
                 return entity
         return None
+
+    def collect_forbidden_keywords(self) -> list[str]:
+        """Collect all forbidden keywords from all entities and sections.
+
+        Returns:
+            全エンティティとセクションから収集した禁止キーワードのリスト（重複なし）
+        """
+        keywords: set[str] = set()
+
+        for entity in self.entities:
+            # Collect from sections
+            for section in entity.sections:
+                keywords.update(section.forbidden_keywords)
+
+        return list(keywords)

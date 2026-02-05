@@ -2,7 +2,7 @@
 
 from datetime import date
 
-from src.core.models.character import AIVisibilitySettings, Phase
+from src.core.models.character import Phase
 from src.core.models.world_setting import WorldSetting
 
 

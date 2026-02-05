@@ -1,6 +1,5 @@
 """Tests for Foreshadowing repository."""
 
-from datetime import date
 from pathlib import Path
 
 import pytest

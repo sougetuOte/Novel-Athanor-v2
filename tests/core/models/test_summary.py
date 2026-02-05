@@ -2,7 +2,7 @@
 
 from datetime import date
 
-from src.core.models.summary import SummaryBase, SummaryL1, SummaryL2, SummaryL3
+from src.core.models.summary import SummaryL1, SummaryL2, SummaryL3
 
 
 class TestSummaryL1:

@@ -1,6 +1,5 @@
 """Integration tests for all models."""
 
-import json
 from datetime import date
 
 import yaml

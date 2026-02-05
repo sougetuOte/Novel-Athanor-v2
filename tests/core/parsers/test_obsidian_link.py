@@ -1,6 +1,5 @@
 """Tests for Obsidian link parser."""
 
-import pytest
 
 from src.core.parsers.obsidian_link import ObsidianLink, extract_links, parse_link
 

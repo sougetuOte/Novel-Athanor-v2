@@ -2,8 +2,6 @@
 
 from pathlib import Path
 
-import pytest
-
 from src.core.vault.init import VaultInitializer, VaultStructure
 
 

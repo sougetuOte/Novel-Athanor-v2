@@ -1,6 +1,5 @@
 """Tests for Markdown body extractor."""
 
-import pytest
 
 from src.core.parsers.markdown import Section, extract_body, extract_sections
 

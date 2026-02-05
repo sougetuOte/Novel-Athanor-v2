@@ -209,3 +209,110 @@ class TestParseResult:
         assert result.error == "パースエラー"
         assert result.frontmatter is None
         assert result.body is None
+
+
+class TestParseWithDepthLimit:
+    """parse_with_depth_limit 関数のテスト."""
+
+    def test_parse_normal_frontmatter_within_depth_limit(self) -> None:
+        """通常の frontmatter が深度制限内で正常にパースされる."""
+        from src.core.parsers.frontmatter import parse_with_depth_limit
+
+        content = """---
+type: episode
+title: "テスト"
+nested:
+  level1:
+    level2: "value"
+---
+
+本文です。
+"""
+        frontmatter, body = parse_with_depth_limit(content, max_depth=10)
+
+        assert frontmatter["type"] == "episode"
+        assert frontmatter["nested"]["level1"]["level2"] == "value"
+        assert "本文です。" in body
+
+    def test_parse_exceeds_depth_limit_raises_error(self) -> None:
+        """深度制限を超える場合はエラーを発生させる."""
+        from src.core.parsers.frontmatter import (
+            RecursionLimitError,
+            parse_with_depth_limit,
+        )
+
+        # 深いネスト構造
+        content = """---
+level1:
+  level2:
+    level3:
+      level4:
+        level5:
+          level6:
+            level7:
+              level8:
+                level9:
+                  level10:
+                    level11: "deep"
+---
+
+本文
+"""
+        with pytest.raises(RecursionLimitError) as exc_info:
+            parse_with_depth_limit(content, max_depth=5)
+
+        assert "深度制限" in str(exc_info.value) or "depth limit" in str(
+            exc_info.value
+        ).lower()
+
+    def test_parse_with_depth_limit_zero(self) -> None:
+        """深度制限=0の場合、ネストがあるとエラーになる."""
+        from src.core.parsers.frontmatter import (
+            RecursionLimitError,
+            parse_with_depth_limit,
+        )
+
+        content = """---
+nested:
+  value: "test"
+---
+
+本文
+"""
+        with pytest.raises(RecursionLimitError):
+            parse_with_depth_limit(content, max_depth=0)
+
+    def test_parse_with_depth_limit_one(self) -> None:
+        """深度制限=1の場合、1レベルのネストは許可される."""
+        from src.core.parsers.frontmatter import parse_with_depth_limit
+
+        content = """---
+title: "test"
+tags:
+  - tag1
+  - tag2
+---
+
+本文
+"""
+        frontmatter, body = parse_with_depth_limit(content, max_depth=1)
+
+        assert frontmatter["title"] == "test"
+        assert frontmatter["tags"] == ["tag1", "tag2"]
+
+    def test_parse_flat_structure_always_succeeds(self) -> None:
+        """フラットな構造は常に成功する."""
+        from src.core.parsers.frontmatter import parse_with_depth_limit
+
+        content = """---
+title: "test"
+episode: 1
+status: "draft"
+---
+
+本文
+"""
+        frontmatter, body = parse_with_depth_limit(content, max_depth=0)
+
+        assert frontmatter["title"] == "test"
+        assert frontmatter["episode"] == 1

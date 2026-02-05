@@ -1,7 +1,8 @@
 """Tests for scene resolver."""
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 from src.core.context.scene_identifier import SceneIdentifier
 from src.core.context.scene_resolver import ResolvedPaths, SceneResolver

@@ -2,13 +2,11 @@
 
 from pathlib import Path
 
-import pytest
-
 from src.core.context.collectors.summary_collector import (
     SummaryCollector,
     SummaryContext,
 )
-from src.core.context.lazy_loader import FileLazyLoader, LoadPriority
+from src.core.context.lazy_loader import FileLazyLoader
 from src.core.context.scene_identifier import SceneIdentifier
 
 

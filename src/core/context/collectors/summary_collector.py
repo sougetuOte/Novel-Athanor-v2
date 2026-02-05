@@ -6,9 +6,13 @@ This module collects summary information (L1/L2/L3) from the vault.
 import re
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from ..lazy_loader import FileLazyLoader, LoadPriority
 from ..scene_identifier import SceneIdentifier
+
+if TYPE_CHECKING:
+    from src.core.repositories.summary import SummaryRepository
 
 
 @dataclass
@@ -44,24 +48,30 @@ class SummaryCollector:
     Collects L1/L2/L3 summaries from vault.
     Summaries are supplementary information, so failures are tolerated.
 
+    Supports both file-based and repository-based collection for backward compatibility.
+
     Attributes:
         vault_root: Vault root path.
         loader: Lazy loader for file loading.
+        repository: Optional SummaryRepository for structured data access.
     """
 
     def __init__(
         self,
         vault_root: Path,
         loader: FileLazyLoader,
+        repository: "SummaryRepository | None" = None,
     ):
         """Initialize SummaryCollector.
 
         Args:
             vault_root: Vault root path.
             loader: Lazy loader instance.
+            repository: Optional SummaryRepository for structured access.
         """
         self.vault_root = vault_root
         self.loader = loader
+        self.repository = repository
 
     def _load_file(self, path: str, priority: LoadPriority) -> str | None:
         """Load a file and extract data if successful.
@@ -98,18 +108,30 @@ class SummaryCollector:
     def _collect_l1(self) -> str | None:
         """Collect L1 summary (overall).
 
-        Path: _summary/l1_overall.md
+        Uses repository if available, otherwise falls back to file-based loading.
+
+        Path (file-based): _summary/l1_overall.md
         Priority: OPTIONAL
 
         Returns:
             L1 overall summary content, or None if not available.
         """
+        if self.repository:
+            try:
+                summary = self.repository.read("L1")
+                return summary.content or None
+            except Exception:
+                # Fall back to file-based if repository fails
+                pass
+
         return self._load_file("_summary/l1_overall.md", LoadPriority.OPTIONAL)
 
     def _collect_l2(self, scene: SceneIdentifier) -> str | None:
         """Collect L2 summary (chapter).
 
-        Path: _summary/l2_{chapter_id}.md
+        Uses repository if available and chapter info can be resolved.
+
+        Path (file-based): _summary/l2_{chapter_id}.md
         Priority: OPTIONAL
 
         Args:
@@ -121,6 +143,10 @@ class SummaryCollector:
         if not scene.chapter_id:
             return None
 
+        # Repository-based collection for L2 would require mapping chapter_id
+        # to chapter_number and chapter_name, which is not straightforward.
+        # For now, use file-based approach for backward compatibility.
+
         path = f"_summary/l2_{scene.chapter_id}.md"
         return self._load_file(path, LoadPriority.OPTIONAL)
 
@@ -128,7 +154,9 @@ class SummaryCollector:
         """Collect L3 summary (recent scene).
 
         Retrieves summary of the previous episode.
-        Path: _summary/l3_{previous_episode_id}.md
+        Uses repository if available and scene info can be resolved.
+
+        Path (file-based): _summary/l3_{previous_episode_id}.md
         Priority: OPTIONAL
 
         Args:
@@ -140,6 +168,11 @@ class SummaryCollector:
         previous_episode_id = self._get_previous_episode_id(scene.episode_id)
         if not previous_episode_id:
             return None
+
+        # Repository-based collection for L3 would require mapping episode_id
+        # to chapter_number, chapter_name, and sequence_number.
+        # This mapping is not available in the current SceneIdentifier.
+        # For now, use file-based approach for backward compatibility.
 
         path = f"_summary/l3_{previous_episode_id}.md"
         return self._load_file(path, LoadPriority.OPTIONAL)

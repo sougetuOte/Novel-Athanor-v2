@@ -1,6 +1,5 @@
 """Tests for HintCollector."""
 
-import pytest
 
 from src.core.context.filtered_context import FilteredContext
 from src.core.context.foreshadow_instruction import (

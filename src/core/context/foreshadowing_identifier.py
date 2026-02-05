@@ -6,12 +6,48 @@ relevant to a given scene, determining appropriate actions (PLANT/REINFORCE/HINT
 
 import re
 from dataclasses import dataclass
+from typing import Protocol
 
 from src.core.models.foreshadowing import Foreshadowing, ForeshadowingStatus
-from src.core.repositories.foreshadowing import ForeshadowingRepository
 
 from .foreshadow_instruction import InstructionAction
 from .scene_identifier import SceneIdentifier
+
+
+class ForeshadowingReader(Protocol):
+    """Protocol for reading foreshadowing data (L3 → L1/L2 DI boundary).
+
+    This protocol defines the read-only interface that L3 context builders
+    require for accessing foreshadowing data. It allows dependency injection
+    of L1 repositories without direct coupling.
+
+    Implementations:
+        - ForeshadowingRepository (L1): The concrete implementation.
+    """
+
+    def list_all(self) -> list[Foreshadowing]:
+        """List all foreshadowing elements.
+
+        Returns:
+            List of all foreshadowing elements.
+        """
+        ...
+
+    def read(self, identifier: str) -> Foreshadowing:
+        """Read a specific foreshadowing element.
+
+        Args:
+            identifier: Foreshadowing ID.
+
+        Returns:
+            The foreshadowing element.
+
+        Raises:
+            EntityNotFoundError: If foreshadowing not found.
+            KeyError: If foreshadowing not found (legacy).
+            FileNotFoundError: If foreshadowing file not found.
+        """
+        ...
 
 
 @dataclass
@@ -42,19 +78,19 @@ class ForeshadowingIdentifier:
     suggested actions (PLANT/REINFORCE/HINT/NONE).
 
     Attributes:
-        repository: Foreshadowing repository for data access.
+        reader: Foreshadowing reader for data access.
     """
 
     # Pattern to extract episode from foreshadowing ID (FS-{episode}-{slug})
     _ID_PATTERN = re.compile(r"^FS-(\d+)-")
 
-    def __init__(self, repository: ForeshadowingRepository) -> None:
+    def __init__(self, reader: ForeshadowingReader) -> None:
         """Initialize ForeshadowingIdentifier.
 
         Args:
-            repository: Foreshadowing repository instance.
+            reader: Foreshadowing reader instance (Protocol).
         """
-        self.repository = repository
+        self.reader = reader
 
     def identify(
         self,
@@ -78,7 +114,7 @@ class ForeshadowingIdentifier:
         already_identified_ids: set[str] = set()
 
         # Get all foreshadowing elements
-        all_foreshadowings = self.repository.list_all()
+        all_foreshadowings = self.reader.list_all()
 
         # 1. Find PLANT targets (registered + episode matches)
         for fs in all_foreshadowings:

@@ -20,7 +20,6 @@ from src.core.models.foreshadowing import (
 )
 from src.core.repositories.foreshadowing import ForeshadowingRepository
 
-
 # --- Test Fixtures ---
 
 

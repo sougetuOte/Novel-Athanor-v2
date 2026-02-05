@@ -128,17 +128,7 @@ class CharacterPhaseFilter:
         # Filter phases
         filtered_phases = [p for p in entity.phases if p.name in applicable_phases]
 
-        return Character(
-            type=entity.type,
-            name=entity.name,
-            phases=filtered_phases,
-            current_phase=entity.current_phase,
-            ai_visibility=entity.ai_visibility,
-            sections=entity.sections,
-            created=entity.created,
-            updated=entity.updated,
-            tags=entity.tags,
-        )
+        return entity.model_copy(update={"phases": filtered_phases})
 
     def get_available_phases(self, entity: Character) -> list[str]:
         """Get phases that exist in the character.
@@ -217,18 +207,7 @@ class WorldSettingPhaseFilter:
 
         filtered_phases = [p for p in entity.phases if p.name in applicable_phases]
 
-        return WorldSetting(
-            type=entity.type,
-            name=entity.name,
-            category=entity.category,
-            phases=filtered_phases,
-            current_phase=entity.current_phase,
-            ai_visibility=entity.ai_visibility,
-            sections=entity.sections,
-            created=entity.created,
-            updated=entity.updated,
-            tags=entity.tags,
-        )
+        return entity.model_copy(update={"phases": filtered_phases})
 
     def get_available_phases(self, entity: WorldSetting) -> list[str]:
         """Get phases that exist in the world setting.

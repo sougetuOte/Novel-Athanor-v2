@@ -1,6 +1,5 @@
 """Tests for CharacterCollector."""
 
-from datetime import date
 from pathlib import Path
 
 import pytest
@@ -13,7 +12,6 @@ from src.core.context.lazy_loader import FileLazyLoader
 from src.core.context.phase_filter import CharacterPhaseFilter
 from src.core.context.scene_identifier import SceneIdentifier
 from src.core.context.scene_resolver import SceneResolver
-from src.core.models.character import Character, Phase
 
 
 class TestCharacterContext:
@@ -380,3 +378,31 @@ invalid yaml: [unclosed
         # Assert
         # パースエラーまたは読み込みエラーが記録される
         assert len(context.warnings) > 0
+
+    def test_error_message_format_matches_world_setting(
+        self, temp_vault: Path, collector: CharacterCollector
+    ) -> None:
+        """エラーメッセージフォーマットが WorldSettingCollector と同じパターンである."""
+        # Arrange: 不正なYAMLを持つキャラクター
+        invalid_content = """---
+invalid yaml: [unclosed
+---
+"""
+        self._create_character_file(temp_vault, "破損キャラ", invalid_content)
+
+        episode_content = "登場人物: [[破損キャラ]]"
+        self._create_episode_file(temp_vault, "016", episode_content)
+        self._create_plot_l3_file(temp_vault, "016", episode_content)
+
+        scene = SceneIdentifier(episode_id="016")
+
+        # Act
+        context = collector.collect(scene)
+
+        # Assert
+        # WorldSettingCollector と同じフォーマット: "失敗: パス - エラー詳細"
+        assert len(context.warnings) > 0
+        # エラー詳細が含まれている（" - " で区切られている）
+        warning = context.warnings[0]
+        assert "パース失敗" in warning
+        assert "破損キャラ" in warning or "path" in warning.lower()

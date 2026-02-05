@@ -30,7 +30,7 @@ class TestInstructionAction:
 
     def test_all_actions(self):
         """全アクションが定義されている."""
-        actions = [a for a in InstructionAction]
+        actions = list(InstructionAction)
         assert len(actions) == 4
 
 

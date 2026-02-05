@@ -2,8 +2,9 @@
 
 This module collects forbidden keywords from multiple sources:
 1. Foreshadowing instructions (forbidden_expressions)
-2. AI visibility settings (visibility.yaml)
+2. AI visibility settings (global_forbidden_keywords from visibility.yaml)
 3. Global forbidden list (forbidden_keywords.txt)
+4. Entity-specific forbidden keywords (entities[].sections[].forbidden_keywords from visibility.yaml)
 """
 
 from dataclasses import dataclass, field
@@ -32,7 +33,7 @@ class ForbiddenKeywordResult:
         """Add keywords from a source.
 
         Args:
-            source: Source name (e.g., "foreshadowing", "visibility", "global").
+            source: Source name (e.g., "foreshadowing", "visibility", "global", "entity_visibility").
             keywords: Keywords from this source.
         """
         self.sources[source] = keywords
@@ -52,6 +53,7 @@ class ForbiddenKeywordCollector:
     1. Foreshadowing instructions (forbidden_expressions from each instruction)
     2. AI visibility settings (global_forbidden_keywords from visibility.yaml)
     3. Global forbidden list (forbidden_keywords.txt)
+    4. Entity-specific forbidden keywords (entities[].sections[].forbidden_keywords from visibility.yaml)
 
     Attributes:
         vault_root: Vault root path.
@@ -98,7 +100,7 @@ class ForbiddenKeywordCollector:
             if fs_keywords:
                 result.add_from_source("foreshadowing", fs_keywords)
 
-        # 2. From visibility.yaml
+        # 2. From visibility.yaml (global)
         visibility_keywords = self._collect_from_visibility()
         if visibility_keywords:
             result.add_from_source("visibility", visibility_keywords)
@@ -107,6 +109,11 @@ class ForbiddenKeywordCollector:
         global_keywords = self._collect_from_global()
         if global_keywords:
             result.add_from_source("global", global_keywords)
+
+        # 4. From visibility.yaml (entity-specific)
+        entity_keywords = self._collect_from_entity_visibility()
+        if entity_keywords:
+            result.add_from_source("entity_visibility", entity_keywords)
 
         result.finalize()
         return result
@@ -167,3 +174,36 @@ class ForbiddenKeywordCollector:
                 keywords.append(line)
 
         return keywords
+
+    def _collect_from_entity_visibility(self) -> list[str]:
+        """Collect from visibility.yaml entity-specific forbidden keywords.
+
+        Parses entities[*].sections[*].forbidden_keywords from visibility.yaml.
+
+        Returns:
+            List of entity-specific forbidden keywords.
+        """
+        load_result = self.loader.load(self._VISIBILITY_FILE, LoadPriority.OPTIONAL)
+        if not load_result.success or not load_result.data:
+            return []
+
+        try:
+            data = yaml.safe_load(load_result.data)
+            if not data or not isinstance(data, dict):
+                return []
+
+            keywords: list[str] = []
+            entities = data.get("entities", [])
+            if isinstance(entities, list):
+                for entity in entities:
+                    if isinstance(entity, dict):
+                        sections = entity.get("sections", [])
+                        if isinstance(sections, list):
+                            for section in sections:
+                                if isinstance(section, dict):
+                                    fk = section.get("forbidden_keywords", [])
+                                    if isinstance(fk, list):
+                                        keywords.extend(str(k) for k in fk if k)
+            return keywords
+        except yaml.YAMLError:
+            return []

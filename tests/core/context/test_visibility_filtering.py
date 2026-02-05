@@ -1,10 +1,8 @@
 """Tests for VisibilityFilteringService."""
 
-import pytest
 
 from src.core.context.filtered_context import FilteredContext
 from src.core.context.visibility_context import VisibilityAwareContext
-from src.core.models.ai_visibility import AIVisibilityLevel
 from src.core.services.visibility_controller import VisibilityController
 
 
@@ -14,8 +12,8 @@ class TestVisibilityFilteringServiceImport:
     def test_import(self):
         """VisibilityFilteringService can be imported."""
         from src.core.context.visibility_filtering import (
-            VisibilityFilteringService,
             FilteringResult,
+            VisibilityFilteringService,
         )
 
         assert VisibilityFilteringService is not None
@@ -282,3 +280,51 @@ class TestVisibilityFilteringServiceEmptyContext:
         result = service.filter_context(base_context)
 
         assert result.filtered_characters == {}
+
+
+class TestVisibilityFilteringServiceTypeImports:
+    """Tests for type imports (W2B-3)."""
+
+    def test_l2_filtered_context_not_confused_with_l3(self):
+        """L2 VisibilityFilteredContent import is distinct from L3 FilteredContext."""
+        from src.core.context.filtered_context import (
+            FilteredContext as L3FilteredContext,
+        )
+        from src.core.context.visibility_filtering import VisibilityFilteringService
+        from src.core.services.visibility_controller import (
+            VisibilityFilteredContent as L2VisibilityFilteredContent,
+        )
+
+        # L2 and L3 should be different types (name collision resolved)
+        assert L2VisibilityFilteredContent is not L3FilteredContext
+
+        # Service should work with L3 FilteredContext
+        controller = VisibilityController()
+        service = VisibilityFilteringService(controller)
+
+        l3_context = L3FilteredContext(
+            characters={"Alice": "Hero"},
+        )
+        result = service.filter_context(l3_context)
+        assert isinstance(result, VisibilityAwareContext)
+
+    def test_filtering_returns_l2_visibility_filtered_content(self):
+        """filter() method returns L2 VisibilityFilteredContent type."""
+        from src.core.context.visibility_filtering import VisibilityFilteringService
+
+        controller = VisibilityController()
+        service = VisibilityFilteringService(controller)
+
+        characters = {"Alice": "A brave hero."}
+        service.filter_characters(characters)
+
+        # The result should reference L2's VisibilityFilteredContent type in the controller
+        # Verify that filter_result from controller has correct attributes
+        content = "## Secret\n<!-- ai_visibility: 0 -->\nSecret info"
+        filter_result = controller.filter(content)
+
+        # L2 VisibilityFilteredContent has these attributes
+        assert hasattr(filter_result, "content")
+        assert hasattr(filter_result, "hints")
+        assert hasattr(filter_result, "forbidden_keywords")
+        assert hasattr(filter_result, "excluded_sections")

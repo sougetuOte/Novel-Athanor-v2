@@ -1,13 +1,12 @@
 """Tests for VisibilityAwareContext data classes."""
 
-import pytest
 
-from src.core.models.ai_visibility import AIVisibilityLevel
 from src.core.context.filtered_context import FilteredContext
 from src.core.context.visibility_context import (
-    VisibilityHint,
     VisibilityAwareContext,
+    VisibilityHint,
 )
+from src.core.models.ai_visibility import AIVisibilityLevel
 
 
 class TestVisibilityHint:

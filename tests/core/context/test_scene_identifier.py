@@ -1,7 +1,8 @@
 """Tests for SceneIdentifier data class."""
 
-import pytest
 from dataclasses import FrozenInstanceError
+
+import pytest
 
 from src.core.context.scene_identifier import SceneIdentifier
 

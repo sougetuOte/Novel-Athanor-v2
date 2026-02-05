@@ -140,7 +140,9 @@ class TestForbiddenKeywordCollectorFromForeshadowing:
         self, tmp_vault: Path, scene: SceneIdentifier, sample_instructions: ForeshadowInstructions
     ):
         """Collect forbidden keywords from foreshadow instructions."""
-        from src.core.context.forbidden_keyword_collector import ForbiddenKeywordCollector
+        from src.core.context.forbidden_keyword_collector import (
+            ForbiddenKeywordCollector,
+        )
 
         loader = FileLazyLoader(tmp_vault)
         collector = ForbiddenKeywordCollector(tmp_vault, loader)
@@ -158,7 +160,9 @@ class TestForbiddenKeywordCollectorFromVisibility:
 
     def test_collect_from_visibility(self, vault_with_files: Path, scene: SceneIdentifier):
         """Collect from visibility.yaml."""
-        from src.core.context.forbidden_keyword_collector import ForbiddenKeywordCollector
+        from src.core.context.forbidden_keyword_collector import (
+            ForbiddenKeywordCollector,
+        )
 
         loader = FileLazyLoader(vault_with_files)
         collector = ForbiddenKeywordCollector(vault_with_files, loader)
@@ -175,7 +179,9 @@ class TestForbiddenKeywordCollectorFromGlobal:
 
     def test_collect_from_global(self, vault_with_files: Path, scene: SceneIdentifier):
         """Collect from forbidden_keywords.txt."""
-        from src.core.context.forbidden_keyword_collector import ForbiddenKeywordCollector
+        from src.core.context.forbidden_keyword_collector import (
+            ForbiddenKeywordCollector,
+        )
 
         loader = FileLazyLoader(vault_with_files)
         collector = ForbiddenKeywordCollector(vault_with_files, loader)
@@ -197,7 +203,9 @@ class TestForbiddenKeywordCollectorAllSources:
         sample_instructions: ForeshadowInstructions,
     ):
         """Collect from all sources and merge."""
-        from src.core.context.forbidden_keyword_collector import ForbiddenKeywordCollector
+        from src.core.context.forbidden_keyword_collector import (
+            ForbiddenKeywordCollector,
+        )
 
         loader = FileLazyLoader(vault_with_files)
         collector = ForbiddenKeywordCollector(vault_with_files, loader)
@@ -229,7 +237,9 @@ class TestForbiddenKeywordCollectorAllSources:
         sample_instructions: ForeshadowInstructions,
     ):
         """Collect as simple list."""
-        from src.core.context.forbidden_keyword_collector import ForbiddenKeywordCollector
+        from src.core.context.forbidden_keyword_collector import (
+            ForbiddenKeywordCollector,
+        )
 
         loader = FileLazyLoader(vault_with_files)
         collector = ForbiddenKeywordCollector(vault_with_files, loader)
@@ -240,12 +250,226 @@ class TestForbiddenKeywordCollectorAllSources:
         assert "王族" in keywords
 
 
+class TestForbiddenKeywordCollectorFromEntityVisibility:
+    """Tests for collecting from entity-specific visibility.yaml (Source 4)."""
+
+    def test_collect_from_entity_visibility_basic(self, tmp_vault: Path, scene: SceneIdentifier):
+        """Collect entity-specific forbidden keywords from visibility.yaml."""
+        from src.core.context.forbidden_keyword_collector import (
+            ForbiddenKeywordCollector,
+        )
+
+        # Create visibility.yaml with entity-specific forbidden keywords
+        (tmp_vault / "_ai_control" / "visibility.yaml").write_text(
+            """global_forbidden_keywords:
+  - 秘密
+  - 真実
+
+entities:
+  - entity_name: "Alice"
+    default_level: 0
+    sections:
+      - name: "秘密の出自"
+        level: 0
+        forbidden_keywords:
+          - "王族"
+          - "王女"
+      - name: "表の顔"
+        level: 3
+  - entity_name: "Magic System"
+    default_level: 3
+    sections:
+      - name: "禁忌の魔法"
+        level: 0
+        forbidden_keywords:
+          - "闇の魔法"
+""",
+            encoding="utf-8",
+        )
+
+        loader = FileLazyLoader(tmp_vault)
+        collector = ForbiddenKeywordCollector(tmp_vault, loader)
+
+        result = collector.collect(scene)
+
+        # Entity-specific keywords should be collected
+        assert "王族" in result.keywords
+        assert "王女" in result.keywords
+        assert "闇の魔法" in result.keywords
+        assert "entity_visibility" in result.sources
+
+    def test_collect_from_entity_visibility_no_entities(self, tmp_vault: Path, scene: SceneIdentifier):
+        """No entities key in visibility.yaml."""
+        from src.core.context.forbidden_keyword_collector import (
+            ForbiddenKeywordCollector,
+        )
+
+        (tmp_vault / "_ai_control" / "visibility.yaml").write_text(
+            """global_forbidden_keywords:
+  - 秘密
+""",
+            encoding="utf-8",
+        )
+
+        loader = FileLazyLoader(tmp_vault)
+        collector = ForbiddenKeywordCollector(tmp_vault, loader)
+
+        result = collector.collect(scene)
+
+        # Should not have entity_visibility source
+        assert "entity_visibility" not in result.sources
+        # Global keywords should still work
+        assert "秘密" in result.keywords
+
+    def test_collect_from_entity_visibility_no_forbidden(self, tmp_vault: Path, scene: SceneIdentifier):
+        """Sections without forbidden_keywords."""
+        from src.core.context.forbidden_keyword_collector import (
+            ForbiddenKeywordCollector,
+        )
+
+        (tmp_vault / "_ai_control" / "visibility.yaml").write_text(
+            """entities:
+  - entity_name: "Alice"
+    sections:
+      - name: "基本情報"
+        level: 3
+""",
+            encoding="utf-8",
+        )
+
+        loader = FileLazyLoader(tmp_vault)
+        collector = ForbiddenKeywordCollector(tmp_vault, loader)
+
+        result = collector.collect(scene)
+
+        # Should not crash, should have no entity keywords
+        assert "entity_visibility" not in result.sources or result.sources["entity_visibility"] == []
+
+    def test_collect_from_entity_visibility_multiple_entities(self, tmp_vault: Path, scene: SceneIdentifier):
+        """Multiple entities with forbidden keywords."""
+        from src.core.context.forbidden_keyword_collector import (
+            ForbiddenKeywordCollector,
+        )
+
+        (tmp_vault / "_ai_control" / "visibility.yaml").write_text(
+            """entities:
+  - entity_name: "Alice"
+    sections:
+      - name: "秘密1"
+        forbidden_keywords:
+          - "王族"
+  - entity_name: "Bob"
+    sections:
+      - name: "秘密2"
+        forbidden_keywords:
+          - "暗殺者"
+  - entity_name: "World"
+    sections:
+      - name: "秘密3"
+        forbidden_keywords:
+          - "世界の真実"
+""",
+            encoding="utf-8",
+        )
+
+        loader = FileLazyLoader(tmp_vault)
+        collector = ForbiddenKeywordCollector(tmp_vault, loader)
+
+        result = collector.collect(scene)
+
+        assert "王族" in result.keywords
+        assert "暗殺者" in result.keywords
+        assert "世界の真実" in result.keywords
+
+    def test_collect_integrates_all_four_sources(
+        self,
+        tmp_vault: Path,
+        scene: SceneIdentifier,
+        sample_instructions: ForeshadowInstructions,
+    ):
+        """All four sources are integrated."""
+        from src.core.context.forbidden_keyword_collector import (
+            ForbiddenKeywordCollector,
+        )
+
+        # Setup all sources
+        (tmp_vault / "_ai_control" / "visibility.yaml").write_text(
+            """global_forbidden_keywords:
+  - グローバル1
+
+entities:
+  - entity_name: "Alice"
+    sections:
+      - name: "秘密"
+        forbidden_keywords:
+          - "エンティティ1"
+""",
+            encoding="utf-8",
+        )
+        (tmp_vault / "_ai_control" / "forbidden_keywords.txt").write_text(
+            "グローバルファイル1",
+            encoding="utf-8",
+        )
+
+        loader = FileLazyLoader(tmp_vault)
+        collector = ForbiddenKeywordCollector(tmp_vault, loader)
+
+        result = collector.collect(scene, sample_instructions)
+
+        # Source 1: foreshadowing
+        assert "王族" in result.keywords
+        # Source 2: visibility global
+        assert "グローバル1" in result.keywords
+        # Source 3: forbidden_keywords.txt
+        assert "グローバルファイル1" in result.keywords
+        # Source 4: entity visibility
+        assert "エンティティ1" in result.keywords
+
+        # All 4 sources present
+        assert "foreshadowing" in result.sources
+        assert "visibility" in result.sources
+        assert "global" in result.sources
+        assert "entity_visibility" in result.sources
+
+    def test_collect_deduplication_across_sources(self, tmp_vault: Path, scene: SceneIdentifier):
+        """Keywords duplicated across sources are deduplicated."""
+        from src.core.context.forbidden_keyword_collector import (
+            ForbiddenKeywordCollector,
+        )
+
+        (tmp_vault / "_ai_control" / "visibility.yaml").write_text(
+            """global_forbidden_keywords:
+  - 共通キーワード
+
+entities:
+  - entity_name: "Alice"
+    sections:
+      - name: "秘密"
+        forbidden_keywords:
+          - "共通キーワード"
+          - "独自キーワード"
+""",
+            encoding="utf-8",
+        )
+
+        loader = FileLazyLoader(tmp_vault)
+        collector = ForbiddenKeywordCollector(tmp_vault, loader)
+
+        result = collector.collect(scene)
+
+        # Should only appear once in final keywords
+        assert result.keywords.count("共通キーワード") == 1
+        assert "独自キーワード" in result.keywords
+
+
 class TestForbiddenKeywordCollectorEmptyVault:
     """Tests for empty vault scenarios."""
 
     def test_empty_vault_no_error(self, tmp_vault: Path, scene: SceneIdentifier):
         """Empty vault returns empty result without error."""
-        from src.core.context.forbidden_keyword_collector import ForbiddenKeywordCollector
+        from src.core.context.forbidden_keyword_collector import (
+            ForbiddenKeywordCollector,
+        )
 
         loader = FileLazyLoader(tmp_vault)
         collector = ForbiddenKeywordCollector(tmp_vault, loader)
@@ -256,7 +480,9 @@ class TestForbiddenKeywordCollectorEmptyVault:
 
     def test_no_instructions_no_error(self, vault_with_files: Path, scene: SceneIdentifier):
         """No foreshadow instructions still works."""
-        from src.core.context.forbidden_keyword_collector import ForbiddenKeywordCollector
+        from src.core.context.forbidden_keyword_collector import (
+            ForbiddenKeywordCollector,
+        )
 
         loader = FileLazyLoader(vault_with_files)
         collector = ForbiddenKeywordCollector(vault_with_files, loader)

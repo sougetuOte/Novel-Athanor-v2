@@ -1,6 +1,5 @@
 """Tests for FilteredContext data class."""
 
-import pytest
 
 from src.core.context.filtered_context import FilteredContext
 

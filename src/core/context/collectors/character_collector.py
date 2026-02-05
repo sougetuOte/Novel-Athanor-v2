@@ -151,9 +151,12 @@ class CharacterCollector:
                 return
 
             # Parse character
-            character = self._parse_character(path, result.data)
+            character, parse_error = self._parse_character(path, result.data)
             if not character:
-                context.warnings.append(f"キャラクターパース失敗: {path}")
+                msg = f"キャラクターパース失敗: {path}"
+                if parse_error:
+                    msg += f" - {parse_error}"
+                context.warnings.append(msg)
                 return
 
             # Apply phase filter and add to context
@@ -181,7 +184,9 @@ class CharacterCollector:
             # No phase specified, return all information
             return self._character_to_string(character)
 
-    def _parse_character(self, path: Path, content: str) -> Character | None:
+    def _parse_character(
+        self, path: Path, content: str
+    ) -> tuple[Character | None, str | None]:
         """Parse character from file content.
 
         Args:
@@ -189,15 +194,16 @@ class CharacterCollector:
             content: File content.
 
         Returns:
-            Parsed Character, or None if parsing failed.
+            Tuple of (parsed Character or None, error message or None).
         """
         try:
             frontmatter, _body = parse_frontmatter(content)
             # Character model doesn't have a body field (uses sections instead)
-            return Character(**frontmatter)
-        except (ParseError, Exception):
-            # Return None on any parsing error
-            return None
+            return Character(**frontmatter), None
+        except ParseError as e:
+            return None, f"Frontmatter parse failed: {e}"
+        except Exception as e:
+            return None, str(e)
 
     def _character_to_string(self, character: Character) -> str:
         """Convert character to string without phase filtering.

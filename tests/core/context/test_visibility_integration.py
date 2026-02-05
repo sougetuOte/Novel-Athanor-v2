@@ -15,11 +15,9 @@ from src.core.context.foreshadow_instruction import (
     InstructionAction,
 )
 from src.core.context.hint_collector import HintCollector
-from src.core.context.visibility_context import VisibilityAwareContext
 from src.core.context.visibility_filtering import VisibilityFilteringService
 from src.core.models.ai_visibility import AIVisibilityLevel
 from src.core.services.visibility_controller import VisibilityController
-
 
 # --- Test Fixtures ---
 

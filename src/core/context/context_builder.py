@@ -16,7 +16,6 @@ from collections import OrderedDict
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from src.core.repositories.foreshadowing import ForeshadowingRepository
 from src.core.services.visibility_controller import VisibilityController
 
 from .collectors.character_collector import CharacterCollector
@@ -31,7 +30,7 @@ from .forbidden_keyword_collector import (
     ForbiddenKeywordResult,
 )
 from .foreshadow_instruction import ForeshadowInstructions, InstructionAction
-from .foreshadowing_identifier import ForeshadowingIdentifier
+from .foreshadowing_identifier import ForeshadowingIdentifier, ForeshadowingReader
 from .hint_collector import HintCollection, HintCollector
 from .instruction_generator import InstructionGeneratorImpl
 from .lazy_loader import FileLazyLoader
@@ -100,9 +99,9 @@ class ContextBuilder:
 
     Args:
         vault_root: Root path of the Obsidian vault.
-        work_name: Name of the work (for foreshadowing repository).
+        work_name: Name of the work (for foreshadowing).
         visibility_controller: Optional L2 visibility controller.
-        foreshadowing_repository: Optional foreshadowing repository.
+        foreshadowing_reader: Optional foreshadowing reader (Protocol).
 
     Examples:
         >>> builder = ContextBuilder(vault_root=Path("vault"))
@@ -127,7 +126,7 @@ class ContextBuilder:
         *,
         work_name: str = "",
         visibility_controller: VisibilityController | None = None,
-        foreshadowing_repository: ForeshadowingRepository | None = None,
+        foreshadowing_reader: ForeshadowingReader | None = None,
         phase_order: list[str] | None = None,
     ) -> None:
         """Initialize ContextBuilder with all components.
@@ -136,7 +135,7 @@ class ContextBuilder:
             vault_root: Root path of the Obsidian vault.
             work_name: Name of the work (for foreshadowing).
             visibility_controller: Optional L2 visibility controller.
-            foreshadowing_repository: Optional foreshadowing repository.
+            foreshadowing_reader: Optional foreshadowing reader (Protocol).
             phase_order: Ordered list of narrative phases. Uses defaults if None.
         """
         self._vault_root = vault_root
@@ -182,15 +181,15 @@ class ContextBuilder:
             )
 
         # Foreshadowing (optional L2 dependency)
-        self._foreshadowing_repository = foreshadowing_repository
+        self._foreshadowing_reader = foreshadowing_reader
         self._foreshadowing_identifier: ForeshadowingIdentifier | None = None
         self._instruction_generator: InstructionGeneratorImpl | None = None
-        if foreshadowing_repository is not None:
+        if foreshadowing_reader is not None:
             self._foreshadowing_identifier = ForeshadowingIdentifier(
-                foreshadowing_repository
+                foreshadowing_reader
             )
             self._instruction_generator = InstructionGeneratorImpl(
-                foreshadowing_repository, self._foreshadowing_identifier
+                foreshadowing_reader, self._foreshadowing_identifier
             )
 
         # Caches (OrderedDict for LRU eviction with size limit)
@@ -342,12 +341,17 @@ class ContextBuilder:
     ) -> list[str]:
         """Get forbidden keywords for a scene.
 
+        This method collects keywords in two stages:
+        - Stage 1: ForbiddenKeywordCollector (4 sources: foreshadowing, visibility global,
+          forbidden_keywords.txt, entity-specific visibility)
+        - Stage 2: VisibilityController forbidden_keywords (L2 service level)
+
         Args:
             scene: The scene identifier.
             use_cache: Whether to use cached results. Default is True.
 
         Returns:
-            List of forbidden keywords.
+            List of forbidden keywords (sorted, deduplicated).
         """
         cache_key = f"{scene.episode_id}:{scene.sequence_id}"
 
@@ -355,17 +359,21 @@ class ContextBuilder:
             logger.debug("Forbidden keyword cache hit for %s", cache_key)
             return self._forbidden_cache[cache_key]
 
-        # Get foreshadowing instructions for forbidden expressions
+        # Stage 1: ForbiddenKeywordCollector (4 sources)
         foreshadow_instructions = self.get_foreshadow_instructions(scene)
-
-        # Collect forbidden keywords from all sources
         result = self._forbidden_keyword_collector.collect(scene, foreshadow_instructions)
-        keywords = result.keywords
-        logger.debug("Collected %d forbidden keywords for %s", len(keywords), cache_key)
+        keywords = set(result.keywords)
 
-        self._cache_put(self._forbidden_cache, cache_key, keywords)
+        # Stage 2: VisibilityController forbidden_keywords integration
+        if self._visibility_controller is not None:
+            keywords.update(self._visibility_controller.forbidden_keywords)
+
+        sorted_keywords = sorted(keywords)
+        logger.debug("Collected %d forbidden keywords for %s", len(sorted_keywords), cache_key)
+
+        self._cache_put(self._forbidden_cache, cache_key, sorted_keywords)
         self._cache_put(self._forbidden_result_cache, cache_key, result)
-        return keywords
+        return sorted_keywords
 
     def get_foreshadow_instructions_as_prompt(self, scene: SceneIdentifier) -> str:
         """Get foreshadowing instructions formatted as a prompt.

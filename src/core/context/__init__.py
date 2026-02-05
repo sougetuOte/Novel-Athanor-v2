@@ -16,6 +16,16 @@ from .foreshadow_instruction import (
     ForeshadowInstructions,
     InstructionAction,
 )
+from .foreshadowing_checker import (
+    AlertSeverity,
+    AlertType,
+    ForeshadowingAlert,
+    PayoffApproaching,
+    PlantSuggestion,
+    ReinforceSuggestion,
+    SceneForeshadowingCheck,
+    SceneForeshadowingChecker,
+)
 from .instruction_generator import InstructionGenerator
 from .lazy_loader import (
     CacheEntry,
@@ -38,6 +48,14 @@ from .phase_filter import (
 from .scene_identifier import SceneIdentifier
 from .scene_resolver import ResolvedPaths, SceneResolver
 from .visibility_context import VisibilityAwareContext, VisibilityHint
+
+# Phase F: Write Facade
+from .write_facade import (
+    DependencyNotConfiguredError,
+    WriteFacade,
+    WriteFacadeError,
+    WriteOperationError,
+)
 
 __all__ = [
     # Scene identification
@@ -68,6 +86,15 @@ __all__ = [
     "ForeshadowInstructions",
     "InstructionAction",
     "InstructionGenerator",
+    # Foreshadowing checker (integrated check output)
+    "AlertSeverity",
+    "AlertType",
+    "ForeshadowingAlert",
+    "PayoffApproaching",
+    "PlantSuggestion",
+    "ReinforceSuggestion",
+    "SceneForeshadowingCheck",
+    "SceneForeshadowingChecker",
     # Visibility-aware context
     "VisibilityAwareContext",
     "VisibilityHint",
@@ -77,4 +104,9 @@ __all__ = [
     # Context Builder (L3-7 Facade)
     "ContextBuilder",
     "ContextBuildResult",
+    # Write Facade (L3 Write Operations)
+    "DependencyNotConfiguredError",
+    "WriteFacade",
+    "WriteFacadeError",
+    "WriteOperationError",
 ]

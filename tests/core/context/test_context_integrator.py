@@ -2,21 +2,20 @@
 
 import time
 from pathlib import Path
-from typing import Optional
 
 import pytest
 
-from src.core.context.scene_identifier import SceneIdentifier
-from src.core.context.filtered_context import FilteredContext
+from src.core.context.collectors.plot_collector import PlotCollector
+from src.core.context.collectors.style_guide_collector import StyleGuideCollector
+from src.core.context.collectors.summary_collector import SummaryCollector
 from src.core.context.context_integrator import (
     ContextCollector,
     ContextIntegrator,
     ContextIntegratorImpl,
 )
+from src.core.context.filtered_context import FilteredContext
 from src.core.context.lazy_loader import FileLazyLoader
-from src.core.context.collectors.plot_collector import PlotCollector
-from src.core.context.collectors.summary_collector import SummaryCollector
-from src.core.context.collectors.style_guide_collector import StyleGuideCollector
+from src.core.context.scene_identifier import SceneIdentifier
 
 
 # ContextCollector のテスト
@@ -27,7 +26,7 @@ class TestContextCollectorProtocol:
         """Mock が ContextCollector プロトコルを満たす"""
 
         class MockCollector:
-            def collect(self, scene: SceneIdentifier) -> Optional[str]:
+            def collect(self, scene: SceneIdentifier) -> str | None:
                 return "collected content"
 
         collector: ContextCollector = MockCollector()
@@ -38,7 +37,7 @@ class TestContextCollectorProtocol:
         """collect() が None を返せる"""
 
         class MockCollector:
-            def collect(self, scene: SceneIdentifier) -> Optional[str]:
+            def collect(self, scene: SceneIdentifier) -> str | None:
                 return None
 
         collector: ContextCollector = MockCollector()
@@ -58,11 +57,11 @@ class TestContextIntegratorProtocol:
                 self,
                 scene: SceneIdentifier,
                 *,
-                plot_collector: Optional[ContextCollector] = None,
-                summary_collector: Optional[ContextCollector] = None,
-                character_collector: Optional[ContextCollector] = None,
-                world_collector: Optional[ContextCollector] = None,
-                style_collector: Optional[ContextCollector] = None,
+                plot_collector: ContextCollector | None = None,
+                summary_collector: ContextCollector | None = None,
+                character_collector: ContextCollector | None = None,
+                world_collector: ContextCollector | None = None,
+                style_collector: ContextCollector | None = None,
             ) -> FilteredContext:
                 return FilteredContext(scene_id=str(scene))
 
@@ -85,7 +84,7 @@ class TestContextIntegratorProtocol:
             def __init__(self, content: str):
                 self.content = content
 
-            def collect(self, scene: SceneIdentifier) -> Optional[str]:
+            def collect(self, scene: SceneIdentifier) -> str | None:
                 return self.content
 
         class MockIntegrator:
@@ -93,11 +92,11 @@ class TestContextIntegratorProtocol:
                 self,
                 scene: SceneIdentifier,
                 *,
-                plot_collector: Optional[ContextCollector] = None,
-                summary_collector: Optional[ContextCollector] = None,
-                character_collector: Optional[ContextCollector] = None,
-                world_collector: Optional[ContextCollector] = None,
-                style_collector: Optional[ContextCollector] = None,
+                plot_collector: ContextCollector | None = None,
+                summary_collector: ContextCollector | None = None,
+                character_collector: ContextCollector | None = None,
+                world_collector: ContextCollector | None = None,
+                style_collector: ContextCollector | None = None,
             ) -> FilteredContext:
                 ctx = FilteredContext(scene_id=str(scene))
                 if plot_collector:
@@ -133,7 +132,7 @@ class TestContextIntegratorProtocol:
             def __init__(self, content: str):
                 self.content = content
 
-            def collect(self, scene: SceneIdentifier) -> Optional[str]:
+            def collect(self, scene: SceneIdentifier) -> str | None:
                 return self.content
 
         class MockIntegrator:
@@ -141,11 +140,11 @@ class TestContextIntegratorProtocol:
                 self,
                 scene: SceneIdentifier,
                 *,
-                plot_collector: Optional[ContextCollector] = None,
-                summary_collector: Optional[ContextCollector] = None,
-                character_collector: Optional[ContextCollector] = None,
-                world_collector: Optional[ContextCollector] = None,
-                style_collector: Optional[ContextCollector] = None,
+                plot_collector: ContextCollector | None = None,
+                summary_collector: ContextCollector | None = None,
+                character_collector: ContextCollector | None = None,
+                world_collector: ContextCollector | None = None,
+                style_collector: ContextCollector | None = None,
             ) -> FilteredContext:
                 ctx = FilteredContext(scene_id=str(scene))
                 if plot_collector:
@@ -177,11 +176,11 @@ class TestContextIntegratorProtocol:
                 self,
                 scene: SceneIdentifier,
                 *,
-                plot_collector: Optional[ContextCollector] = None,
-                summary_collector: Optional[ContextCollector] = None,
-                character_collector: Optional[ContextCollector] = None,
-                world_collector: Optional[ContextCollector] = None,
-                style_collector: Optional[ContextCollector] = None,
+                plot_collector: ContextCollector | None = None,
+                summary_collector: ContextCollector | None = None,
+                character_collector: ContextCollector | None = None,
+                world_collector: ContextCollector | None = None,
+                style_collector: ContextCollector | None = None,
             ) -> FilteredContext:
                 return FilteredContext(scene_id=str(scene))
 
@@ -209,11 +208,11 @@ class TestContextIntegratorProtocol:
                 self,
                 scene: SceneIdentifier,
                 *,
-                plot_collector: Optional[ContextCollector] = None,
-                summary_collector: Optional[ContextCollector] = None,
-                character_collector: Optional[ContextCollector] = None,
-                world_collector: Optional[ContextCollector] = None,
-                style_collector: Optional[ContextCollector] = None,
+                plot_collector: ContextCollector | None = None,
+                summary_collector: ContextCollector | None = None,
+                character_collector: ContextCollector | None = None,
+                world_collector: ContextCollector | None = None,
+                style_collector: ContextCollector | None = None,
             ) -> FilteredContext:
                 return FilteredContext(scene_id=str(scene))
 

@@ -1,12 +1,28 @@
 """Tests for instruction generator protocol."""
 
-from src.core.context.scene_identifier import SceneIdentifier
+from datetime import date
+from pathlib import Path
+
+import pytest
+
 from src.core.context.foreshadow_instruction import (
-    ForeshadowInstructions,
     ForeshadowInstruction,
+    ForeshadowInstructions,
     InstructionAction,
 )
 from src.core.context.instruction_generator import InstructionGenerator
+from src.core.context.scene_identifier import SceneIdentifier
+from src.core.models.foreshadowing import (
+    Foreshadowing,
+    ForeshadowingAIVisibility,
+    ForeshadowingSeed,
+    ForeshadowingStatus,
+    ForeshadowingType,
+    RelatedElements,
+    TimelineEntry,
+    TimelineInfo,
+)
+from src.core.repositories.foreshadowing import ForeshadowingRepository
 
 
 class TestInstructionGeneratorProtocol:
@@ -343,24 +359,6 @@ class TestInstructionGeneratorProtocol:
 
 # --- Tests for InstructionGeneratorImpl ---
 
-from datetime import date
-from pathlib import Path
-
-import pytest
-
-from src.core.models.foreshadowing import (
-    Foreshadowing,
-    ForeshadowingAIVisibility,
-    ForeshadowingPayoff,
-    ForeshadowingSeed,
-    ForeshadowingStatus,
-    ForeshadowingType,
-    RelatedElements,
-    TimelineEntry,
-    TimelineInfo,
-)
-from src.core.repositories.foreshadowing import ForeshadowingRepository
-
 
 @pytest.fixture
 def tmp_vault(tmp_path: Path) -> Path:
@@ -624,3 +622,60 @@ class TestInstructionGeneratorImplForbiddenKeywords:
         assert "reveal" in keywords
         assert "mystery" in keywords
         assert len([k for k in keywords if k == "truth"]) == 1  # No duplicates
+
+
+class TestInstructionGeneratorImplExceptionHandling:
+    """Tests for exception handling (W2B-2)."""
+
+    def test_generate_handles_entity_not_found_error(
+        self, repository: ForeshadowingRepository
+    ):
+        """Generate handles EntityNotFoundError gracefully."""
+        from src.core.context.foreshadowing_identifier import (
+            IdentifiedForeshadowing,
+        )
+        from src.core.context.instruction_generator import InstructionGeneratorImpl
+
+        # Create a mock identifier that returns a non-existent foreshadowing
+        class MockIdentifier:
+            def identify(
+                self, scene: SceneIdentifier, appearing_characters: list[str] | None = None
+            ) -> list[IdentifiedForeshadowing]:
+                # Return identified foreshadowing that doesn't exist in repository
+                return [
+                    IdentifiedForeshadowing(
+                        foreshadowing_id="FS-999-nonexistent",
+                        suggested_action=InstructionAction.PLANT,
+                        status="registered",
+                        relevance_reason="Test",
+                    )
+                ]
+
+        identifier = MockIdentifier()
+        generator = InstructionGeneratorImpl(repository, identifier)
+
+        scene = SceneIdentifier(episode_id="010")
+        # Should not raise EntityNotFoundError
+        result = generator.generate(scene)
+
+        # Should return empty instructions (gracefully handled)
+        assert len(result.instructions) == 0
+
+    def test_determine_action_handles_entity_not_found_error(
+        self, repository: ForeshadowingRepository
+    ):
+        """determine_action handles EntityNotFoundError gracefully."""
+        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
+        from src.core.context.instruction_generator import InstructionGeneratorImpl
+
+        identifier = ForeshadowingIdentifier(repository)
+        generator = InstructionGeneratorImpl(repository, identifier)
+
+        scene = SceneIdentifier(episode_id="010")
+        foreshadowing = {"id": "FS-999-nonexistent"}
+
+        # Should not raise EntityNotFoundError
+        action = generator.determine_action(foreshadowing, scene)
+
+        # Should return NONE action (gracefully handled)
+        assert action == InstructionAction.NONE

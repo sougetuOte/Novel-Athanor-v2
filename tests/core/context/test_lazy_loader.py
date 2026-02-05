@@ -1,10 +1,9 @@
 """Tests for LazyLoader protocol and related classes."""
 
-import pytest
 from datetime import datetime, timedelta
 from pathlib import Path
-from time import sleep
-from typing import Optional
+
+import pytest
 
 from src.core.context.lazy_loader import (
     ContentType,
@@ -28,7 +27,7 @@ class TestLoadPriority:
 
     def test_all_priorities(self):
         """全ての優先度が定義されている."""
-        priorities = [p for p in LoadPriority]
+        priorities = list(LoadPriority)
         assert len(priorities) == 2
 
 
@@ -212,7 +211,7 @@ class TestContentType:
 
     def test_all_content_types(self):
         """全てのコンテンツタイプが定義されている."""
-        content_types = [ct for ct in ContentType]
+        content_types = list(ContentType)
         assert len(content_types) == 7
 
 

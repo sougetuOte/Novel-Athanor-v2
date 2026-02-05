@@ -3,8 +3,10 @@
 Tests the collection of plot contexts (L1/L2/L3) from vault files.
 """
 
-import pytest
 from pathlib import Path
+
+import pytest
+
 from src.core.context.collectors.plot_collector import PlotCollector, PlotContext
 from src.core.context.lazy_loader import FileLazyLoader
 from src.core.context.scene_identifier import SceneIdentifier

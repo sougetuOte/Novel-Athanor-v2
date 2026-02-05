@@ -134,13 +134,13 @@ class TestContextBuilderInit:
             vault_root=tmp_path,
             work_name="test_work",
             visibility_controller=vc,
-            foreshadowing_repository=repo,
+            foreshadowing_reader=repo,
         )
 
         assert builder._vault_root == tmp_path
         assert builder._work_name == "test_work"
         assert builder._visibility_controller is vc
-        assert builder._foreshadowing_repository is repo
+        assert builder._foreshadowing_reader is repo
 
     def test_internal_components_initialized(self, tmp_path):
         """T5: Internal components are correctly initialized."""
@@ -169,7 +169,7 @@ class TestContextBuilderInit:
         """T5b: Without repository, foreshadowing components are None."""
         builder = ContextBuilder(vault_root=tmp_path)
 
-        assert builder._foreshadowing_repository is None
+        assert builder._foreshadowing_reader is None
         assert builder._foreshadowing_identifier is None
         assert builder._instruction_generator is None
 
@@ -182,10 +182,10 @@ class TestContextBuilderInit:
         builder = ContextBuilder(
             vault_root=tmp_path,
             work_name="test",
-            foreshadowing_repository=repo,
+            foreshadowing_reader=repo,
         )
 
-        assert builder._foreshadowing_repository is repo
+        assert builder._foreshadowing_reader is repo
         assert builder._foreshadowing_identifier is not None
         assert builder._instruction_generator is not None
 

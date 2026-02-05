@@ -3,20 +3,19 @@
 TDD cycle for WorldSetting context collection with Phase filtering.
 """
 
-import pytest
-from datetime import date
 from pathlib import Path
 from unittest.mock import Mock
+
+import pytest
 
 from src.core.context.collectors.world_setting_collector import (
     WorldSettingCollector,
     WorldSettingContext,
 )
-from src.core.context.lazy_loader import FileLazyLoader, LoadPriority, LazyLoadResult
+from src.core.context.lazy_loader import FileLazyLoader, LazyLoadResult, LoadPriority
 from src.core.context.phase_filter import WorldSettingPhaseFilter
 from src.core.context.scene_identifier import SceneIdentifier
 from src.core.context.scene_resolver import SceneResolver
-from src.core.models.world_setting import WorldSetting
 
 
 @pytest.fixture

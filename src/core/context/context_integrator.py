@@ -93,18 +93,29 @@ class ContextIntegratorImpl:
     """Implementation of ContextIntegrator protocol.
 
     Integrates multiple context collectors into a unified FilteredContext.
+    Supports optional parallel execution via ThreadPoolExecutor.
 
     Attributes:
         vault_root: Root path of the vault.
     """
 
-    def __init__(self, vault_root: Path) -> None:
+    def __init__(
+        self,
+        vault_root: Path,
+        *,
+        parallel: bool = False,
+        max_workers: int = 5,
+    ) -> None:
         """Initialize ContextIntegratorImpl.
 
         Args:
             vault_root: Root path of the vault.
+            parallel: Whether to execute collectors in parallel.
+            max_workers: Maximum number of parallel workers.
         """
         self.vault_root = vault_root
+        self._parallel = parallel
+        self._max_workers = max_workers
 
     def integrate(
         self,
@@ -134,27 +145,116 @@ class ContextIntegratorImpl:
             current_phase=scene.current_phase,
         )
 
-        # Collect plot context
+        if self._parallel:
+            self._integrate_parallel(
+                ctx,
+                scene,
+                plot_collector=plot_collector,
+                summary_collector=summary_collector,
+                character_collector=character_collector,
+                world_collector=world_collector,
+                style_collector=style_collector,
+            )
+        else:
+            self._integrate_sequential(
+                ctx,
+                scene,
+                plot_collector=plot_collector,
+                summary_collector=summary_collector,
+                character_collector=character_collector,
+                world_collector=world_collector,
+                style_collector=style_collector,
+            )
+
+        return ctx
+
+    def _integrate_sequential(
+        self,
+        ctx: FilteredContext,
+        scene: SceneIdentifier,
+        *,
+        plot_collector: ContextCollector | None = None,
+        summary_collector: ContextCollector | None = None,
+        character_collector: ContextCollector | None = None,
+        world_collector: ContextCollector | None = None,
+        style_collector: ContextCollector | None = None,
+    ) -> None:
+        """Integrate collectors sequentially (original behavior)."""
         if plot_collector is not None:
             self._integrate_plot(ctx, plot_collector, scene)
-
-        # Collect summary context
         if summary_collector is not None:
             self._integrate_summary(ctx, summary_collector, scene)
-
-        # Collect character context
         if character_collector is not None:
             self._integrate_character(ctx, character_collector, scene)
-
-        # Collect world setting context
         if world_collector is not None:
             self._integrate_world_setting(ctx, world_collector, scene)
-
-        # Collect style guide context
         if style_collector is not None:
             ctx.style_guide = style_collector.collect_as_string(scene)
 
-        return ctx
+    def _integrate_parallel(
+        self,
+        ctx: FilteredContext,
+        scene: SceneIdentifier,
+        *,
+        plot_collector: ContextCollector | None = None,
+        summary_collector: ContextCollector | None = None,
+        character_collector: ContextCollector | None = None,
+        world_collector: ContextCollector | None = None,
+        style_collector: ContextCollector | None = None,
+    ) -> None:
+        """Integrate collectors in parallel using ThreadPoolExecutor."""
+        import concurrent.futures
+
+        collectors: dict[str, ContextCollector] = {}
+        if plot_collector is not None:
+            collectors["plot"] = plot_collector
+        if summary_collector is not None:
+            collectors["summary"] = summary_collector
+        if character_collector is not None:
+            collectors["character"] = character_collector
+        if world_collector is not None:
+            collectors["world"] = world_collector
+        if style_collector is not None:
+            collectors["style"] = style_collector
+
+        if not collectors:
+            return
+
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=self._max_workers
+        ) as executor:
+            futures: dict[str, concurrent.futures.Future[None]] = {}
+            for name, collector in collectors.items():
+                futures[name] = executor.submit(
+                    self._run_collector, ctx, name, collector, scene
+                )
+
+            for name, future in futures.items():
+                try:
+                    future.result()
+                except Exception as e:
+                    ctx.warnings.append(
+                        f"Parallel collection failed for {name}: {e}"
+                    )
+
+    def _run_collector(
+        self,
+        ctx: FilteredContext,
+        name: str,
+        collector: ContextCollector,
+        scene: SceneIdentifier,
+    ) -> None:
+        """Run a single collector and merge results into ctx."""
+        if name == "plot":
+            self._integrate_plot(ctx, collector, scene)
+        elif name == "summary":
+            self._integrate_summary(ctx, collector, scene)
+        elif name == "character":
+            self._integrate_character(ctx, collector, scene)
+        elif name == "world":
+            self._integrate_world_setting(ctx, collector, scene)
+        elif name == "style":
+            ctx.style_guide = collector.collect_as_string(scene)
 
     def _integrate_plot(
         self,

@@ -6,9 +6,13 @@ This module provides PlotCollector which gathers plot information
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from ..lazy_loader import FileLazyLoader, LoadPriority
 from ..scene_identifier import SceneIdentifier
+
+if TYPE_CHECKING:
+    from src.core.repositories.plot import PlotRepository
 
 
 @dataclass
@@ -43,24 +47,30 @@ class PlotCollector:
 
     Collects L1/L2/L3 plot information from vault.
 
+    Supports both file-based and repository-based collection for backward compatibility.
+
     Attributes:
         vault_root: Vault root path
         loader: Lazy loader for file loading
+        repository: Optional PlotRepository for structured data access
     """
 
     def __init__(
         self,
         vault_root: Path,
         loader: FileLazyLoader,
+        repository: "PlotRepository | None" = None,
     ) -> None:
         """Initialize PlotCollector.
 
         Args:
             vault_root: Root path of the vault
             loader: Lazy loader for file loading
+            repository: Optional PlotRepository for structured access
         """
         self.vault_root = vault_root
         self.loader = loader
+        self.repository = repository
 
     def _load_file(self, path: str, priority: LoadPriority) -> str | None:
         """Load a file and extract data if successful.
@@ -97,18 +107,30 @@ class PlotCollector:
     def _collect_l1(self) -> str | None:
         """Collect L1 plot (theme).
 
-        Path: _plot/l1_theme.md
+        Uses repository if available, otherwise falls back to file-based loading.
+
+        Path (file-based): _plot/l1_theme.md
         Priority: OPTIONAL (continue without it)
 
         Returns:
             L1 theme content, or None if not available.
         """
+        if self.repository:
+            try:
+                plot = self.repository.read("L1")
+                return plot.content or None
+            except Exception:
+                # Fall back to file-based if repository fails
+                pass
+
         return self._load_file("_plot/l1_theme.md", LoadPriority.OPTIONAL)
 
     def _collect_l2(self, scene: SceneIdentifier) -> str | None:
         """Collect L2 plot (chapter goal).
 
-        Path: _plot/l2_{chapter_id}.md
+        Uses repository if available and chapter info can be resolved.
+
+        Path (file-based): _plot/l2_{chapter_id}.md
         Priority: OPTIONAL
 
         Args:
@@ -120,13 +142,19 @@ class PlotCollector:
         if not scene.chapter_id:
             return None
 
+        # Repository-based collection for L2 would require mapping chapter_id
+        # to chapter_number and chapter_name, which is not straightforward.
+        # For now, use file-based approach for backward compatibility.
+
         path = f"_plot/l2_{scene.chapter_id}.md"
         return self._load_file(path, LoadPriority.OPTIONAL)
 
     def _collect_l3(self, scene: SceneIdentifier) -> str | None:
         """Collect L3 plot (scene structure).
 
-        Path: _plot/l3_{episode_id}.md
+        Uses repository if available and scene info can be resolved.
+
+        Path (file-based): _plot/l3_{episode_id}.md
         Priority: REQUIRED (essential for scene writing)
 
         Args:
@@ -135,6 +163,11 @@ class PlotCollector:
         Returns:
             L3 scene structure content, or None if not available.
         """
+        # Repository-based collection for L3 would require mapping episode_id
+        # to chapter_number, chapter_name, and sequence_number.
+        # This mapping is not available in the current SceneIdentifier.
+        # For now, use file-based approach for backward compatibility.
+
         path = f"_plot/l3_{scene.episode_id}.md"
         return self._load_file(path, LoadPriority.REQUIRED)
 

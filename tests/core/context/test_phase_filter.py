@@ -1,13 +1,13 @@
 """Tests for PhaseFilter protocol and related classes."""
 
-import pytest
 from datetime import date
-from typing import TypeVar
+
+import pytest
 
 from src.core.context.phase_filter import (
+    InvalidPhaseError,
     PhaseFilter,
     PhaseFilterError,
-    InvalidPhaseError,
 )
 
 
@@ -345,6 +345,44 @@ class TestCharacterPhaseFilter:
         assert filtered.updated == character.updated
         assert filtered.tags == character.tags
 
+    def test_filter_preserves_all_fields_via_model_copy(self, filter):
+        """filter_by_phase preserves all fields including any new ones.
+
+        This test validates that using model_copy(update={...}) ensures
+        all fields are preserved even if new fields are added to the model.
+        """
+        from src.core.models.character import AIVisibilitySettings, Character, Phase
+
+        # Character with all fields populated
+        character = Character(
+            name="Test",
+            type="character",
+            phases=[
+                Phase(name="initial", episodes="1-5"),
+                Phase(name="arc_1", episodes="6-10"),
+            ],
+            current_phase="initial",
+            ai_visibility=AIVisibilitySettings(),
+            sections={"background": "Test background"},
+            created=date(2024, 1, 1),
+            updated=date(2024, 1, 2),
+            tags=["tag1", "tag2"],
+        )
+
+        result = filter.filter_by_phase(character, "initial")
+
+        # Should preserve all non-phase fields
+        assert result.name == "Test"
+        assert result.type == "character"
+        assert result.current_phase == "initial"
+        assert result.sections == {"background": "Test background"}
+        assert result.created == date(2024, 1, 1)
+        assert result.updated == date(2024, 1, 2)
+        assert result.tags == ["tag1", "tag2"]
+        # Phase should be filtered
+        assert len(result.phases) == 1
+        assert result.phases[0].name == "initial"
+
 
 class TestWorldSettingPhaseFilter:
     """Test WorldSettingPhaseFilter concrete implementation."""
@@ -357,7 +395,7 @@ class TestWorldSettingPhaseFilter:
     @pytest.fixture
     def world_setting(self):
         """Create a test world setting with phases."""
-        from src.core.models.world_setting import WorldSetting, Phase
+        from src.core.models.world_setting import Phase, WorldSetting
 
         return WorldSetting(
             name="Magic System",
@@ -433,3 +471,42 @@ class TestWorldSettingPhaseFilter:
         assert filtered.sections == world_setting.sections
         assert filtered.created == world_setting.created
         assert filtered.updated == world_setting.updated
+
+    def test_filter_preserves_all_fields_via_model_copy(self, filter):
+        """filter_by_phase preserves all fields including any new ones.
+
+        This test validates that using model_copy(update={...}) ensures
+        all fields are preserved even if new fields are added to the model.
+        """
+        from src.core.models.character import AIVisibilitySettings, Phase
+        from src.core.models.world_setting import WorldSetting
+
+        # WorldSetting with all fields populated
+        world_setting = WorldSetting(
+            name="TestSetting",
+            category="Location",
+            phases=[
+                Phase(name="initial", episodes="1-5"),
+                Phase(name="arc_1", episodes="6-10"),
+            ],
+            current_phase="initial",
+            ai_visibility=AIVisibilitySettings(),
+            sections={"description": "Test description"},
+            created=date(2024, 1, 1),
+            updated=date(2024, 1, 2),
+            tags=["tag1", "tag2"],
+        )
+
+        result = filter.filter_by_phase(world_setting, "initial")
+
+        # Should preserve all non-phase fields
+        assert result.name == "TestSetting"
+        assert result.category == "Location"
+        assert result.current_phase == "initial"
+        assert result.sections == {"description": "Test description"}
+        assert result.created == date(2024, 1, 1)
+        assert result.updated == date(2024, 1, 2)
+        assert result.tags == ["tag1", "tag2"]
+        # Phase should be filtered
+        assert len(result.phases) == 1
+        assert result.phases[0].name == "initial"

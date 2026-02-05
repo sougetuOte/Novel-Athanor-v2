@@ -1,13 +1,15 @@
 """Tests for StyleGuideCollector (L3-4-2e)."""
 
-import pytest
 from pathlib import Path
-from src.core.context.scene_identifier import SceneIdentifier
-from src.core.context.lazy_loader import FileLazyLoader
+
+import pytest
+
 from src.core.context.collectors.style_guide_collector import (
     StyleGuideCollector,
     StyleGuideContext,
 )
+from src.core.context.lazy_loader import FileLazyLoader
+from src.core.context.scene_identifier import SceneIdentifier
 
 
 @pytest.fixture

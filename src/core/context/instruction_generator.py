@@ -8,14 +8,18 @@ as well as the concrete implementation.
 from typing import Any, Protocol
 
 from src.core.models.foreshadowing import Foreshadowing, ForeshadowingStatus
-from src.core.repositories.foreshadowing import ForeshadowingRepository
+from src.core.repositories.base import EntityNotFoundError
 
 from .foreshadow_instruction import (
     ForeshadowInstruction,
     ForeshadowInstructions,
     InstructionAction,
 )
-from .foreshadowing_identifier import ForeshadowingIdentifier, IdentifiedForeshadowing
+from .foreshadowing_identifier import (
+    ForeshadowingIdentifier,
+    ForeshadowingReader,
+    IdentifiedForeshadowing,
+)
 from .scene_identifier import SceneIdentifier
 
 
@@ -90,7 +94,7 @@ class InstructionGeneratorImpl:
     instructions for each.
 
     Attributes:
-        repository: Foreshadowing repository for data access.
+        reader: Foreshadowing reader for data access.
         identifier: Foreshadowing identifier for scene analysis.
     """
 
@@ -112,17 +116,17 @@ class InstructionGeneratorImpl:
 
     def __init__(
         self,
-        repository: ForeshadowingRepository,
+        reader: ForeshadowingReader,
         identifier: ForeshadowingIdentifier,
     ) -> None:
         """Initialize InstructionGeneratorImpl.
 
         Args:
-            repository: Foreshadowing repository instance.
+            reader: Foreshadowing reader instance (Protocol).
             identifier: Foreshadowing identifier instance.
         """
-        self.repository = repository
-        self.identifier = identifier
+        self._reader = reader
+        self._identifier = identifier
 
     def generate(
         self,
@@ -141,7 +145,7 @@ class InstructionGeneratorImpl:
         instructions = ForeshadowInstructions()
 
         # Identify relevant foreshadowing elements
-        identified = self.identifier.identify(scene, appearing_characters)
+        identified = self._identifier.identify(scene, appearing_characters)
 
         # Generate instruction for each identified element
         for item in identified:
@@ -164,8 +168,8 @@ class InstructionGeneratorImpl:
             Generated instruction, or None if foreshadowing not found.
         """
         try:
-            fs = self.repository.read(identified.foreshadowing_id)
-        except (KeyError, FileNotFoundError):
+            fs = self._reader.read(identified.foreshadowing_id)
+        except (KeyError, FileNotFoundError, EntityNotFoundError):
             # Foreshadowing was identified but no longer exists in repository
             return None
         action = identified.suggested_action
@@ -236,15 +240,15 @@ class InstructionGeneratorImpl:
             return InstructionAction.NONE
 
         try:
-            fs = self.repository.read(fs_id)
-        except (KeyError, FileNotFoundError):
+            fs = self._reader.read(fs_id)
+        except (KeyError, FileNotFoundError, EntityNotFoundError):
             return InstructionAction.NONE
 
         # Check status and determine action directly
         # REGISTERED -> check if this is plant episode
         if fs.status == ForeshadowingStatus.REGISTERED:
-            plant_episode = self.identifier._extract_episode_from_id(fs_id)
-            if plant_episode and self.identifier._episode_matches(plant_episode, scene.episode_id):
+            plant_episode = self._identifier._extract_episode_from_id(fs_id)
+            if plant_episode and self._identifier._episode_matches(plant_episode, scene.episode_id):
                 return InstructionAction.PLANT
 
         # PLANTED/REINFORCED -> check for reinforce timeline
@@ -252,12 +256,12 @@ class InstructionGeneratorImpl:
             if fs.timeline and fs.timeline.events:
                 for event in fs.timeline.events:
                     if event.type == ForeshadowingStatus.REINFORCED:
-                        if self.identifier._episode_matches(event.episode, scene.episode_id):
+                        if self._identifier._episode_matches(event.episode, scene.episode_id):
                             return InstructionAction.REINFORCE
 
         # Check if reveal episode
         if fs.payoff and fs.payoff.planned_episode:
-            if self.identifier._episode_matches(fs.payoff.planned_episode, scene.episode_id):
+            if self._identifier._episode_matches(fs.payoff.planned_episode, scene.episode_id):
                 return InstructionAction.REINFORCE
 
         return InstructionAction.NONE

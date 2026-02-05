@@ -147,3 +147,43 @@ class TestClearForbiddenCache:
         builder.clear_all_caches()
         result2 = builder.get_forbidden_keywords(scene)
         assert result1 is not result2
+
+
+class TestStage2Integration:
+    """Tests for Stage 2 integration with VisibilityFilteringService."""
+
+    def test_get_forbidden_keywords_stage2_integration(self, tmp_path, scene):
+        """Stage 2 integrates VisibilityFilteringService forbidden_keywords."""
+        from src.core.services.visibility_controller import VisibilityController
+
+        # Setup vault with Stage 1 source
+        ai_control = tmp_path / "_ai_control"
+        ai_control.mkdir()
+        (ai_control / "forbidden_keywords.txt").write_text("Stage1キーワード\n")
+
+        # Create mock visibility controller with forbidden_keywords
+        mock_controller = VisibilityController(tmp_path)
+        mock_controller.forbidden_keywords = ["Stage2キーワード", "追加キーワード"]
+
+        builder = ContextBuilder(vault_root=tmp_path, visibility_controller=mock_controller)
+        result = builder.get_forbidden_keywords(scene)
+
+        # Stage 1 keywords (from forbidden_keywords.txt)
+        assert "Stage1キーワード" in result
+        # Stage 2 keywords (from VisibilityController)
+        assert "Stage2キーワード" in result
+        assert "追加キーワード" in result
+
+    def test_get_forbidden_keywords_without_visibility_controller(self, tmp_path, scene):
+        """Without visibility controller, Stage 2 is not applied."""
+        ai_control = tmp_path / "_ai_control"
+        ai_control.mkdir()
+        (ai_control / "forbidden_keywords.txt").write_text("Stage1キーワード\n")
+
+        builder = ContextBuilder(vault_root=tmp_path, visibility_controller=None)
+        result = builder.get_forbidden_keywords(scene)
+
+        # Only Stage 1 keywords
+        assert "Stage1キーワード" in result
+        # No Stage 2 keywords
+        assert len(result) == 1

@@ -5,9 +5,11 @@
 _TDD実装フェーズ_
 
 ## Current Context
-- Feature: Issue Resolution Wave 2 + Wave 3
+- Feature: L4 Agent Layer
 - Started: 2026-02-05
-- Focus: 小規模修正 + L1 基盤構築
+- Phase: A (エージェント基盤) — TDD実装中
+- Design: `docs/memos/2026-02-05-l4-core-design.md`
+- Tasks: `docs/tasks/l4-phase-plan.md`
 
 ---
 

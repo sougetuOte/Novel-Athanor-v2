@@ -1,19 +1,20 @@
 {
   "feature": "novel-generator",
   "description": "AIとユーザーが協力して小説を作成する半自動生成システム",
-  "phase": "PLANNING",
-  "subPhase": "requirements",
+  "phase": "BUILDING",
+  "subPhase": "implementation",
   "status": {
-    "requirements": "in_progress",
-    "design": "pending",
-    "tasks": "pending"
+    "requirements": "approved",
+    "design": "approved",
+    "tasks": "approved",
+    "implementation": "in_progress"
   },
   "approvals": {
-    "requirements": null,
-    "design": null,
-    "tasks": null
+    "requirements": "2026-02-05T00:00:00Z",
+    "design": "2026-02-05T00:00:00Z",
+    "tasks": "2026-02-05T00:00:00Z"
   },
-  "currentActivity": "L4 Agent Layer PLANNING 開始",
+  "currentActivity": "L4 Phase A 完了。Phase B (Ghost Writer) 実装可能。",
   "l3Progress": {
     "phaseA": "completed",
     "phaseB": "completed",
@@ -23,7 +24,16 @@
     "phaseF": "completed",
     "phaseG": "skipped"
   },
-  "l4Progress": {},
+  "l4Progress": {
+    "planning": "completed",
+    "phaseA": "completed",
+    "phaseB": "pending",
+    "phaseC": "pending",
+    "phaseD": "pending",
+    "phaseE": "pending",
+    "phaseF": "pending",
+    "phaseG": "pending"
+  },
   "artifacts": {
     "analysisTarget": [
       "docs/Novel-Athanor-main",
@@ -33,18 +43,25 @@
     "specs": [
       "docs/specs/novel-generator-v2/00_overview.md",
       "docs/specs/novel-generator-v2/02_architecture.md",
+      "docs/specs/novel-generator-v2/03_data-model.md",
       "docs/specs/novel-generator-v2/08_agent-design.md"
     ],
+    "l4Design": [
+      "docs/memos/2026-02-05-l4-core-design.md",
+      "docs/tasks/l4-phase-plan.md",
+      "docs/memos/2026-02-05-m1-manual-outline.md"
+    ],
     "implementation": [
-      "src/core/context/"
+      "src/core/context/",
+      "src/agents/"
     ],
     "roadmap": "docs/memos/2026-02-04-future-roadmap.md"
   },
   "qualityMetrics": {
-    "tests": 730,
+    "tests": 979,
     "mypy": 0,
     "ruff": 0,
-    "lastAudit": "2026-02-04",
+    "lastAudit": "2026-02-05",
     "auditGrade": "A"
   },
   "createdAt": "2026-01-24T00:00:00Z",

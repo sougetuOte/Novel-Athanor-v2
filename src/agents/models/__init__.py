@@ -1,27 +1,24 @@
-"""L4 Agent layer.
+"""L4 Agent I/O models."""
 
-半自動小説生成パイプラインのエージェント層。
-Models, Config, CLI Tools を提供する。
-"""
+from __future__ import annotations
 
-from src.agents.config import get_assessment
-from src.agents.models import (
-    IssueSeverity,
-    PipelineConfig,
+from src.agents.models.pipeline_config import PipelineConfig
+from src.agents.models.quality_result import (
     QualityAssessment,
     QualityIssue,
     QualityResult,
     QualityScore,
+)
+from src.agents.models.review_result import (
+    IssueSeverity,
     ReviewIssue,
     ReviewIssueType,
     ReviewResult,
     ReviewStatus,
-    SceneRequirements,
 )
+from src.agents.models.scene_requirements import SceneRequirements
 
 __all__ = [
-    # Config
-    "get_assessment",
     # Enums
     "IssueSeverity",
     "QualityAssessment",

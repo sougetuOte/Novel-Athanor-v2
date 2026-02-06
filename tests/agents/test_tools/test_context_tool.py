@@ -10,8 +10,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from src.core.context.context_builder import ContextBuildResult
 from src.core.context.filtered_context import FilteredContext
 from src.core.context.foreshadow_instruction import (

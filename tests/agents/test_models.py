@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import pytest
+
 from src.agents.models import (
     IssueSeverity,
     PipelineConfig,
     QualityAssessment,
-    QualityIssue,
     QualityResult,
     QualityScore,
     ReviewIssue,

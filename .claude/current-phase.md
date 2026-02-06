@@ -7,9 +7,10 @@ _TDD実装フェーズ_
 ## Current Context
 - Feature: L4 Agent Layer
 - Started: 2026-02-05
-- Phase: A (エージェント基盤) — TDD実装中
+- Phase: B (Ghost Writer) — TDD実装中 + インフラ改善
 - Design: `docs/memos/2026-02-05-l4-core-design.md`
 - Tasks: `docs/tasks/l4-phase-plan.md`
+- Session Mgmt: `docs/memos/2026-02-06-claude-code-session-management.md`
 
 ---
 

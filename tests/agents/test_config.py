@@ -3,15 +3,16 @@
 from __future__ import annotations
 
 import pytest
+
 from src.agents.config import (
     DEFAULT_POV,
     DEFAULT_WORD_COUNT,
     HUMAN_FALLBACK_ENABLED,
     MAX_REVIEW_RETRIES,
-    QUALITY_THRESHOLDS,
     QUALITY_THRESHOLD_ACCEPTABLE,
     QUALITY_THRESHOLD_EXCELLENT,
     QUALITY_THRESHOLD_GOOD,
+    QUALITY_THRESHOLDS,
     get_assessment,
 )
 

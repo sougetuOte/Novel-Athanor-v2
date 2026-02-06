@@ -9,9 +9,11 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from pathlib import Path
 
 from .context_tool import format_context_as_markdown, run_build_context
 from .review_tool import run_algorithmic_review
+from .style_tool import run_analyze_style, run_save_style
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -47,6 +49,37 @@ def create_parser() -> argparse.ArgumentParser:
     )
     review_parser.add_argument(
         "--keywords", required=True, help="禁止キーワード（カンマ区切り）"
+    )
+
+    # analyze-style
+    analyze_style_parser = subparsers.add_parser(
+        "analyze-style", help="文体分析（エピソードテキスト → StyleGuide/Profile 生成用プロンプト）"
+    )
+    analyze_style_parser.add_argument(
+        "--vault", required=True, help="Vault ルートパス"
+    )
+    analyze_style_parser.add_argument(
+        "--work", required=True, help="作品名"
+    )
+    analyze_style_parser.add_argument(
+        "--episodes", default=None, help="エピソード ID（カンマ区切り、省略時は全エピソード）"
+    )
+
+    # save-style
+    save_style_parser = subparsers.add_parser(
+        "save-style", help="LLM出力を StyleGuide/Profile として保存"
+    )
+    save_style_parser.add_argument(
+        "--vault", required=True, help="Vault ルートパス"
+    )
+    save_style_parser.add_argument(
+        "--work", required=True, help="作品名"
+    )
+    save_style_parser.add_argument(
+        "--type", required=True, choices=["guide", "profile"], help="保存タイプ（guide or profile）"
+    )
+    save_style_parser.add_argument(
+        "--input", required=True, help="LLM出力ファイルパス"
     )
 
     return parser
@@ -99,6 +132,22 @@ def main(argv: list[str] | None = None) -> int:
             keywords = [k.strip() for k in args.keywords.split(",") if k.strip()]
             review_result = run_algorithmic_review(draft_text, keywords)
             print(review_result.model_dump_json(indent=2))
+            return 0
+
+        elif args.command == "analyze-style":
+            vault_root = Path(args.vault)
+            episode_ids = None
+            if args.episodes:
+                episode_ids = [int(e.strip()) for e in args.episodes.split(",") if e.strip()]
+            prompt = run_analyze_style(vault_root, args.work, episode_ids)
+            print(prompt)
+            return 0
+
+        elif args.command == "save-style":
+            vault_root = Path(args.vault)
+            input_path = Path(args.input)
+            run_save_style(vault_root, args.work, args.type, input_path)
+            print(f"Saved {args.type} to {vault_root / args.work}")
             return 0
 
         else:

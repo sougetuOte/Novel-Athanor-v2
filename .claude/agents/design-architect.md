@@ -7,6 +7,7 @@ description: |
   PLANNINGフェーズでの設計作業で使用推奨。
 tools: Read, Glob, Grep, Write, Edit, WebSearch
 model: sonnet
+memory: user
 ---
 
 # Design Architect サブエージェント

@@ -7,6 +7,7 @@ description: |
   AUDITINGフェーズでの監査作業で使用推奨。
 tools: Read, Glob, Grep, Bash
 model: opus
+memory: user
 ---
 
 # Quality Auditor サブエージェント

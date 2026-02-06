@@ -7,6 +7,7 @@ description: |
   BUILDINGフェーズでの実装作業で使用推奨。
 tools: Read, Glob, Grep, Write, Edit, Bash
 model: sonnet
+memory: user
 ---
 
 # TDD Developer サブエージェント

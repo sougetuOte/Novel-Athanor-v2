@@ -1,47 +1,51 @@
 # SESSION_STATE (2026-02-06)
 
 ## 完了タスク
-- StatusLine Windows対応 (runpy bootstrap パターンで解決)
-- `/full-save` コマンド作成 (15%コンテキストガード付き)
-- `/quick-save` 簡素化 (SESSION_STATE.md 記録のみ、commit 除去)
-- Serena プラグイン無効化 (コンテキスト節約、29K行規模では不要と判断)
-- CLAUDE.md にコンテキスト20%警告ルール追加
-- Agent MD 4件に `memory: user` 追加 (design-architect, quality-auditor, tdd-developer, requirement-analyst)
-- セッション引き継ぎキット作成 (`docs/memo/2026-02-06-session/`)
-- L4 Phase B Ghost Writer 完了 (formatter, snapshots, agent MD)
+- `/full-load` コマンド作成 + 引き継ぎキット更新
+- L4 Phase C (Reviewer) 全6タスク完了 (TDD)
+  - C-1: Review Prompt Formatter (`src/agents/prompts/reviewer.py`)
+  - C-2: Review Result Parser (`src/agents/parsers/review_parser.py`)
+  - C-3: Algorithmic Review Tool (`src/agents/tools/review_tool.py` + CLI `check-review`)
+  - C-4: Human Fallback (`should_fallback()` + `format_fallback_report()`)
+  - C-5: Reviewer agent MD (`.claude/agents/reviewer.md`)
+  - C-6: 全テスト通過 (1034件, mypy 0, ruff 0)
 
 ## 進行中タスク
-- なし（全タスク完了）
-
-## 次のステップ
-1. **L4 Phase C (Reviewer)** — prompt formatter + parser + review tool + agent MD
-2. **L4 Phase D (Quality Agent)** — prompt formatter + parser + agent MD
-3. **L4 Phase E (Style Agent)** — 文体分析 (最大7タスク)
-4. Phase C/D/E は並列可能（互いに独立）
-
-## 変更ファイル一覧
-### 今回コミット対象
-- `.claude/agents/design-architect.md` — memory: user 追加
-- `.claude/agents/quality-auditor.md` — memory: user 追加
-- `.claude/agents/requirement-analyst.md` — memory: user 追加
-- `.claude/agents/tdd-developer.md` — memory: user 追加
-- `.claude/commands/quick-save.md` — commit 除去、SESSION_STATE.md のみに
-- `.claude/commands/full-save.md` — 新規作成
-- `.claude/settings.local.json` — Serena 無効化
-- `CLAUDE.md` — Context Management セクション追加
-
-### 前回コミット済み (360e891)
-- `docs/memo/2026-02-06-session/` — 引き継ぎキット (5ファイル)
-- L4 Phase B 全成果物 (formatter, snapshots, agent MD)
-
-## 未解決の問題
 - なし
 
+## 次のステップ
+1. **L4 Phase D (Quality Agent)** — prompt formatter + parser + agent MD (4タスク)
+2. **L4 Phase E (Style Agent)** — 文体分析 (7タスク)
+3. Phase D/E は並列可能（互いに独立）
+4. 未コミットの Phase C 成果物を git commit + push
+
+## 変更ファイル一覧
+- `src/agents/prompts/reviewer.py` — 新規
+- `src/agents/prompts/__init__.py` — export追加
+- `src/agents/parsers/__init__.py` — 新規
+- `src/agents/parsers/review_parser.py` — 新規
+- `src/agents/tools/review_tool.py` — 新規
+- `src/agents/tools/cli.py` — check-review サブコマンド追加
+- `.claude/agents/reviewer.md` — 新規
+- `.claude/commands/full-load.md` — 新規
+- `.claude/commands/quick-save.md` — 再開方法更新
+- `.claude/commands/full-save.md` — 再開方法更新
+- `docs/memo/2026-02-06-session/full-load.md` — 新規
+- `docs/memo/2026-02-06-session/README.md` — full-load 追加
+- `tests/agents/test_parsers/__init__.py` — 新規
+- `tests/agents/test_parsers/test_review_parser.py` — 新規 (12テスト)
+- `tests/agents/test_prompts/test_reviewer_formatter.py` — 新規 (10テスト)
+- `tests/agents/test_tools/test_review_tool.py` — 新規 (8テスト)
+- `tests/agents/test_tools/test_human_fallback.py` — 新規 (9テスト)
+- `tests/agents/test_tools/test_cli.py` — check-review テスト追加 (3テスト)
+
+## 未解決の問題
+- 既存フレーキーテスト: `test_performance_within_limit` (0.1017s > 0.1s、Phase C無関係)
+
 ## コンテキスト情報
-- **ブランチ**: main (origin/main より 1 commit 先行)
-- **Phase**: BUILDING (L4 Phase B 完了)
-- **テスト**: 992件、mypy 0、ruff 0
+- **ブランチ**: main
+- **Phase**: BUILDING (L4 Phase C 完了)
+- **テスト**: 1034件 (前回992 + Phase C 42件)
 - **関連ドキュメント**:
-  - `docs/tasks/l4-phase-plan.md` (Phase C/D/E)
+  - `docs/tasks/l4-phase-plan.md` (Phase D/E)
   - `docs/memos/2026-02-05-l4-core-design.md`
-  - `docs/specs/novel-generator-v2/08_agent-design.md`

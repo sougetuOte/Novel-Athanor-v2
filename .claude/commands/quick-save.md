@@ -37,6 +37,6 @@ SESSION_STATE.md への記録のみ。git commit は行わない。
   claude -c  （直前セッション続行）
   claude     （新規セッション）
 
-再開後: 「SESSION_STATE.md を読んで前回の続きから」
+再開後: /full-load
 ---
 ```

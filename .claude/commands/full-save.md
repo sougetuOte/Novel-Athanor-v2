@@ -88,6 +88,6 @@ Daily: docs/daily/YYYY-MM-DD.md
   claude -c  （直前セッション続行）
   claude     （新規セッション）
 
-再開後: 「SESSION_STATE.md を読んで前回の続きから」
+再開後: /full-load
 ---
 ```

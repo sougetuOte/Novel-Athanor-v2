@@ -11,6 +11,7 @@ import json
 import sys
 
 from .context_tool import format_context_as_markdown, run_build_context
+from .review_tool import run_algorithmic_review
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -35,6 +36,17 @@ def create_parser() -> argparse.ArgumentParser:
     )
     format_parser.add_argument(
         "--input", default="-", help="入力JSONファイル（'-' で stdin）"
+    )
+
+    # check-review
+    review_parser = subparsers.add_parser(
+        "check-review", help="アルゴリズミックレビュー（禁止キーワードチェック）"
+    )
+    review_parser.add_argument(
+        "--draft", required=True, help="ドラフトテキストファイルパス（'-' で stdin）"
+    )
+    review_parser.add_argument(
+        "--keywords", required=True, help="禁止キーワード（カンマ区切り）"
     )
 
     return parser
@@ -76,6 +88,17 @@ def main(argv: list[str] | None = None) -> int:
                     data = json.load(f)
             markdown = format_context_as_markdown(data)
             print(markdown)
+            return 0
+
+        elif args.command == "check-review":
+            if args.draft == "-":
+                draft_text = sys.stdin.read()
+            else:
+                with open(args.draft, encoding="utf-8") as f:
+                    draft_text = f.read()
+            keywords = [k.strip() for k in args.keywords.split(",") if k.strip()]
+            review_result = run_algorithmic_review(draft_text, keywords)
+            print(review_result.model_dump_json(indent=2))
             return 0
 
         else:

@@ -146,3 +146,63 @@ def test_main_format_context_from_file(tmp_path: Path, capsys: pytest.CaptureFix
     assert "テーマ: 贖罪" in markdown
     assert "## 禁止キーワード" in markdown
     assert "- royal" in markdown
+
+
+# ============================================================================
+# check-review CLI tests
+# ============================================================================
+
+
+def test_parser_check_review_args() -> None:
+    """check-review 引数パース."""
+    from src.agents.tools.cli import create_parser
+
+    parser = create_parser()
+    args = parser.parse_args(
+        ["check-review", "--draft", "draft.txt", "--keywords", "王族,血筋"]
+    )
+
+    assert args.command == "check-review"
+    assert args.draft == "draft.txt"
+    assert args.keywords == "王族,血筋"
+
+
+def test_main_check_review_clean(
+    tmp_path: Path, capsys: pytest.CaptureFixture,  # type: ignore[type-arg]
+) -> None:
+    """check-review with clean text → approved."""
+    from src.agents.tools.cli import main
+
+    draft_file = tmp_path / "draft.txt"
+    draft_file.write_text("彼女は静かに微笑んだ。", encoding="utf-8")
+
+    exit_code = main(
+        ["check-review", "--draft", str(draft_file), "--keywords", "王族,血筋"]
+    )
+    assert exit_code == 0
+
+    captured = capsys.readouterr()
+    data = json.loads(captured.out)
+    assert data["status"] == "approved"
+    assert data["issues"] == []
+
+
+def test_main_check_review_violation(
+    tmp_path: Path, capsys: pytest.CaptureFixture,  # type: ignore[type-arg]
+) -> None:
+    """check-review with violation → rejected."""
+    from src.agents.tools.cli import main
+
+    draft_file = tmp_path / "draft.txt"
+    draft_file.write_text("彼女は王族の末裔だった。", encoding="utf-8")
+
+    exit_code = main(
+        ["check-review", "--draft", str(draft_file), "--keywords", "王族,血筋"]
+    )
+    assert exit_code == 0
+
+    captured = capsys.readouterr()
+    data = json.loads(captured.out)
+    assert data["status"] == "rejected"
+    assert len(data["issues"]) == 1
+    assert data["issues"][0]["type"] == "forbidden_keyword"

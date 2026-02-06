@@ -1,6 +1,6 @@
 # クイックセーブ（軽量版）
 
-Serena登録やDaily記録は行わない。SESSION_STATE.mdとgit commitのみ。
+SESSION_STATE.md への記録のみ。git commit は行わない。
 コンテキスト消費を最小限に抑えるため、簡潔に実行すること。
 
 ## 1. SESSION_STATE.md を書き出す
@@ -27,13 +27,7 @@ Serena登録やDaily記録は行わない。SESSION_STATE.mdとgit commitのみ�
 - 現在のgitブランチ
 - 関連するSPEC/ADR/設計書ファイル名
 
-## 2. git commit
-
-1. `git status` で未コミットの変更を確認
-2. 変更がある場合はコミット
-   - コミットメッセージ: `WIP: quick-save [auto]`
-
-## 3. 完了報告
+## 2. 完了報告
 
 以下を表示:
 

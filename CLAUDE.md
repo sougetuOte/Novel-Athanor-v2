@@ -70,6 +70,12 @@
 
 詳細は `.claude/rules/phase-*.md` を参照。
 
+## Context Management
+
+コンテキスト残量が **20% を下回った** と判断したら、現在のタスクの区切りの良いところで
+ユーザーに「残り少ないので `/quick-save` を推奨します」と提案すること。
+auto-compact の発動を待たないこと。これは保険であり、基本はユーザーが StatusLine を監視する。
+
 ## Cost Management
 
 - **サブエージェント（Task）はデフォルトで `model: "sonnet"` を使用する**

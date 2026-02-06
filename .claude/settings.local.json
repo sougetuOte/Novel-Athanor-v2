@@ -112,7 +112,20 @@
       "Bash(git -C \"C:\\\\work5\\\\Novel-Athanor-v2\" commit -m \"$\\(cat <<''EOF''\nfix: add error classification and logging to ContextBuilder\n\nSHORT-01: build_context\\(\\) now classifies integration failures as errors\n  \\(success=False\\) while keeping optional failures as warnings\nSHORT-03: add logging with getLogger\\(__name__\\) at key points\n  \\(build lifecycle, cache hits, failures\\)\nAdd 2 tests for error classification behavior\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(del \"C:\\\\work5\\\\Novel-Athanor-v2\\\\verify_w3c.py\")",
       "Bash(python -m pytest:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "WebFetch(domain:www.anthropic.com)",
+      "WebFetch(domain:releasebot.io)",
+      "Bash(cmd.exe /c \"echo test | python %USERPROFILE%\\\\.claude\\\\statusline.py\")",
+      "Bash(cmd.exe /c \"echo {\"\"context_window\"\":{\"\"total_input_tokens\"\":50000,\"\"total_output_tokens\"\":10000,\"\"context_window_size\"\":200000},\"\"model\"\":{\"\"display_name\"\":\"\"Opus\"\"}} | python %USERPROFILE%\\\\.claude\\\\statusline.py\")",
+      "WebFetch(domain:harishgarg.com)",
+      "Bash(claude:*)",
+      "Bash(powershell -NoProfile -Command \"echo ''{\"\"context_window\"\":{\"\"total_input_tokens\"\":50000,\"\"total_output_tokens\"\":10000,\"\"context_window_size\"\":200000},\"\"model\"\":{\"\"display_name\"\":\"\"Opus 4.6\"\"}}'' | python -c \"\"import os,runpy;runpy.run_path\\(os.path.expanduser\\(''~/.claude/statusline.py''\\),run_name=''__main__''\\)\"\"\")",
+      "Bash(powershell -NoProfile -Command \"''{\"\"model\"\":{\"\"display_name\"\":\"\"X\"\"},\"\"context_window\"\":{\"\"remaining_percentage\"\":50},\"\"cost\"\":{\"\"total_cost_usd\"\":0}}'' | python -c ''import os,runpy;runpy.run_path\\(os.path.expanduser\\(chr\\(126\\)+\"\"/.claude/statusline.py\"\"\\),run_name=\"\"__main__\"\"\\)''\")",
+      "Bash(powershell -NoProfile -Command \"@''\n{\"\"model\"\":{\"\"display_name\"\":\"\"X\"\"},\"\"context_window\"\":{\"\"remaining_percentage\"\":50},\"\"cost\"\":{\"\"total_cost_usd\"\":0}}\n''@ | python C:/Users/metral/.claude/statusline.py\")",
+      "Bash(cmd.exe /c \"echo {\"\"model\"\":{\"\"display_name\"\":\"\"X\"\"},\"\"context_window\"\":{\"\"remaining_percentage\"\":50},\"\"cost\"\":{\"\"total_cost_usd\"\":0}} | python C:/Users/metral/.claude/statusline.py\")",
+      "Bash(node -e \"\nconst {exec} = require\\(''child_process''\\);\nconst cmd = ''python -c \"\"import os,runpy;runpy.run_path\\(os.path.expanduser\\(\\\\\"\"~/.claude/statusline.py\\\\\"\"\\),run_name=\\\\\"\"__main__\\\\\"\"\\)\"\"'';\nconsole.log\\(''Command:'', cmd\\);\nconst child = exec\\(cmd, \\(err, stdout, stderr\\) => {\n  console.log\\(''stdout:'', JSON.stringify\\(stdout\\)\\);\n  console.log\\(''stderr:'', JSON.stringify\\(stderr\\)\\);\n  if \\(err\\) console.log\\(''error:'', err.message\\);\n}\\);\nchild.stdin.write\\(JSON.stringify\\({model:{display_name:''Test''},context_window:{remaining_percentage:50},cost:{total_cost_usd:1.5}}\\)\\);\nchild.stdin.end\\(\\);\n\")",
+      "Bash(node -e \"\nconst {exec} = require\\(''child_process''\\);\n// This is exactly what Claude Code reads from settings.json after JSON.parse\nconst cmd = String.raw\\\\`python -c \"\"import os,runpy;runpy.run_path\\(os.path.expanduser\\(''~/.claude/statusline.py''\\),run_name=''__main__''\\)\"\"\\\\`;\nconsole.log\\(''Command:'', cmd\\);\nconst child = exec\\(cmd, \\(err, stdout, stderr\\) => {\n  console.log\\(''stdout:'', JSON.stringify\\(stdout\\)\\);\n  console.log\\(''stderr:'', JSON.stringify\\(stderr\\)\\);\n  if \\(err\\) console.log\\(''error:'', err.message\\);\n}\\);\nchild.stdin.write\\(JSON.stringify\\({model:{display_name:''Test''},context_window:{remaining_percentage:50},cost:{total_cost_usd:1.5}}\\)\\);\nchild.stdin.end\\(\\);\n\")",
+      "Bash(test:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

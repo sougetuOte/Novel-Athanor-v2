@@ -1,6 +1,8 @@
 ---
 name: reviewer
-description: 生成テキストの情報漏洩チェック・禁止キーワード検出・品質レビューを行う校閲エージェント。レビュータスクが委任された場合に使用。
+description: >
+  生成テキストの情報漏洩チェック・禁止キーワード検出・品質レビューを行う校閲エージェント。
+  Use proactively when reviewing draft text for forbidden keywords or information leakage.
 tools: Read, Bash, Glob, Grep
 model: sonnet
 memory: project

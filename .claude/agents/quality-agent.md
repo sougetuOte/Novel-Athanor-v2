@@ -1,6 +1,8 @@
 ---
 name: quality-agent
-description: 生成テキストの品質をスコアリングし、改善提案を行う品質評価エージェント。品質評価タスクが委任された場合に使用。
+description: >
+  生成テキストの品質をスコアリングし、改善提案を行う品質評価エージェント。
+  Use proactively when evaluating draft text quality or when quality scoring tasks are delegated.
 tools: Read, Bash, Glob, Grep
 model: sonnet
 memory: project

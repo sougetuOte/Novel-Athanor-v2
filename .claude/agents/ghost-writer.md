@@ -1,6 +1,8 @@
 ---
 name: ghost-writer
-description: 小説のシーンテキストを生成する専門エージェント。/draft-scene コマンドで使用される。シーン執筆タスクが委任された場合に使用。
+description: >
+  小説のシーンテキストを生成する専門エージェント。/draft-scene コマンドで使用される。
+  Use proactively when writing novel scenes or when scene generation tasks are delegated.
 tools: Read, Write, Bash, Glob, Grep
 model: sonnet
 memory: project

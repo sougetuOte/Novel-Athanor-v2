@@ -76,11 +76,24 @@
 ユーザーに「残り少ないので `/quick-save` を推奨します」と提案すること。
 auto-compact の発動を待たないこと。これは保険であり、基本はユーザーが StatusLine を監視する。
 
+### セーブコマンドの使い分け
+- `/quick-save`: SESSION_STATE.md のみ記録（軽量、3-4%消費）。普段使い
+- `/full-save`: SESSION_STATE.md + git commit + push + daily（一日の終わり）
+- `/full-load`: セッション復元（次セッション開始時）
+- 残量 25% 以下では `/quick-save` を使うこと
+- `/full-save` は残量に余裕があるときのみ
+
 ## Cost Management
 
 - **サブエージェント（Task）はデフォルトで `model: "sonnet"` を使用する**
 - Opus は設計・監査など深い推論が必要な場合のみ使用
 - Haiku は単純な検索・確認タスクに使用可
+
+## MEMORY.md Policy
+
+Claude Code の auto memory 機能（`MEMORY.md`）はプロジェクト状態の SSOT としては使用しない。
+SSOT は `SESSION_STATE.md` と `.claude/states/`。MEMORY.md はセッション復帰の補助および Subagent の役割ノウハウ蓄積に使用可。
+詳細は `docs/internal/05_MCP_INTEGRATION.md` Section 6 を参照。
 
 ## References
 
@@ -88,7 +101,7 @@ auto-compact の発動を待たないこと。これは保険であり、基本�
 |---------|------|
 | 行動規範 | `.claude/rules/` |
 | プロセス SSOT | `docs/internal/` |
-| クイックリファレンス | `.claude/CHEATSHEET.md` |
+| クイックリファレンス | `CHEATSHEET.md` |
 
 ## Initial Instruction
 

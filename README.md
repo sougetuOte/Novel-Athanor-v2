@@ -25,13 +25,17 @@ Novel-Athanor-v2 は、完全自動ではなく、ユーザーの創造性を活
 
 ## 現在のステータス
 
-**仕様策定完了・実装準備中**
+**L4 エージェント層 実装中**
 
 | フェーズ | 状態 |
 |---------|------|
 | 解析 | ✅ 完了 |
 | 仕様策定 | ✅ 完了 |
-| 実装 | 🔲 未着手 |
+| L1-L3 コア実装 | ✅ 完了（921 テスト） |
+| L4 エージェント層 | 🔨 Phase A-E 完了 / Phase F-G 残 |
+
+- テスト: **1103 件** (mypy: 0, ruff: 0)
+- 実装済みエージェント: Ghost Writer, Reviewer, Quality Agent, Style Agent
 
 ## ドキュメント
 
@@ -76,7 +80,7 @@ Novel-Athanor-v2 は、完全自動ではなく、ユーザーの創造性を活
 
 - フェーズ制御: `/planning` → `/building` → `/auditing`
 - 承認ゲート: 各サブフェーズ完了時にユーザー承認必須
-- 詳細: `.claude/CHEATSHEET.md`
+- 詳細: `CHEATSHEET.md`
 
 ## ライセンス
 

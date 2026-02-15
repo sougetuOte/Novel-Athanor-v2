@@ -25,13 +25,17 @@ Novel-Athanor-v2 is a novel writing support system that aims for **collaborative
 
 ## Current Status
 
-**Specification Complete - Ready for Implementation**
+**L4 Agent Layer - In Progress**
 
 | Phase | Status |
 |-------|--------|
 | Analysis | ✅ Complete |
 | Specification | ✅ Complete |
-| Implementation | 🔲 Not Started |
+| L1-L3 Core Implementation | ✅ Complete (921 tests) |
+| L4 Agent Layer | 🔨 Phase A-E Done / Phase F-G Remaining |
+
+- Tests: **1,103** (mypy: 0, ruff: 0)
+- Implemented Agents: Ghost Writer, Reviewer, Quality Agent, Style Agent
 
 ## Documentation
 
@@ -76,7 +80,7 @@ This project adopts the **Living Architect Model**.
 
 - Phase Control: `/planning` → `/building` → `/auditing`
 - Approval Gates: User approval required at each sub-phase completion
-- Details: `.claude/CHEATSHEET.md`
+- Details: `CHEATSHEET.md`
 
 ## License
 

@@ -33,37 +33,28 @@
 ### 2.2 スコア計算
 
 ```python
-@dataclass
-class QualityScore:
-    coherence_score: float      # 0.0 - 1.0
-    pacing_score: float
-    prose_score: float
-    character_score: float
-    style_consistency: float
+class QualityScore(BaseModel):
+    coherence: float       # 0.0 - 1.0  一貫性
+    pacing: float          # 0.0 - 1.0  ペーシング
+    prose: float           # 0.0 - 1.0  文章品質
+    character_score: float # 0.0 - 1.0  キャラクター表現
+    style: float           # 0.0 - 1.0  スタイル一貫性
     reader_excitement: float    # 読者感情シミュレーション
     emotional_resonance: float  # 感情的共鳴
+    overall: float         # 0.0 - 1.0  LLM が直接出力する総合スコア
 
-    @property
-    def overall_score(self) -> float:
-        weights = {
-            'coherence': 0.20,
-            'pacing': 0.12,
-            'prose': 0.20,
-            'character': 0.15,
-            'style': 0.13,
-            'excitement': 0.10,   # 読者の興奮・期待感
-            'resonance': 0.10     # 感情的共鳴
-        }
-        return (
-            self.coherence_score * weights['coherence'] +
-            self.pacing_score * weights['pacing'] +
-            self.prose_score * weights['prose'] +
-            self.character_score * weights['character'] +
-            self.style_consistency * weights['style'] +
-            self.reader_excitement * weights['excitement'] +
-            self.emotional_resonance * weights['resonance']
-        )
+    def average(self) -> float:
+        """overall を除く全フィールドの平均を計算する."""
+        scores = [
+            self.coherence, self.pacing, self.prose,
+            self.character_score, self.style,
+            self.reader_excitement, self.emotional_resonance,
+        ]
+        return sum(scores) / len(scores)
 ```
+
+> **実装ノート (L4設計決定 D4)**: LLM がスコアを直接出力する設計のため、
+> `overall` は独立フィールドとして LLM が算出する。`average()` は検証用。
 
 ### 2.3 品質閾値設定
 
@@ -246,7 +237,7 @@ quality_report:
     style: 0.75
     overall: 0.72
 
-  assessment: "good"  # critical | warning | good | excellent
+  assessment: "good"  # excellent | good | acceptable | needs_improvement
 
   issues:
     - category: "pacing"

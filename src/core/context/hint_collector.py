@@ -67,7 +67,7 @@ class CollectedHint:
 
     def __post_init__(self) -> None:
         """Calculate priority based on source and strength."""
-        weight = self._SOURCE_WEIGHTS.get(self.source, 0.5)
+        weight = self._SOURCE_WEIGHTS[self.source]
         self.priority = weight * self.strength
 
 
@@ -253,7 +253,7 @@ class HintCollector:
             InstructionAction.HINT: 0.3,
             InstructionAction.NONE: 0.0,
         }
-        return strength_map.get(action, 0.5)
+        return strength_map[action]
 
     def format_for_prompt(
         self,

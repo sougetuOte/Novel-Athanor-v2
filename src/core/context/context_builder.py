@@ -434,11 +434,12 @@ class ContextBuilder:
             InstructionAction.PLANT: "設置",
             InstructionAction.REINFORCE: "強化",
             InstructionAction.HINT: "ヒント",
+            InstructionAction.NONE: "なし",
         }
 
         lines = ["## 伏線指示書\n"]
         for inst in active:
-            label = _ACTION_LABELS.get(inst.action, str(inst.action.value))
+            label = _ACTION_LABELS[inst.action]
             lines.append(f"### {inst.foreshadowing_id} [{label}]")
             if inst.note:
                 lines.append(f"- 指示: {inst.note}")

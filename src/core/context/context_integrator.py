@@ -237,12 +237,18 @@ class ContextIntegratorImpl:
             for name, future in futures.items():
                 try:
                     partial_ctx = future.result()
-                    ctx.plot_l1 = ctx.plot_l1 or partial_ctx.plot_l1
-                    ctx.plot_l2 = ctx.plot_l2 or partial_ctx.plot_l2
-                    ctx.plot_l3 = ctx.plot_l3 or partial_ctx.plot_l3
-                    ctx.summary_l1 = ctx.summary_l1 or partial_ctx.summary_l1
-                    ctx.summary_l2 = ctx.summary_l2 or partial_ctx.summary_l2
-                    ctx.summary_l3 = ctx.summary_l3 or partial_ctx.summary_l3
+                    if ctx.plot_l1 is None:
+                        ctx.plot_l1 = partial_ctx.plot_l1
+                    if ctx.plot_l2 is None:
+                        ctx.plot_l2 = partial_ctx.plot_l2
+                    if ctx.plot_l3 is None:
+                        ctx.plot_l3 = partial_ctx.plot_l3
+                    if ctx.summary_l1 is None:
+                        ctx.summary_l1 = partial_ctx.summary_l1
+                    if ctx.summary_l2 is None:
+                        ctx.summary_l2 = partial_ctx.summary_l2
+                    if ctx.summary_l3 is None:
+                        ctx.summary_l3 = partial_ctx.summary_l3
                     ctx.characters.update(partial_ctx.characters)
                     ctx.world_settings.update(partial_ctx.world_settings)
                     if partial_ctx.style_guide is not None:

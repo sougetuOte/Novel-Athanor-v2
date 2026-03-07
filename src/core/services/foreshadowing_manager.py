@@ -65,7 +65,7 @@ def validate_status_transition(
     Returns:
         有効な遷移なら True
     """
-    valid_targets = VALID_TRANSITIONS.get(current, set())
+    valid_targets = VALID_TRANSITIONS[current]
     return target in valid_targets
 
 
@@ -78,7 +78,7 @@ def get_recommended_visibility(status: ForeshadowingStatus) -> AIVisibilityLevel
     Returns:
         推奨される可視性レベル
     """
-    return STATUS_VISIBILITY_MAP.get(status, AIVisibilityLevel.HIDDEN)
+    return STATUS_VISIBILITY_MAP[status]
 
 
 def get_visibility_from_subtlety(subtlety_level: int) -> AIVisibilityLevel:

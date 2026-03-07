@@ -382,33 +382,46 @@ Novel-Athanor-v2/
 ├── CLAUDE.md                      # プロジェクト憲法
 ├── .claude/
 │   ├── agents/                    # エージェント定義
-│   │   ├── continuity-director.md
 │   │   ├── ghost-writer.md
 │   │   ├── reviewer.md
 │   │   ├── quality-agent.md
+│   │   ├── style-agent.md
 │   │   └── ...
 │   ├── commands/                  # スラッシュコマンド
 │   ├── skills/                    # 知識ベース
-│   │   ├── foreshadowing-rules/   # 【新規】
+│   │   ├── ultimate-think/
 │   │   └── ...
-│   ├── protocols/                 # プロトコル
-│   │   └── the-relay.md           # 【新規】
 │   ├── rules/                     # ガードレール
 │   └── states/                    # 状態管理
 │
 ├── vault/                         # 作品データ
 │   └── {作品名}/
-│       ├── _foreshadowing/        # 【新規】
+│       ├── _foreshadowing/
 │       │   ├── registry.yaml
 │       │   └── timeline.yaml
-│       ├── _ai_control/           # 【新規】
+│       ├── _ai_control/
 │       │   └── visibility.yaml
 │       └── ...
 │
 ├── src/
-│   └── analyzers/                 # 分析モジュール
+│   ├── core/                      # L1-L3 コアモジュール
+│   │   ├── models/                # L1: データモデル
+│   │   ├── parsers/               # L1: パーサー
+│   │   ├── repositories/          # L1: リポジトリ
+│   │   ├── services/              # L2: サービス
+│   │   ├── context/               # L3: コンテキストビルダー
+│   │   └── vault/                 # Vault初期化・パス解決
+│   ├── agents/                    # L4: エージェント基盤
+│   │   ├── models/                # エージェント共通モデル
+│   │   ├── prompts/               # プロンプトフォーマッター
+│   │   ├── parsers/               # LLM出力パーサー
+│   │   └── tools/                 # CLI ツール
+│   └── cli/                       # CLI エントリポイント
 │
 └── docs/
     ├── internal/                  # SSOT
     └── specs/                     # 仕様書
 ```
+
+> **実装ノート**: Continuity Director は L4 設計決定により L3 ContextBuilder +
+> Formatter に統合。独立エージェント定義不要。`protocols/` ディレクトリは MVP スコープ外。

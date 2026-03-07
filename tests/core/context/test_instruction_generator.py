@@ -1,6 +1,5 @@
 """Tests for instruction generator protocol."""
 
-from datetime import date
 from pathlib import Path
 
 import pytest
@@ -12,23 +11,16 @@ from src.core.context.foreshadow_instruction import (
 )
 from src.core.context.instruction_generator import InstructionGenerator
 from src.core.context.scene_identifier import SceneIdentifier
-from src.core.models.foreshadowing import (
-    Foreshadowing,
-    ForeshadowingAIVisibility,
-    ForeshadowingSeed,
-    ForeshadowingStatus,
-    ForeshadowingType,
-    RelatedElements,
-    TimelineEntry,
-    TimelineInfo,
-)
+from src.core.models.foreshadowing import ForeshadowingStatus
 from src.core.repositories.foreshadowing import ForeshadowingRepository
+
+from .conftest import create_foreshadowing
 
 
 class TestInstructionGeneratorProtocol:
     """Test InstructionGenerator protocol compliance."""
 
-    def test_mock_implements_protocol(self):
+    def test_mock_implements_protocol(self) -> None:
         """Mock implements InstructionGenerator protocol."""
 
         class MockGenerator:
@@ -57,7 +49,7 @@ class TestInstructionGeneratorProtocol:
         result = generator.generate(scene, [])
         assert isinstance(result, ForeshadowInstructions)
 
-    def test_generate_with_empty_foreshadowings(self):
+    def test_generate_with_empty_foreshadowings(self) -> None:
         """Generate empty instructions with no foreshadowings."""
 
         class MockGenerator:
@@ -89,7 +81,7 @@ class TestInstructionGeneratorProtocol:
         assert len(result.instructions) == 0
         assert len(result.global_forbidden_keywords) == 0
 
-    def test_generate_with_foreshadowings(self):
+    def test_generate_with_foreshadowings(self) -> None:
         """Generate instructions with foreshadowings."""
 
         class MockGenerator:
@@ -129,7 +121,7 @@ class TestInstructionGeneratorProtocol:
         assert result.instructions[0].foreshadowing_id == "FS-001"
         assert result.instructions[1].foreshadowing_id == "FS-002"
 
-    def test_determine_action_plant(self):
+    def test_determine_action_plant(self) -> None:
         """Determine PLANT action."""
 
         class MockGenerator:
@@ -169,7 +161,7 @@ class TestInstructionGeneratorProtocol:
         action = generator.determine_action(foreshadowing, scene)
         assert action == InstructionAction.PLANT
 
-    def test_determine_action_reinforce(self):
+    def test_determine_action_reinforce(self) -> None:
         """Determine REINFORCE action."""
 
         class MockGenerator:
@@ -209,7 +201,7 @@ class TestInstructionGeneratorProtocol:
         action = generator.determine_action(foreshadowing, scene)
         assert action == InstructionAction.REINFORCE
 
-    def test_determine_action_hint(self):
+    def test_determine_action_hint(self) -> None:
         """Determine HINT action."""
 
         class MockGenerator:
@@ -245,7 +237,7 @@ class TestInstructionGeneratorProtocol:
         action = generator.determine_action(foreshadowing, scene)
         assert action == InstructionAction.HINT
 
-    def test_determine_action_none(self):
+    def test_determine_action_none(self) -> None:
         """Determine NONE action for revealed foreshadowing."""
 
         class MockGenerator:
@@ -281,7 +273,7 @@ class TestInstructionGeneratorProtocol:
         action = generator.determine_action(foreshadowing, scene)
         assert action == InstructionAction.NONE
 
-    def test_collect_forbidden_keywords_empty(self):
+    def test_collect_forbidden_keywords_empty(self) -> None:
         """Collect forbidden keywords returns empty list when none exist."""
 
         class MockGenerator:
@@ -311,7 +303,7 @@ class TestInstructionGeneratorProtocol:
         keywords = generator.collect_forbidden_keywords(instructions)
         assert keywords == []
 
-    def test_collect_forbidden_keywords_deduplicates(self):
+    def test_collect_forbidden_keywords_deduplicates(self) -> None:
         """Collect forbidden keywords deduplicates and sorts."""
 
         class MockGenerator:
@@ -374,66 +366,10 @@ def repository(tmp_vault: Path) -> ForeshadowingRepository:
     return ForeshadowingRepository(tmp_vault, "test_work")
 
 
-def create_foreshadowing(
-    fs_id: str,
-    status: ForeshadowingStatus,
-    plant_episode: str | None = None,
-    reinforce_episodes: list[str] | None = None,
-    forbidden_keywords: list[str] | None = None,
-    allowed_expressions: list[str] | None = None,
-    subtlety: int = 5,
-) -> Foreshadowing:
-    """Helper to create foreshadowing."""
-    timeline_events = []
-
-    if plant_episode:
-        timeline_events.append(
-            TimelineEntry(
-                episode=plant_episode,
-                type=ForeshadowingStatus.PLANTED,
-                date=date.today(),
-                expression="planted expression",
-                subtlety=subtlety,
-            )
-        )
-
-    if reinforce_episodes:
-        for ep in reinforce_episodes:
-            timeline_events.append(
-                TimelineEntry(
-                    episode=ep,
-                    type=ForeshadowingStatus.REINFORCED,
-                    date=date.today(),
-                    expression="reinforced expression",
-                    subtlety=subtlety + 1,
-                )
-            )
-
-    return Foreshadowing(
-        id=fs_id,
-        title=f"Foreshadowing {fs_id}",
-        fs_type=ForeshadowingType.PLOT_TWIST,
-        status=status,
-        subtlety_level=subtlety,
-        ai_visibility=ForeshadowingAIVisibility(
-            level=2,
-            forbidden_keywords=forbidden_keywords or [],
-            allowed_expressions=allowed_expressions or [],
-        ),
-        seed=ForeshadowingSeed(content="seed content"),
-        payoff=None,
-        timeline=TimelineInfo(
-            registered_at=date.today(),
-            events=timeline_events,
-        ),
-        related=RelatedElements(),
-    )
-
-
 class TestInstructionGeneratorImplImport:
     """Test InstructionGeneratorImpl can be imported."""
 
-    def test_import(self):
+    def test_import(self) -> None:
         """InstructionGeneratorImpl can be imported."""
         from src.core.context.instruction_generator import InstructionGeneratorImpl
 
@@ -550,7 +486,7 @@ class TestInstructionGeneratorImplSubtlety:
         fs = create_foreshadowing(
             fs_id="FS-010-secret",
             status=ForeshadowingStatus.REGISTERED,
-            subtlety=5,
+            subtlety_level=5,
         )
         repository.create(fs)
 

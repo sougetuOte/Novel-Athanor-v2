@@ -85,8 +85,9 @@ def dialogue_ratio(
 def ttr(text: str) -> float:
     """Calculate Type-Token Ratio.
 
-    For text with spaces, splits by whitespace. For text without spaces
-    (Japanese), splits by character.
+    For text containing at least one space, splits by whitespace (word-level TTR).
+    For text without any spaces (e.g. Japanese), splits by character (char-level TTR).
+    Mixed texts with even a single space use whitespace splitting.
 
     Args:
         text: Input text.

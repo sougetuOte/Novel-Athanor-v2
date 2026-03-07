@@ -4,7 +4,7 @@ Markdown ファイルの YAML frontmatter を解析するパーサー。
 """
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal
 
 import frontmatter
 import yaml
@@ -34,7 +34,7 @@ class ParseResult:
         error: エラーメッセージ (raw_text の場合)
     """
 
-    result_type: str  # "structured" | "raw_text"
+    result_type: Literal["structured", "raw_text"]
     frontmatter: dict[str, Any] | None = None
     body: str | None = None
     raw_content: str | None = None

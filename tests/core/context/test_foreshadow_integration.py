@@ -5,7 +5,6 @@ ForeshadowingIdentifier -> InstructionGeneratorImpl -> ForbiddenKeywordCollector
 """
 
 import time
-from datetime import date
 from pathlib import Path
 
 import pytest
@@ -16,25 +15,17 @@ from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
 from src.core.context.instruction_generator import InstructionGeneratorImpl
 from src.core.context.lazy_loader import FileLazyLoader
 from src.core.context.scene_identifier import SceneIdentifier
-from src.core.models.foreshadowing import (
-    Foreshadowing,
-    ForeshadowingAIVisibility,
-    ForeshadowingPayoff,
-    ForeshadowingSeed,
-    ForeshadowingStatus,
-    ForeshadowingType,
-    RelatedElements,
-    TimelineEntry,
-    TimelineInfo,
-)
+from src.core.models.foreshadowing import ForeshadowingStatus
 from src.core.repositories.foreshadowing import ForeshadowingRepository
+
+from .conftest import create_foreshadowing
 
 # --- Test Fixtures ---
 
 
 @pytest.fixture
 def tmp_vault(tmp_path: Path) -> Path:
-    """Create a temporary vault structure."""
+    """Create a temporary vault structure with ai_control files."""
     vault = tmp_path / "vault"
     work_dir = vault / "test_work"
 
@@ -91,90 +82,6 @@ def scene_ep015() -> SceneIdentifier:
 def scene_unrelated() -> SceneIdentifier:
     """Scene with no related foreshadowing."""
     return SceneIdentifier(episode_id="999")
-
-
-def create_foreshadowing(
-    fs_id: str,
-    status: ForeshadowingStatus,
-    title: str = "Test Foreshadowing",
-    forbidden_keywords: list[str] | None = None,
-    allowed_expressions: list[str] | None = None,
-    seed_description: str | None = None,
-    subtlety_level: int = 5,
-    reinforce_episodes: list[str] | None = None,
-    reveal_episode: str | None = None,
-    related_characters: list[str] | None = None,
-) -> Foreshadowing:
-    """Helper to create foreshadowing with full configuration."""
-    timeline_events = []
-
-    # If status is PLANTED or later, add a plant event
-    if status in (
-        ForeshadowingStatus.PLANTED,
-        ForeshadowingStatus.REINFORCED,
-        ForeshadowingStatus.REVEALED,
-    ):
-        # Extract plant episode from ID
-        parts = fs_id.split("-")
-        if len(parts) >= 2:
-            plant_episode = parts[1]
-            timeline_events.append(
-                TimelineEntry(
-                    episode=plant_episode,
-                    type=ForeshadowingStatus.PLANTED,
-                    date=date.today(),
-                    expression="planted",
-                    subtlety=subtlety_level,
-                )
-            )
-
-    # Add reinforce events
-    if reinforce_episodes:
-        for ep in reinforce_episodes:
-            timeline_events.append(
-                TimelineEntry(
-                    episode=ep,
-                    type=ForeshadowingStatus.REINFORCED,
-                    date=date.today(),
-                    expression="reinforced",
-                    subtlety=subtlety_level + 1,
-                )
-            )
-
-    payoff = None
-    if reveal_episode:
-        payoff = ForeshadowingPayoff(
-            content="payoff content",
-            planned_episode=reveal_episode,
-        )
-
-    seed = ForeshadowingSeed(content="seed content")
-    if seed_description:
-        seed = ForeshadowingSeed(content="seed content", description=seed_description)
-
-    return Foreshadowing(
-        id=fs_id,
-        title=title,
-        fs_type=ForeshadowingType.PLOT_TWIST,
-        status=status,
-        subtlety_level=subtlety_level,
-        ai_visibility=ForeshadowingAIVisibility(
-            level=2,
-            forbidden_keywords=forbidden_keywords or [],
-            allowed_expressions=allowed_expressions or [],
-        ),
-        seed=seed,
-        payoff=payoff,
-        timeline=TimelineInfo(
-            registered_at=date.today(),
-            events=timeline_events,
-        ),
-        related=RelatedElements(
-            characters=related_characters or [],
-            plot_threads=[],
-            locations=[],
-        ),
-    )
 
 
 # --- Integration Tests ---
@@ -393,6 +300,8 @@ class TestForeshadowIntegrationEmptyScenarios:
         assert len(instructions.instructions) == 0
 
 
+
+@pytest.mark.slow
 class TestForeshadowIntegrationPerformance:
     """Performance tests."""
 

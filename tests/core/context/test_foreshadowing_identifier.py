@@ -1,24 +1,15 @@
 """Tests for foreshadowing identifier."""
 
-from datetime import date
 from pathlib import Path
 
 import pytest
 
 from src.core.context.foreshadow_instruction import InstructionAction
 from src.core.context.scene_identifier import SceneIdentifier
-from src.core.models.foreshadowing import (
-    Foreshadowing,
-    ForeshadowingAIVisibility,
-    ForeshadowingPayoff,
-    ForeshadowingSeed,
-    ForeshadowingStatus,
-    ForeshadowingType,
-    RelatedElements,
-    TimelineEntry,
-    TimelineInfo,
-)
+from src.core.models.foreshadowing import ForeshadowingStatus
 from src.core.repositories.foreshadowing import ForeshadowingRepository
+
+from .conftest import create_foreshadowing
 
 # --- Test Fixtures ---
 
@@ -49,79 +40,13 @@ def scene_ep015() -> SceneIdentifier:
     return SceneIdentifier(episode_id="015")
 
 
-def create_foreshadowing(
-    fs_id: str,
-    status: ForeshadowingStatus,
-    plant_episode: str | None = None,
-    reinforce_episodes: list[str] | None = None,
-    reveal_episode: str | None = None,
-    related_characters: list[str] | None = None,
-) -> Foreshadowing:
-    """Helper to create foreshadowing with timeline."""
-    timeline_events = []
-
-    if plant_episode:
-        timeline_events.append(
-            TimelineEntry(
-                episode=plant_episode,
-                type=ForeshadowingStatus.PLANTED,
-                date=date.today(),
-                expression="planted expression",
-                subtlety=5,
-            )
-        )
-
-    if reinforce_episodes:
-        for ep in reinforce_episodes:
-            timeline_events.append(
-                TimelineEntry(
-                    episode=ep,
-                    type=ForeshadowingStatus.REINFORCED,
-                    date=date.today(),
-                    expression="reinforced expression",
-                    subtlety=6,
-                )
-            )
-
-    payoff = None
-    if reveal_episode:
-        payoff = ForeshadowingPayoff(
-            content="payoff content",
-            planned_episode=reveal_episode,
-        )
-
-    return Foreshadowing(
-        id=fs_id,
-        title=f"Foreshadowing {fs_id}",
-        fs_type=ForeshadowingType.PLOT_TWIST,
-        status=status,
-        subtlety_level=5,
-        ai_visibility=ForeshadowingAIVisibility(
-            level=2,
-            forbidden_keywords=["secret", "truth"],
-            allowed_expressions=["mysterious", "shadow"],
-        ),
-        seed=ForeshadowingSeed(content="seed content"),
-        payoff=payoff,
-        timeline=TimelineInfo(
-            registered_at=date.today(),
-            events=timeline_events,
-        ),
-        related=RelatedElements(
-            characters=related_characters or [],
-            plot_threads=[],
-            locations=[],
-        ),
-    )
-
-
 # --- Tests for ForeshadowingIdentifier ---
 
 
 class TestForeshadowingIdentifierImport:
     """Test that ForeshadowingIdentifier can be imported."""
 
-    def test_import(self):
+    def test_import(self) -> None:
         """ForeshadowingIdentifier can be imported."""
         from src.core.context.foreshadowing_identifier import (
             ForeshadowingIdentifier,
@@ -135,7 +60,7 @@ class TestForeshadowingIdentifierImport:
 class TestIdentifiedForeshadowing:
     """Tests for IdentifiedForeshadowing dataclass."""
 
-    def test_create(self):
+    def test_create(self) -> None:
         """IdentifiedForeshadowing can be created."""
         from src.core.context.foreshadowing_identifier import IdentifiedForeshadowing
 

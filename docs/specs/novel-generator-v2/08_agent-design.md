@@ -55,10 +55,14 @@ implementation: Main System Prompt (CLAUDE.md)
 
 ### 3.1 概要
 
+> **実装ノート (L4設計決定)**: Continuity Director の責務は L3 ContextBuilder +
+> L4 Prompt Formatter に吸収された。独立エージェント定義ファイルは不要。
+> Chief Editor (ユーザー/Claude Code) が `build-context` CLI を通じて直接 L3 を呼び出す。
+
 ```yaml
-name: Continuity Director
+name: Continuity Director (設計統合済み → L3 ContextBuilder)
 role: 情報制御・整合性管理
-implementation: .claude/agents/continuity-director.md
+implementation: src/core/context/context_builder.py + src/agents/tools/context_tool.py
 tools:
   - build_context  # L3 ContextBuilder.build_context(scene) を呼び出す必須ツール
 ```
@@ -481,6 +485,8 @@ auditor_group:
 ---
 
 ## 7. 補助エージェント
+
+> **実装ノート**: 以下の補助エージェントは MVP スコープ外。Phase G 以降で検討。
 
 ### 7.1 Consistency Agent
 

@@ -62,12 +62,10 @@ class CharacterRepository(BaseRepository[Character]):
             セクション辞書
 
         Note:
-            現時点では全セクションを返す。
-            Phase Filter による current_phase に基づくフィルタリングは
-            L2 フェーズ（Phase Filter 実装タスク）で対応予定。
+            このメソッドは全セクションを返す（リポジトリ層の責務）。
+            Phase に基づくフィルタリングは L3 の CharacterPhaseFilter が担当。
         """
         char = self.read(name)
-        # TODO(L2-phase-filter): current_phase に基づくセクションフィルタリング
         return char.sections
 
     def update_phase(self, name: str, new_phase: str) -> None:

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import yaml
+
 from src.agents.tools.style_tool import (
     collect_episode_texts,
     load_existing_guide,
@@ -156,7 +158,6 @@ avoid_expressions:
     assert saved_file.exists()
 
     # パース確認
-    import yaml
 
     with saved_file.open(encoding="utf-8") as f:
         data = yaml.safe_load(f)
@@ -191,7 +192,6 @@ frequent_words:
     assert saved_file.exists()
 
     # パース確認
-    import yaml
 
     with saved_file.open(encoding="utf-8") as f:
         data = yaml.safe_load(f)

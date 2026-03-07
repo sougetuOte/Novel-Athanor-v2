@@ -7,7 +7,10 @@ Summary エンティティの CRUD 操作を行うリポジトリ。
 from pathlib import Path
 from typing import Literal
 
+import yaml
+
 from src.core.models.summary import SummaryL1, SummaryL2, SummaryL3
+from src.core.parsers.frontmatter import parse_frontmatter
 from src.core.repositories.base import BaseRepository
 from src.core.vault.path_resolver import VaultPathResolver
 
@@ -98,8 +101,6 @@ class SummaryRepository(BaseRepository[Summary]):
         content フィールドは frontmatter から除去し、body を使用する。
         """
         file_content = path.read_text(encoding="utf-8")
-        from src.core.parsers.frontmatter import parse_frontmatter
-
         fm, body = parse_frontmatter(file_content)
 
         # content が frontmatter に残っている場合は除去し、body を優先
@@ -169,9 +170,6 @@ class SummaryRepository(BaseRepository[Summary]):
         data = entity.model_dump(mode="json")
         body = data.pop("content", "")
         data.pop("body", "")
-
-        import yaml
-
         yaml_content = yaml.dump(data, allow_unicode=True, default_flow_style=False)
         return f"---\n{yaml_content}---\n\n{body}"
 

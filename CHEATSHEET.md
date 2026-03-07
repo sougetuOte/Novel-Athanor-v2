@@ -30,6 +30,8 @@ docs/adr/                  # アーキテクチャ決定記録
 | `model-selection.md` | モデル選定ガイド |
 | `decision-making.md` | 意思決定プロトコル |
 | `self-modification.md` | **プロジェクト自己改造ルール（計画優先原則）** |
+| `audit-fix-policy.md` | 監査修正ポリシー（全重篤度対応義務） |
+| `building-checklist.md` | BUILDING 品質チェックリスト（R-1〜R-6） |
 
 ## フェーズコマンド
 
@@ -55,12 +57,14 @@ requirements → [承認] → design → [承認] → tasks → [承認] → BUI
 |---------|------|----------------|
 | `/quick-save` | 軽量セーブ（SESSION_STATE.md のみ） | 3-4% |
 | `/full-save` | フルセーブ（commit + push + daily） | 約10% |
-| `/full-load` | セッション復元（次セッション開始時） | 2-3% |
+| `/quick-load` | 軽量ロード（1行報告のみ） | ~1% |
+| `/full-load` | フルロード（復帰サマリー付き） | 2-3% |
 
-### セーブの使い分け
-- **普段**: `/quick-save`（残量 25% 以下でも安全）
+### セーブ/ロードの使い分け
+- **普段のセーブ**: `/quick-save`（残量 25% 以下でも安全）
 - **一日の終わり**: `/full-save`（残量に余裕があるとき）
-- **次セッション開始時**: `/full-load`
+- **日常の再開**: `/quick-load`（前回から間もない場合）
+- **数日ぶりの復帰**: `/full-load`（詳細な状態確認が必要な場合）
 
 ### StatusLine
 画面下部にコンテキスト残量を常時表示（要 Python 3.x）:
@@ -102,6 +106,7 @@ requirements → [承認] → design → [承認] → tasks → [承認] → BUI
 | `adr-template` | ADR作成テンプレート | `/adr-create` 実行時に自動適用 |
 | `spec-template` | 仕様書作成テンプレート | 仕様書作成時に自動適用 |
 | `analyze-style` | 文体分析・StyleGuide/Profile 生成 | `/analyze-style` |
+| `ultimate-think` | AoT+3Agents+Reflection 多層思考 | `/ultimate-think` |
 
 ## 典型的なプロジェクトの進め方
 
@@ -131,6 +136,13 @@ requirements → [承認] → design → [承認] → tasks → [承認] → BUI
 | `.claude/current-phase.md` | 現在のフェーズ |
 | `.claude/states/<feature>.json` | 機能ごとの進捗・承認状態 |
 | `SESSION_STATE.md` | セッション間の引き継ぎ（/quick-save で生成） |
+
+## ワークフローコマンド
+
+| コマンド | 用途 |
+|---------|------|
+| `/ship` | 変更の棚卸し → 論理グループ分けコミット → 手動作業通知 |
+| `/full-review` | 3エージェント並列監査 → 全Issue修正 → テスト/lint検証 |
 
 ## 補助コマンド
 

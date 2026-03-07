@@ -31,6 +31,7 @@ def create_parser() -> argparse.ArgumentParser:
     build_parser.add_argument("--sequence", default=None, help="シーケンス ID")
     build_parser.add_argument("--chapter", default=None, help="チャプター ID")
     build_parser.add_argument("--phase", default=None, help="フェーズ")
+    build_parser.add_argument("--work", default=None, help="作品名（伏線取得に必要）")
 
     # format-context
     format_parser = subparsers.add_parser(
@@ -109,6 +110,7 @@ def main(argv: list[str] | None = None) -> int:
                 sequence=args.sequence,
                 chapter=args.chapter,
                 phase=args.phase,
+                work=args.work,
             )
             print(json.dumps(result, ensure_ascii=False, indent=2))
             return 0

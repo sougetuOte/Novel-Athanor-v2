@@ -12,6 +12,7 @@ from typing import Any
 
 from src.core.context.context_builder import ContextBuilder, ContextBuildResult
 from src.core.context.scene_identifier import SceneIdentifier
+from src.core.repositories.foreshadowing import ForeshadowingRepository
 
 
 def serialize_context_result(result: ContextBuildResult) -> dict[str, Any]:
@@ -139,6 +140,7 @@ def run_build_context(
     sequence: str | None = None,
     chapter: str | None = None,
     phase: str | None = None,
+    work: str | None = None,
 ) -> dict[str, Any]:
     """コンテキストを構築し、シリアライズ済み dict を返す.
 
@@ -148,6 +150,7 @@ def run_build_context(
         sequence: シーケンス ID (optional)
         chapter: チャプター ID (optional)
         phase: フェーズ (optional)
+        work: 作品名 (optional, 伏線取得に必要)
 
     Returns:
         serialize_context_result() の出力
@@ -158,6 +161,21 @@ def run_build_context(
         chapter_id=chapter,
         current_phase=phase,
     )
-    builder = ContextBuilder(vault_root=Path(vault_root))
+    vault_path = Path(vault_root)
+
+    # ForeshadowingRepository は vault_root.parent / vault_root.name で構成
+    # 例: vault_root="vault/my_novel" → repo(vault_root.parent, vault_root.name)
+    #   → vault/my_novel/_foreshadowing/registry.yaml を読む
+    work_name = work if work is not None else vault_path.name
+    foreshadowing_reader: ForeshadowingRepository | None = None
+    registry_path = vault_path.parent / work_name / "_foreshadowing" / "registry.yaml"
+    if registry_path.exists():
+        foreshadowing_reader = ForeshadowingRepository(vault_path.parent, work_name)
+
+    builder = ContextBuilder(
+        vault_root=vault_path,
+        work_name=work_name,
+        foreshadowing_reader=foreshadowing_reader,
+    )
     result = builder.build_context(scene)
     return serialize_context_result(result)

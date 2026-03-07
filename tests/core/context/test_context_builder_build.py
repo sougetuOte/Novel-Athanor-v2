@@ -1,18 +1,20 @@
 """Tests for ContextBuilder.build_context() (L3-7-1b)."""
 
 
+from unittest.mock import MagicMock
 
 from src.core.context.context_builder import ContextBuilder, ContextBuildResult
 from src.core.context.filtered_context import FilteredContext
 from src.core.context.foreshadow_instruction import ForeshadowInstructions
 from src.core.context.hint_collector import HintCollection
 from src.core.context.visibility_context import VisibilityAwareContext
+from src.core.services.visibility_controller import VisibilityController
 
 
 class TestBuildContext:
     """Tests for build_context() method."""
 
-    def test_build_context_returns_result(self, builder, scene):
+    def test_build_context_returns_result(self, builder, scene) -> None:
         """T6: build_context() returns ContextBuildResult."""
         result = builder.build_context(scene)
         assert isinstance(result, ContextBuildResult)
@@ -21,29 +23,27 @@ class TestBuildContext:
         assert isinstance(result.forbidden_keywords, list)
         assert isinstance(result.hints, HintCollection)
 
-    def test_build_context_without_visibility(self, builder, scene):
+    def test_build_context_without_visibility(self, builder, scene) -> None:
         """T7: build_context() works without visibility controller."""
         result = builder.build_context(scene)
         assert result.visibility_context is None
         assert result.success is True
 
-    def test_build_context_with_visibility(self, tmp_path, scene):
+    def test_build_context_with_visibility(self, tmp_path, scene) -> None:
         """T7b: build_context() applies visibility when controller provided."""
-        from src.core.services.visibility_controller import VisibilityController
-
         vc = VisibilityController()
         builder = ContextBuilder(vault_root=tmp_path, visibility_controller=vc)
         result = builder.build_context(scene)
         assert result.visibility_context is not None
         assert isinstance(result.visibility_context, VisibilityAwareContext)
 
-    def test_build_context_without_foreshadowing(self, builder, scene):
+    def test_build_context_without_foreshadowing(self, builder, scene) -> None:
         """T8: build_context() works without foreshadowing repository."""
         result = builder.build_context(scene)
         assert result.foreshadow_instructions is not None
         assert len(result.foreshadow_instructions.instructions) == 0
 
-    def test_build_context_graceful_degradation(self, builder, scene):
+    def test_build_context_graceful_degradation(self, builder, scene) -> None:
         """T9: build_context() handles component errors gracefully."""
         # Even with missing files, build should succeed with warnings
         result = builder.build_context(scene)
@@ -51,7 +51,7 @@ class TestBuildContext:
         # errors should be empty (no critical failures)
         assert result.has_errors() is False
 
-    def test_build_context_warnings_propagated(self, builder, scene):
+    def test_build_context_warnings_propagated(self, builder, scene) -> None:
         """T11: Warnings from integrator are propagated to result."""
         result = builder.build_context(scene)
         # Warnings from individual collectors are preserved in result
@@ -61,10 +61,8 @@ class TestBuildContext:
 class TestBuildContextErrors:
     """Tests for build_context() error classification (SHORT-01)."""
 
-    def test_integration_failure_recorded_as_error(self, tmp_path, scene):
+    def test_integration_failure_recorded_as_error(self, tmp_path, scene) -> None:
         """Integration failure is recorded in errors (not warnings) with success=False."""
-        from unittest.mock import MagicMock
-
         builder = ContextBuilder(vault_root=tmp_path)
         # Replace integrator with one that raises
         mock_integrator = MagicMock()
@@ -79,12 +77,8 @@ class TestBuildContextErrors:
         # Should still return a valid (empty) FilteredContext
         assert isinstance(result.context, FilteredContext)
 
-    def test_optional_failures_remain_warnings(self, tmp_path, scene):
+    def test_optional_failures_remain_warnings(self, tmp_path, scene) -> None:
         """Optional component failures are recorded as warnings, not errors."""
-        from unittest.mock import MagicMock
-
-        from src.core.services.visibility_controller import VisibilityController
-
         vc = VisibilityController()
         builder = ContextBuilder(vault_root=tmp_path, visibility_controller=vc)
         # Replace visibility filtering with one that raises
@@ -102,7 +96,7 @@ class TestBuildContextErrors:
 class TestBuildContextSimple:
     """Tests for build_context_simple() method."""
 
-    def test_build_context_simple_returns_filtered(self, builder, scene):
+    def test_build_context_simple_returns_filtered(self, builder, scene) -> None:
         """T10: build_context_simple() returns FilteredContext directly."""
         result = builder.build_context_simple(scene)
         assert isinstance(result, FilteredContext)

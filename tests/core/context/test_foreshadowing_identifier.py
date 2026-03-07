@@ -5,6 +5,10 @@ from pathlib import Path
 import pytest
 
 from src.core.context.foreshadow_instruction import InstructionAction
+from src.core.context.foreshadowing_identifier import (
+    ForeshadowingIdentifier,
+    IdentifiedForeshadowing,
+)
 from src.core.context.scene_identifier import SceneIdentifier
 from src.core.models.foreshadowing import ForeshadowingStatus
 from src.core.repositories.foreshadowing import ForeshadowingRepository
@@ -48,11 +52,6 @@ class TestForeshadowingIdentifierImport:
 
     def test_import(self) -> None:
         """ForeshadowingIdentifier can be imported."""
-        from src.core.context.foreshadowing_identifier import (
-            ForeshadowingIdentifier,
-            IdentifiedForeshadowing,
-        )
-
         assert ForeshadowingIdentifier is not None
         assert IdentifiedForeshadowing is not None
 
@@ -62,8 +61,6 @@ class TestIdentifiedForeshadowing:
 
     def test_create(self) -> None:
         """IdentifiedForeshadowing can be created."""
-        from src.core.context.foreshadowing_identifier import IdentifiedForeshadowing
-
         identified = IdentifiedForeshadowing(
             foreshadowing_id="FS-010-secret",
             suggested_action=InstructionAction.PLANT,
@@ -80,10 +77,8 @@ class TestIdentifiedForeshadowing:
 class TestForeshadowingIdentifierPlant:
     """Tests for PLANT action identification."""
 
-    def test_identify_plant_by_id_episode(self, repository: ForeshadowingRepository, scene_ep010: SceneIdentifier):
+    def test_identify_plant_by_id_episode(self, repository: ForeshadowingRepository, scene_ep010: SceneIdentifier) -> None:
         """Identify PLANT action when episode matches ID pattern."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-
         # FS-010-xxx should be planted in episode 010
         fs = create_foreshadowing(
             fs_id="FS-010-secret",
@@ -98,10 +93,8 @@ class TestForeshadowingIdentifierPlant:
         assert results[0].foreshadowing_id == "FS-010-secret"
         assert results[0].suggested_action == InstructionAction.PLANT
 
-    def test_no_plant_wrong_episode(self, repository: ForeshadowingRepository, scene_ep015: SceneIdentifier):
+    def test_no_plant_wrong_episode(self, repository: ForeshadowingRepository, scene_ep015: SceneIdentifier) -> None:
         """No PLANT when episode doesn't match."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-
         fs = create_foreshadowing(
             fs_id="FS-010-secret",
             status=ForeshadowingStatus.REGISTERED,
@@ -115,10 +108,8 @@ class TestForeshadowingIdentifierPlant:
         plant_results = [r for r in results if r.suggested_action == InstructionAction.PLANT]
         assert len(plant_results) == 0
 
-    def test_no_plant_already_planted(self, repository: ForeshadowingRepository, scene_ep010: SceneIdentifier):
+    def test_no_plant_already_planted(self, repository: ForeshadowingRepository, scene_ep010: SceneIdentifier) -> None:
         """No PLANT when already planted."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-
         fs = create_foreshadowing(
             fs_id="FS-010-secret",
             status=ForeshadowingStatus.PLANTED,
@@ -136,10 +127,8 @@ class TestForeshadowingIdentifierPlant:
 class TestForeshadowingIdentifierReinforce:
     """Tests for REINFORCE action identification."""
 
-    def test_identify_reinforce_from_timeline(self, repository: ForeshadowingRepository, scene_ep015: SceneIdentifier):
+    def test_identify_reinforce_from_timeline(self, repository: ForeshadowingRepository, scene_ep015: SceneIdentifier) -> None:
         """Identify REINFORCE when episode in timeline events."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-
         fs = create_foreshadowing(
             fs_id="FS-010-secret",
             status=ForeshadowingStatus.PLANTED,
@@ -155,10 +144,8 @@ class TestForeshadowingIdentifierReinforce:
         assert len(reinforce_results) == 1
         assert reinforce_results[0].foreshadowing_id == "FS-010-secret"
 
-    def test_no_reinforce_wrong_episode(self, repository: ForeshadowingRepository, scene_ep010: SceneIdentifier):
+    def test_no_reinforce_wrong_episode(self, repository: ForeshadowingRepository, scene_ep010: SceneIdentifier) -> None:
         """No REINFORCE when episode not in timeline."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-
         fs = create_foreshadowing(
             fs_id="FS-005-mystery",
             status=ForeshadowingStatus.PLANTED,
@@ -177,10 +164,8 @@ class TestForeshadowingIdentifierReinforce:
 class TestForeshadowingIdentifierHint:
     """Tests for HINT action identification."""
 
-    def test_identify_hint_with_appearing_characters(self, repository: ForeshadowingRepository, scene_ep015: SceneIdentifier):
+    def test_identify_hint_with_appearing_characters(self, repository: ForeshadowingRepository, scene_ep015: SceneIdentifier) -> None:
         """Identify HINT when related character appears (via parameter)."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-
         fs = create_foreshadowing(
             fs_id="FS-010-secret",
             status=ForeshadowingStatus.PLANTED,
@@ -196,10 +181,8 @@ class TestForeshadowingIdentifierHint:
         hint_results = [r for r in results if r.suggested_action == InstructionAction.HINT]
         assert len(hint_results) == 1
 
-    def test_no_hint_no_related_chars(self, repository: ForeshadowingRepository, scene_ep015: SceneIdentifier):
+    def test_no_hint_no_related_chars(self, repository: ForeshadowingRepository, scene_ep015: SceneIdentifier) -> None:
         """No HINT when no related characters appear."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-
         fs = create_foreshadowing(
             fs_id="FS-010-secret",
             status=ForeshadowingStatus.PLANTED,
@@ -215,10 +198,8 @@ class TestForeshadowingIdentifierHint:
         hint_results = [r for r in results if r.suggested_action == InstructionAction.HINT]
         assert len(hint_results) == 0
 
-    def test_no_hint_without_appearing_chars_param(self, repository: ForeshadowingRepository, scene_ep015: SceneIdentifier):
+    def test_no_hint_without_appearing_chars_param(self, repository: ForeshadowingRepository, scene_ep015: SceneIdentifier) -> None:
         """No HINT when appearing_characters not provided."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-
         fs = create_foreshadowing(
             fs_id="FS-010-secret",
             status=ForeshadowingStatus.PLANTED,
@@ -238,10 +219,8 @@ class TestForeshadowingIdentifierHint:
 class TestForeshadowingIdentifierReveal:
     """Tests for REVEAL consideration."""
 
-    def test_identify_reveal_episode(self, repository: ForeshadowingRepository):
+    def test_identify_reveal_episode(self, repository: ForeshadowingRepository) -> None:
         """Identify when reveal episode matches."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-
         fs = create_foreshadowing(
             fs_id="FS-010-secret",
             status=ForeshadowingStatus.REINFORCED,
@@ -263,10 +242,8 @@ class TestForeshadowingIdentifierReveal:
 class TestForeshadowingIdentifierMultiple:
     """Tests for multiple foreshadowing elements."""
 
-    def test_identify_multiple(self, repository: ForeshadowingRepository, scene_ep010: SceneIdentifier):
+    def test_identify_multiple(self, repository: ForeshadowingRepository, scene_ep010: SceneIdentifier) -> None:
         """Identify multiple foreshadowing elements."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-
         # One for planting
         fs1 = create_foreshadowing(
             fs_id="FS-010-secret1",
@@ -288,10 +265,8 @@ class TestForeshadowingIdentifierMultiple:
 
         assert len(results) >= 2
 
-    def test_empty_repository(self, repository: ForeshadowingRepository, scene_ep010: SceneIdentifier):
+    def test_empty_repository(self, repository: ForeshadowingRepository, scene_ep010: SceneIdentifier) -> None:
         """Empty results from empty repository."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-
         identifier = ForeshadowingIdentifier(repository)
         results = identifier.identify(scene_ep010)
 
@@ -301,10 +276,8 @@ class TestForeshadowingIdentifierMultiple:
 class TestForeshadowingIdentifierHelpers:
     """Tests for helper methods."""
 
-    def test_extract_episode_from_id(self, repository: ForeshadowingRepository):
+    def test_extract_episode_from_id(self, repository: ForeshadowingRepository) -> None:
         """Extract episode from foreshadowing ID."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-
         identifier = ForeshadowingIdentifier(repository)
 
         assert identifier._extract_episode_from_id("FS-010-secret") == "010"

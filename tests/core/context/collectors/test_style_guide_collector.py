@@ -104,7 +104,7 @@ class TestStyleGuideContext:
 class TestStyleGuideCollector:
     """Test StyleGuideCollector."""
 
-    def test_collect_default_only(self, collector: StyleGuideCollector):
+    def test_collect_default_only(self, collector: StyleGuideCollector) -> None:
         """Test collect() with default guide only (no override)."""
         # Scene with no specific style guide
         scene = SceneIdentifier(episode_id="ep999")
@@ -115,7 +115,7 @@ class TestStyleGuideCollector:
         assert "デフォルトスタイルガイド" in context.default_guide
         assert context.scene_override is None
 
-    def test_collect_episode_specific(self, collector: StyleGuideCollector):
+    def test_collect_episode_specific(self, collector: StyleGuideCollector) -> None:
         """Test collect() with episode-specific override."""
         scene = SceneIdentifier(episode_id="ep010")
 
@@ -125,7 +125,7 @@ class TestStyleGuideCollector:
         assert context.scene_override is not None
         assert "エピソード010スタイル" in context.scene_override
 
-    def test_collect_chapter_specific(self, collector: StyleGuideCollector):
+    def test_collect_chapter_specific(self, collector: StyleGuideCollector) -> None:
         """Test collect() with chapter-specific override."""
         scene = SceneIdentifier(episode_id="ep999", chapter_id="chapter01")
 
@@ -137,7 +137,7 @@ class TestStyleGuideCollector:
 
     def test_collect_episode_priority_over_chapter(
         self, collector: StyleGuideCollector, vault_root: Path
-    ):
+    ) -> None:
         """Test collect() prioritizes episode over chapter when both exist."""
         # Create episode guide for same scene
         scene = SceneIdentifier(episode_id="ep010", chapter_id="chapter01")
@@ -149,14 +149,14 @@ class TestStyleGuideCollector:
         assert "エピソード010スタイル" in context.scene_override
         assert "章01スタイル" not in context.scene_override
 
-    def test_collect_default_exists(self, collector: StyleGuideCollector):
+    def test_collect_default_exists(self, collector: StyleGuideCollector) -> None:
         """Test _collect_default() when default.md exists."""
         result = collector._collect_default()
 
         assert result is not None
         assert "デフォルトスタイルガイド" in result
 
-    def test_collect_default_missing(self, tmp_path: Path):
+    def test_collect_default_missing(self, tmp_path: Path) -> None:
         """Test _collect_default() when default.md is missing."""
         # Empty vault
         vault = tmp_path / "empty_vault"
@@ -171,7 +171,7 @@ class TestStyleGuideCollector:
         # Should return None for missing REQUIRED file
         assert result is None
 
-    def test_collect_as_string_protocol(self, collector: StyleGuideCollector):
+    def test_collect_as_string_protocol(self, collector: StyleGuideCollector) -> None:
         """Test collect_as_string() conforms to ContextCollector protocol."""
         scene = SceneIdentifier(episode_id="ep010")
 
@@ -187,7 +187,7 @@ class TestStyleGuideCollector:
 class TestEdgeCases:
     """Test edge cases and error conditions."""
 
-    def test_empty_vault(self, tmp_path: Path):
+    def test_empty_vault(self, tmp_path: Path) -> None:
         """Test with completely empty vault."""
         vault = tmp_path / "empty"
         vault.mkdir()
@@ -202,7 +202,7 @@ class TestEdgeCases:
         assert context.scene_override is None
         assert context.merged is None
 
-    def test_collect_as_string_returns_none_when_no_data(self, tmp_path: Path):
+    def test_collect_as_string_returns_none_when_no_data(self, tmp_path: Path) -> None:
         """Test collect_as_string() returns None when no style guides exist."""
         vault = tmp_path / "empty"
         vault.mkdir()

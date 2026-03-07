@@ -35,14 +35,14 @@ def mock_vault(tmp_path: Path) -> Path:
 class TestContextIntegratorParallelDefault:
     """Test default behavior (parallel=False)."""
 
-    def test_default_is_sequential(self, mock_vault: Path, scene: SceneIdentifier):
+    def test_default_is_sequential(self, mock_vault: Path, scene: SceneIdentifier) -> None:
         """parallel=False should be the default."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault)
 
         # Default should be False
         assert integrator._parallel is False
 
-    def test_default_max_workers(self, mock_vault: Path):
+    def test_default_max_workers(self, mock_vault: Path) -> None:
         """Default max_workers should be 5."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault)
 
@@ -50,7 +50,7 @@ class TestContextIntegratorParallelDefault:
 
     def test_sequential_integration_unchanged(
         self, mock_vault: Path, scene: SceneIdentifier
-    ):
+    ) -> None:
         """parallel=False should produce the same result as before."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault, parallel=False)
 
@@ -73,13 +73,13 @@ class TestContextIntegratorParallelDefault:
 class TestContextIntegratorParallelEnabled:
     """Test parallel execution (parallel=True)."""
 
-    def test_parallel_initialization(self, mock_vault: Path):
+    def test_parallel_initialization(self, mock_vault: Path) -> None:
         """parallel=True should be stored correctly."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault, parallel=True)
 
         assert integrator._parallel is True
 
-    def test_parallel_with_custom_max_workers(self, mock_vault: Path):
+    def test_parallel_with_custom_max_workers(self, mock_vault: Path) -> None:
         """max_workers should be configurable."""
         integrator = ContextIntegratorImpl(
             vault_root=mock_vault, parallel=True, max_workers=10
@@ -89,7 +89,7 @@ class TestContextIntegratorParallelEnabled:
 
     def test_parallel_integration_with_mock_collectors(
         self, mock_vault: Path, scene: SceneIdentifier
-    ):
+    ) -> None:
         """parallel=True should integrate all collectors in parallel."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault, parallel=True)
 
@@ -132,7 +132,7 @@ class TestContextIntegratorParallelEnabled:
 
     def test_parallel_integration_empty_collectors(
         self, mock_vault: Path, scene: SceneIdentifier
-    ):
+    ) -> None:
         """parallel=True with no collectors should return empty context."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault, parallel=True)
 
@@ -145,7 +145,7 @@ class TestContextIntegratorParallelEnabled:
 
     def test_parallel_integration_partial_collectors(
         self, mock_vault: Path, scene: SceneIdentifier
-    ):
+    ) -> None:
         """parallel=True with only some collectors."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault, parallel=True)
 
@@ -168,7 +168,7 @@ class TestContextIntegratorParallelErrorHandling:
 
     def test_parallel_collector_exception_adds_warning(
         self, mock_vault: Path, scene: SceneIdentifier
-    ):
+    ) -> None:
         """Exception in one collector should add warning and continue."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault, parallel=True)
 
@@ -199,7 +199,7 @@ class TestContextIntegratorParallelErrorHandling:
 
     def test_parallel_multiple_collector_exceptions(
         self, mock_vault: Path, scene: SceneIdentifier
-    ):
+    ) -> None:
         """Multiple collectors failing should add multiple warnings."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault, parallel=True)
 
@@ -224,7 +224,7 @@ class TestContextIntegratorParallelCharacterAndWorld:
 
     def test_parallel_character_collector(
         self, mock_vault: Path, scene: SceneIdentifier
-    ):
+    ) -> None:
         """parallel=True should handle CharacterContext correctly."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault, parallel=True)
 
@@ -243,7 +243,7 @@ class TestContextIntegratorParallelCharacterAndWorld:
 
     def test_parallel_world_collector(
         self, mock_vault: Path, scene: SceneIdentifier
-    ):
+    ) -> None:
         """parallel=True should handle WorldSettingContext correctly."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault, parallel=True)
 
@@ -266,7 +266,7 @@ class TestContextIntegratorWithWarningsParallel:
 
     def test_integrate_with_warnings_parallel(
         self, mock_vault: Path, scene: SceneIdentifier
-    ):
+    ) -> None:
         """integrate_with_warnings should work with parallel=True."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault, parallel=True)
 
@@ -288,7 +288,7 @@ class TestContextIntegratorWithWarningsParallel:
 
     def test_integrate_with_warnings_parallel_with_collector_error(
         self, mock_vault: Path, scene: SceneIdentifier
-    ):
+    ) -> None:
         """integrate_with_warnings should propagate warnings from parallel execution."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault, parallel=True)
 

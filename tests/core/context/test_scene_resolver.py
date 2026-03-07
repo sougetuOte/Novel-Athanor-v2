@@ -631,8 +631,6 @@ world_patterns:
         self, vault_root: Path
     ) -> None:
         """Use default patterns when no config file exists."""
-        from src.core.context.scene_resolver import SceneResolver
-
         resolver = SceneResolver(vault_root)
         config = resolver.get_reference_patterns()
 
@@ -645,8 +643,6 @@ world_patterns:
         self, vault_root: Path, default_config_yaml: str
     ) -> None:
         """Load patterns from _settings/reference_patterns.yaml."""
-        from src.core.context.scene_resolver import SceneResolver
-
         # Create config file
         config_path = vault_root / "_settings" / "reference_patterns.yaml"
         config_path.write_text(default_config_yaml)
@@ -662,8 +658,6 @@ world_patterns:
         self, vault_root: Path
     ) -> None:
         """Use custom list header patterns from config."""
-        from src.core.context.scene_resolver import SceneResolver
-
         # Create config with custom headers
         custom_config = """character_patterns:
   list_headers:
@@ -692,8 +686,6 @@ world_patterns:
         self, vault_root: Path, default_config_yaml: str
     ) -> None:
         """Patterns should be cached after first load."""
-        from src.core.context.scene_resolver import SceneResolver
-
         config_path = vault_root / "_settings" / "reference_patterns.yaml"
         config_path.write_text(default_config_yaml)
 
@@ -715,8 +707,6 @@ world_patterns:
         self, vault_root: Path, default_config_yaml: str
     ) -> None:
         """Force reload patterns from file."""
-        from src.core.context.scene_resolver import SceneResolver
-
         config_path = vault_root / "_settings" / "reference_patterns.yaml"
         config_path.write_text(default_config_yaml)
 
@@ -736,8 +726,6 @@ world_patterns:
         self, tmp_path: Path
     ) -> None:
         """Invalid YAML config falls back to defaults."""
-        from src.core.context.scene_resolver import SceneResolver
-
         # Create fresh vault with invalid YAML
         work = tmp_path / "invalid_yaml_test"
         (work / "_settings").mkdir(parents=True)
@@ -755,8 +743,6 @@ world_patterns:
         self, vault_root: Path
     ) -> None:
         """Extract references using configured patterns."""
-        from src.core.context.scene_resolver import SceneResolver
-
         config = """character_patterns:
   list_headers:
     - "メインキャラ"

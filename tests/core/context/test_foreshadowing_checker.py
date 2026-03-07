@@ -286,7 +286,7 @@ class TestSceneForeshadowingChecker:
 
     def test_check_with_plant_action(
         self, checker, mock_identifier, mock_generator, mock_reader
-    ):
+    ) -> None:
         """Test check() with PLANT action detected."""
         scene = SceneIdentifier(episode_id="010")
 
@@ -330,7 +330,7 @@ class TestSceneForeshadowingChecker:
 
     def test_check_with_reinforce_action(
         self, checker, mock_identifier, mock_generator, mock_reader
-    ):
+    ) -> None:
         """Test check() with REINFORCE action detected."""
         scene = SceneIdentifier(episode_id="013")
 
@@ -382,7 +382,7 @@ class TestSceneForeshadowingChecker:
 
     def test_check_with_approaching_payoff(
         self, checker, mock_identifier, mock_generator, mock_reader
-    ):
+    ) -> None:
         """Test check() with approaching payoff detected."""
         scene = SceneIdentifier(episode_id="018")
 
@@ -439,7 +439,7 @@ class TestSceneForeshadowingChecker:
 
     def test_check_with_long_silence_alert(
         self, checker, mock_identifier, mock_generator, mock_reader
-    ):
+    ) -> None:
         """Test check() with long silence alert generated."""
         scene = SceneIdentifier(episode_id="020")
 
@@ -486,7 +486,7 @@ class TestSceneForeshadowingChecker:
 
     def test_check_with_no_foreshadowing(
         self, checker, mock_identifier, mock_generator, mock_reader
-    ):
+    ) -> None:
         """Test check() when no foreshadowing exists."""
         scene = SceneIdentifier(episode_id="010")
 

@@ -72,7 +72,7 @@ class TestPlotCollector:
 
     def test_collect_all_exist(
         self, vault_root: Path, collector: PlotCollector
-    ):
+    ) -> None:
         """Test collect() when all L1/L2/L3 exist."""
         # Arrange
         plot_dir = vault_root / "_plot"
@@ -94,7 +94,7 @@ class TestPlotCollector:
 
     def test_collect_l1_only(
         self, vault_root: Path, collector: PlotCollector
-    ):
+    ) -> None:
         """Test collect() when only L1 exists."""
         # Arrange
         plot_dir = vault_root / "_plot"
@@ -114,7 +114,7 @@ class TestPlotCollector:
 
     def test_collect_l3_only(
         self, vault_root: Path, collector: PlotCollector
-    ):
+    ) -> None:
         """Test collect() when only L3 exists."""
         # Arrange
         plot_dir = vault_root / "_plot"
@@ -134,7 +134,7 @@ class TestPlotCollector:
 
     def test_collect_l1_theme(
         self, vault_root: Path, collector: PlotCollector
-    ):
+    ) -> None:
         """Test _collect_l1() - theme collection."""
         # Arrange
         plot_dir = vault_root / "_plot"
@@ -150,7 +150,7 @@ class TestPlotCollector:
 
     def test_collect_l2_no_chapter_id(
         self, vault_root: Path, collector: PlotCollector
-    ):
+    ) -> None:
         """Test _collect_l2() when chapter_id is None."""
         # Arrange
         scene = SceneIdentifier(episode_id="ep010")
@@ -163,7 +163,7 @@ class TestPlotCollector:
 
     def test_collect_l3_exists(
         self, vault_root: Path, collector: PlotCollector
-    ):
+    ) -> None:
         """Test _collect_l3() when L3 file exists."""
         # Arrange
         plot_dir = vault_root / "_plot"
@@ -181,7 +181,7 @@ class TestPlotCollector:
 
     def test_collect_l3_missing_graceful(
         self, vault_root: Path, collector: PlotCollector
-    ):
+    ) -> None:
         """Test _collect_l3() when L3 file is missing (REQUIRED but graceful)."""
         # Arrange
         scene = SceneIdentifier(episode_id="ep010")
@@ -195,7 +195,7 @@ class TestPlotCollector:
 
     def test_collect_as_string_full(
         self, vault_root: Path, collector: PlotCollector
-    ):
+    ) -> None:
         """Test collect_as_string() with all contexts."""
         # Arrange
         plot_dir = vault_root / "_plot"
@@ -221,7 +221,7 @@ class TestPlotCollector:
 
     def test_collect_as_string_none_available(
         self, vault_root: Path, collector: PlotCollector
-    ):
+    ) -> None:
         """Test collect_as_string() when no contexts are available."""
         # Arrange
         scene = SceneIdentifier(episode_id="ep010")

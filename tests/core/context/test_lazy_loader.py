@@ -6,7 +6,11 @@ from pathlib import Path
 import pytest
 
 from src.core.context.lazy_loader import (
+    CacheEntry,
     ContentType,
+    FileLazyLoader,
+    GracefulLoader,
+    GracefulLoadResult,
     LazyLoadedContent,
     LazyLoader,
     LazyLoadResult,
@@ -319,8 +323,6 @@ class TestCacheEntry:
 
     def test_create_cache_entry(self) -> None:
         """CacheEntryを作成."""
-        from src.core.context.lazy_loader import CacheEntry
-
         entry = CacheEntry(
             data="test content",
             loaded_at=datetime.now(),
@@ -330,8 +332,6 @@ class TestCacheEntry:
 
     def test_is_expired_false(self) -> None:
         """期限切れでない."""
-        from src.core.context.lazy_loader import CacheEntry
-
         entry = CacheEntry(
             data="test",
             loaded_at=datetime.now(),
@@ -341,8 +341,6 @@ class TestCacheEntry:
 
     def test_is_expired_true(self) -> None:
         """期限切れ."""
-        from src.core.context.lazy_loader import CacheEntry
-
         old_time = datetime.now() - timedelta(seconds=400)
         entry = CacheEntry(
             data="test",
@@ -363,56 +361,54 @@ class TestFileLazyLoader:
 
     @pytest.fixture
     def loader(self, vault_root):
-        from src.core.context.lazy_loader import FileLazyLoader
-
         return FileLazyLoader(vault_root, cache_ttl_seconds=300.0)
 
-    def test_load_success(self, loader):
+    def test_load_success(self, loader) -> None:
         """ファイル読み込み成功."""
         result = loader.load("test.md", LoadPriority.REQUIRED)
         assert result.success
         assert result.data == "Test content"
 
-    def test_load_required_not_found(self, loader):
+    def test_load_required_not_found(self, loader) -> None:
         """REQUIRED ファイルなし = エラー."""
         result = loader.load("not_exists.md", LoadPriority.REQUIRED)
         assert not result.success
         assert "not found" in result.error.lower()
 
-    def test_load_optional_not_found(self, loader):
+    def test_load_optional_not_found(self, loader) -> None:
         """OPTIONAL ファイルなし = 警告のみ."""
         result = loader.load("not_exists.md", LoadPriority.OPTIONAL)
         assert result.success
         assert result.data is None
         assert len(result.warnings) > 0
 
-    def test_is_cached_after_load(self, loader):
+    def test_is_cached_after_load(self, loader) -> None:
         """読み込み後はキャッシュされる."""
         assert not loader.is_cached("test.md")
         loader.load("test.md", LoadPriority.REQUIRED)
         assert loader.is_cached("test.md")
 
-    def test_cache_hit(self, loader):
+    def test_cache_hit(self, loader) -> None:
         """キャッシュヒット."""
         loader.load("test.md", LoadPriority.REQUIRED)
         # 2回目はキャッシュから
         result = loader.load("test.md", LoadPriority.REQUIRED)
         assert result.success
 
-    def test_clear_cache(self, loader):
+    def test_clear_cache(self, loader) -> None:
         """キャッシュクリア."""
         loader.load("test.md", LoadPriority.REQUIRED)
         loader.clear_cache()
         assert not loader.is_cached("test.md")
 
-    def test_get_cache_stats(self, loader):
+    def test_get_cache_stats(self, loader) -> None:
         """キャッシュ統計."""
         loader.load("test.md", LoadPriority.REQUIRED)
         stats = loader.get_cache_stats()
         assert stats["total"] == 1
         assert stats["expired"] == 0
 
-    def test_evict_expired(self, loader, vault_root):
+    def test_evict_expired(self, loader, vault_root) -> None:
         """期限切れ削除."""
         loader.load("test.md", LoadPriority.REQUIRED)
         # 手動でキャッシュを古くする
@@ -431,8 +427,6 @@ class TestGracefulLoadResult:
 
     def test_create_success_result(self) -> None:
         """成功結果を作成."""
-        from src.core.context.lazy_loader import GracefulLoadResult
-
         result = GracefulLoadResult(success=True)
         assert result.success is True
         assert result.data == {}
@@ -443,8 +437,6 @@ class TestGracefulLoadResult:
 
     def test_create_with_data(self) -> None:
         """データ付き結果を作成."""
-        from src.core.context.lazy_loader import GracefulLoadResult
-
         result = GracefulLoadResult(
             success=True,
             data={"char": "content", "plot": "plot content"},
@@ -454,8 +446,6 @@ class TestGracefulLoadResult:
 
     def test_create_failure_result(self) -> None:
         """失敗結果を作成."""
-        from src.core.context.lazy_loader import GracefulLoadResult
-
         result = GracefulLoadResult(
             success=False,
             errors=["必須コンテキスト取得失敗: char"],
@@ -480,18 +470,14 @@ class TestGracefulLoader:
     @pytest.fixture
     def base_loader(self, vault_root):
         """基本ローダー."""
-        from src.core.context.lazy_loader import FileLazyLoader
-
         return FileLazyLoader(vault_root)
 
     @pytest.fixture
     def graceful_loader(self, base_loader):
         """GracefulLoader インスタンス."""
-        from src.core.context.lazy_loader import GracefulLoader
-
         return GracefulLoader(base_loader)
 
-    def test_all_success(self, graceful_loader):
+    def test_all_success(self, graceful_loader) -> None:
         """全件成功: required + optional 全て存在."""
         result = graceful_loader.load_with_graceful_degradation(
             required={"r1": "required1.md", "r2": "required2.md"},
@@ -504,7 +490,7 @@ class TestGracefulLoader:
         assert result.errors == []
         assert result.warnings == []
 
-    def test_required_failure(self, graceful_loader):
+    def test_required_failure(self, graceful_loader) -> None:
         """required 失敗: 必須が1件不在 → success=False."""
         result = graceful_loader.load_with_graceful_degradation(
             required={"r1": "required1.md", "missing": "not_exists.md"},
@@ -514,7 +500,7 @@ class TestGracefulLoader:
         assert "missing" in result.missing_required
         assert len(result.errors) > 0
 
-    def test_optional_failure(self, graceful_loader):
+    def test_optional_failure(self, graceful_loader) -> None:
         """optional 失敗: 付加的が不在 → success=True, warnings."""
         result = graceful_loader.load_with_graceful_degradation(
             required={"r1": "required1.md"},
@@ -525,7 +511,7 @@ class TestGracefulLoader:
         assert "missing" in result.missing_optional
         assert len(result.warnings) > 0
 
-    def test_mixed_pattern(self, graceful_loader):
+    def test_mixed_pattern(self, graceful_loader) -> None:
         """混合パターン: required成功、optional一部失敗."""
         result = graceful_loader.load_with_graceful_degradation(
             required={"r1": "required1.md", "r2": "required2.md"},
@@ -539,7 +525,7 @@ class TestGracefulLoader:
         assert len(result.warnings) > 0
         assert result.errors == []
 
-    def test_all_failure(self, graceful_loader):
+    def test_all_failure(self, graceful_loader) -> None:
         """全件失敗: 全て不在."""
         result = graceful_loader.load_with_graceful_degradation(
             required={"r1": "missing1.md"},
@@ -549,10 +535,8 @@ class TestGracefulLoader:
         assert "r1" in result.missing_required
         assert "o1" in result.missing_optional
 
-    def test_load_batch(self, graceful_loader):
+    def test_load_batch(self, graceful_loader) -> None:
         """バッチ読み込み."""
-        from src.core.context.lazy_loader import LoadPriority
-
         result = graceful_loader.load_batch([
             ("r1", "required1.md", LoadPriority.REQUIRED),
             ("o1", "optional1.md", LoadPriority.OPTIONAL),
@@ -563,7 +547,7 @@ class TestGracefulLoader:
         assert "o1" in result.data
         assert "missing" in result.missing_optional
 
-    def test_empty_inputs(self, graceful_loader):
+    def test_empty_inputs(self, graceful_loader) -> None:
         """空入力."""
         result = graceful_loader.load_with_graceful_degradation(
             required={},

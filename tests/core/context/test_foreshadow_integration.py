@@ -95,7 +95,7 @@ class TestForeshadowIntegrationCompleteFlow:
         repository: ForeshadowingRepository,
         work_path: Path,
         scene_ep010: SceneIdentifier,
-    ):
+    ) -> None:
         """Complete flow: scene -> identify -> generate -> collect forbidden."""
         # Setup: Create foreshadowing data
         # FS-010-secret should be PLANTED in ep010
@@ -167,7 +167,7 @@ class TestForeshadowIntegrationCompleteFlow:
         repository: ForeshadowingRepository,
         work_path: Path,
         scene_ep015: SceneIdentifier,
-    ):
+    ) -> None:
         """HINT instruction when related character appears."""
         # Setup: Create planted foreshadowing with related characters
         fs = create_foreshadowing(
@@ -200,7 +200,7 @@ class TestForeshadowIntegrationSubtlety:
         self,
         repository: ForeshadowingRepository,
         scene_ep010: SceneIdentifier,
-    ):
+    ) -> None:
         """Different action types have different base subtlety."""
         # PLANT: FS-010-plant
         fs1 = create_foreshadowing(
@@ -237,7 +237,7 @@ class TestForeshadowIntegrationSubtlety:
         self,
         repository: ForeshadowingRepository,
         scene_ep010: SceneIdentifier,
-    ):
+    ) -> None:
         """Subtlety is adjusted by foreshadowing's own subtlety_level."""
         # High subtlety foreshadowing
         fs_subtle = create_foreshadowing(
@@ -266,7 +266,7 @@ class TestForeshadowIntegrationEmptyScenarios:
         repository: ForeshadowingRepository,
         work_path: Path,
         scene_ep010: SceneIdentifier,
-    ):
+    ) -> None:
         """Empty repository returns empty instructions."""
         identifier = ForeshadowingIdentifier(repository)
         generator = InstructionGeneratorImpl(repository, identifier)
@@ -284,7 +284,7 @@ class TestForeshadowIntegrationEmptyScenarios:
         self,
         repository: ForeshadowingRepository,
         scene_unrelated: SceneIdentifier,
-    ):
+    ) -> None:
         """Scene with no matching foreshadowing returns empty."""
         fs = create_foreshadowing(
             fs_id="FS-010-secret",
@@ -310,7 +310,7 @@ class TestForeshadowIntegrationPerformance:
         repository: ForeshadowingRepository,
         work_path: Path,
         scene_ep010: SceneIdentifier,
-    ):
+    ) -> None:
         """Complete flow finishes within 100ms."""
         # Create multiple foreshadowing entries
         for i in range(10):
@@ -340,7 +340,7 @@ class TestForeshadowIntegrationRevealEpisode:
     def test_reveal_episode_gets_reinforce(
         self,
         repository: ForeshadowingRepository,
-    ):
+    ) -> None:
         """Foreshadowing in reveal episode gets REINFORCE action."""
         # Foreshadowing with planned reveal in ep020
         fs = create_foreshadowing(

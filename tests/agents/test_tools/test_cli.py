@@ -12,6 +12,8 @@ from pathlib import Path
 
 import pytest
 
+from src.agents.tools.cli import create_parser, main
+
 # ============================================================================
 # create_parser tests
 # ============================================================================
@@ -19,8 +21,6 @@ import pytest
 
 def test_parser_build_context_args() -> None:
     """build-context 引数パース."""
-    from src.agents.tools.cli import create_parser
-
     parser = create_parser()
     args = parser.parse_args(
         [
@@ -48,8 +48,6 @@ def test_parser_build_context_args() -> None:
 
 def test_parser_build_context_required_args() -> None:
     """必須引数なしでエラー."""
-    from src.agents.tools.cli import create_parser
-
     parser = create_parser()
 
     with pytest.raises(SystemExit):
@@ -58,8 +56,6 @@ def test_parser_build_context_required_args() -> None:
 
 def test_parser_format_context_args() -> None:
     """format-context 引数パース."""
-    from src.agents.tools.cli import create_parser
-
     parser = create_parser()
     args = parser.parse_args(["format-context", "--input", "data.json"])
 
@@ -69,8 +65,6 @@ def test_parser_format_context_args() -> None:
 
 def test_parser_no_command() -> None:
     """コマンドなしで help."""
-    from src.agents.tools.cli import create_parser
-
     parser = create_parser()
     args = parser.parse_args([])
 
@@ -84,16 +78,12 @@ def test_parser_no_command() -> None:
 
 def test_main_no_command_returns_1() -> None:
     """コマンドなし → return 1."""
-    from src.agents.tools.cli import main
-
     exit_code = main([])
     assert exit_code == 1
 
 
 def test_main_build_context_outputs_json(tmp_path: Path, capsys: pytest.CaptureFixture) -> None:  # type: ignore[type-arg]
     """build-context → JSON 出力 (capsys で検証)."""
-    from src.agents.tools.cli import main
-
     # tmp_path で最小 vault を用意
     vault_root = tmp_path / "vault"
     vault_root.mkdir()
@@ -121,8 +111,6 @@ def test_main_build_context_outputs_json(tmp_path: Path, capsys: pytest.CaptureF
 
 def test_main_format_context_from_file(tmp_path: Path, capsys: pytest.CaptureFixture) -> None:  # type: ignore[type-arg]
     """format-context --input file → Markdown 出力."""
-    from src.agents.tools.cli import main
-
     # tmp_path に JSON ファイルを作成
     json_file = tmp_path / "context.json"
     test_data = {
@@ -155,8 +143,6 @@ def test_main_format_context_from_file(tmp_path: Path, capsys: pytest.CaptureFix
 
 def test_parser_check_review_args() -> None:
     """check-review 引数パース."""
-    from src.agents.tools.cli import create_parser
-
     parser = create_parser()
     args = parser.parse_args(
         ["check-review", "--draft", "draft.txt", "--keywords", "王族,血筋"]
@@ -171,8 +157,6 @@ def test_main_check_review_clean(
     tmp_path: Path, capsys: pytest.CaptureFixture,  # type: ignore[type-arg]
 ) -> None:
     """check-review with clean text → approved."""
-    from src.agents.tools.cli import main
-
     draft_file = tmp_path / "draft.txt"
     draft_file.write_text("彼女は静かに微笑んだ。", encoding="utf-8")
 
@@ -191,8 +175,6 @@ def test_main_check_review_violation(
     tmp_path: Path, capsys: pytest.CaptureFixture,  # type: ignore[type-arg]
 ) -> None:
     """check-review with violation → rejected."""
-    from src.agents.tools.cli import main
-
     draft_file = tmp_path / "draft.txt"
     draft_file.write_text("彼女は王族の末裔だった。", encoding="utf-8")
 

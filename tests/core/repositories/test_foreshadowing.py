@@ -10,6 +10,7 @@ from src.core.models.foreshadowing import (
     ForeshadowingStatus,
     ForeshadowingType,
 )
+from src.core.repositories.base import EntityExistsError, EntityNotFoundError
 from src.core.repositories.foreshadowing import ForeshadowingRepository
 
 
@@ -49,8 +50,6 @@ class TestForeshadowingRepository:
 
     def test_read_not_found(self, repo: ForeshadowingRepository) -> None:
         """存在しない伏線を読み込むと例外が発生する."""
-        from src.core.repositories.base import EntityNotFoundError
-
         with pytest.raises(EntityNotFoundError):
             repo.read("NOT-EXISTS")
 
@@ -159,8 +158,6 @@ class TestForeshadowingRepository:
         self, repo: ForeshadowingRepository, sample_foreshadowing: Foreshadowing
     ) -> None:
         """重複する ID の伏線を作成すると例外が発生する."""
-        from src.core.repositories.base import EntityExistsError
-
         repo.create(sample_foreshadowing)
 
         with pytest.raises(EntityExistsError):

@@ -9,7 +9,14 @@ from src.core.context.foreshadow_instruction import (
     ForeshadowInstructions,
     InstructionAction,
 )
-from src.core.context.instruction_generator import InstructionGenerator
+from src.core.context.foreshadowing_identifier import (
+    ForeshadowingIdentifier,
+    IdentifiedForeshadowing,
+)
+from src.core.context.instruction_generator import (
+    InstructionGenerator,
+    InstructionGeneratorImpl,
+)
 from src.core.context.scene_identifier import SceneIdentifier
 from src.core.models.foreshadowing import ForeshadowingStatus
 from src.core.repositories.foreshadowing import ForeshadowingRepository
@@ -353,17 +360,9 @@ class TestInstructionGeneratorProtocol:
 
 
 @pytest.fixture
-def tmp_vault(tmp_path: Path) -> Path:
-    """Create a temporary vault structure."""
-    vault = tmp_path / "vault"
-    (vault / "test_work" / "_foreshadowing").mkdir(parents=True)
-    return vault
-
-
-@pytest.fixture
-def repository(tmp_vault: Path) -> ForeshadowingRepository:
+def repository(foreshadow_vault: Path) -> ForeshadowingRepository:
     """Create a foreshadowing repository."""
-    return ForeshadowingRepository(tmp_vault, "test_work")
+    return ForeshadowingRepository(foreshadow_vault, "test_work")
 
 
 class TestInstructionGeneratorImplImport:
@@ -371,19 +370,14 @@ class TestInstructionGeneratorImplImport:
 
     def test_import(self) -> None:
         """InstructionGeneratorImpl can be imported."""
-        from src.core.context.instruction_generator import InstructionGeneratorImpl
-
         assert InstructionGeneratorImpl is not None
 
 
 class TestInstructionGeneratorImplGenerate:
     """Tests for generate() method."""
 
-    def test_generate_empty_repository(self, repository: ForeshadowingRepository):
+    def test_generate_empty_repository(self, repository: ForeshadowingRepository) -> None:
         """Generate returns empty instructions for empty repository."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-        from src.core.context.instruction_generator import InstructionGeneratorImpl
-
         identifier = ForeshadowingIdentifier(repository)
         generator = InstructionGeneratorImpl(repository, identifier)
 
@@ -393,11 +387,8 @@ class TestInstructionGeneratorImplGenerate:
         assert isinstance(result, ForeshadowInstructions)
         assert len(result.instructions) == 0
 
-    def test_generate_plant_instruction(self, repository: ForeshadowingRepository):
+    def test_generate_plant_instruction(self, repository: ForeshadowingRepository) -> None:
         """Generate PLANT instruction."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-        from src.core.context.instruction_generator import InstructionGeneratorImpl
-
         fs = create_foreshadowing(
             fs_id="FS-010-secret",
             status=ForeshadowingStatus.REGISTERED,
@@ -419,11 +410,8 @@ class TestInstructionGeneratorImplGenerate:
         assert "truth" in inst.forbidden_expressions
         assert "mysterious" in inst.allowed_expressions
 
-    def test_generate_reinforce_instruction(self, repository: ForeshadowingRepository):
+    def test_generate_reinforce_instruction(self, repository: ForeshadowingRepository) -> None:
         """Generate REINFORCE instruction."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-        from src.core.context.instruction_generator import InstructionGeneratorImpl
-
         fs = create_foreshadowing(
             fs_id="FS-005-mystery",
             status=ForeshadowingStatus.PLANTED,
@@ -442,11 +430,8 @@ class TestInstructionGeneratorImplGenerate:
         inst = result.instructions[0]
         assert inst.action == InstructionAction.REINFORCE
 
-    def test_generate_multiple_instructions(self, repository: ForeshadowingRepository):
+    def test_generate_multiple_instructions(self, repository: ForeshadowingRepository) -> None:
         """Generate multiple instructions."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-        from src.core.context.instruction_generator import InstructionGeneratorImpl
-
         # One for planting
         fs1 = create_foreshadowing(
             fs_id="FS-010-secret",
@@ -478,11 +463,8 @@ class TestInstructionGeneratorImplGenerate:
 class TestInstructionGeneratorImplSubtlety:
     """Tests for subtlety_target calculation."""
 
-    def test_plant_subtlety(self, repository: ForeshadowingRepository):
+    def test_plant_subtlety(self, repository: ForeshadowingRepository) -> None:
         """PLANT gets lower subtlety (more obvious)."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-        from src.core.context.instruction_generator import InstructionGeneratorImpl
-
         fs = create_foreshadowing(
             fs_id="FS-010-secret",
             status=ForeshadowingStatus.REGISTERED,
@@ -500,11 +482,8 @@ class TestInstructionGeneratorImplSubtlety:
         # PLANT subtlety should be around 4 (more obvious)
         assert 1 <= inst.subtlety_target <= 6
 
-    def test_hint_subtlety(self, repository: ForeshadowingRepository):
+    def test_hint_subtlety(self, repository: ForeshadowingRepository) -> None:
         """HINT gets higher subtlety (more subtle)."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-        from src.core.context.instruction_generator import InstructionGeneratorImpl
-
         fs = create_foreshadowing(
             fs_id="FS-005-secret",
             status=ForeshadowingStatus.PLANTED,
@@ -528,11 +507,8 @@ class TestInstructionGeneratorImplSubtlety:
 class TestInstructionGeneratorImplForbiddenKeywords:
     """Tests for forbidden keywords collection."""
 
-    def test_collect_from_instructions(self, repository: ForeshadowingRepository):
+    def test_collect_from_instructions(self, repository: ForeshadowingRepository) -> None:
         """Collect forbidden keywords from all instructions."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-        from src.core.context.instruction_generator import InstructionGeneratorImpl
-
         fs1 = create_foreshadowing(
             fs_id="FS-010-secret1",
             status=ForeshadowingStatus.REGISTERED,
@@ -565,13 +541,8 @@ class TestInstructionGeneratorImplExceptionHandling:
 
     def test_generate_handles_entity_not_found_error(
         self, repository: ForeshadowingRepository
-    ):
+    ) -> None:
         """Generate handles EntityNotFoundError gracefully."""
-        from src.core.context.foreshadowing_identifier import (
-            IdentifiedForeshadowing,
-        )
-        from src.core.context.instruction_generator import InstructionGeneratorImpl
-
         # Create a mock identifier that returns a non-existent foreshadowing
         class MockIdentifier:
             def identify(
@@ -599,11 +570,8 @@ class TestInstructionGeneratorImplExceptionHandling:
 
     def test_determine_action_handles_entity_not_found_error(
         self, repository: ForeshadowingRepository
-    ):
+    ) -> None:
         """determine_action handles EntityNotFoundError gracefully."""
-        from src.core.context.foreshadowing_identifier import ForeshadowingIdentifier
-        from src.core.context.instruction_generator import InstructionGeneratorImpl
-
         identifier = ForeshadowingIdentifier(repository)
         generator = InstructionGeneratorImpl(repository, identifier)
 

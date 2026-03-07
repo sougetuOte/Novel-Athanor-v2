@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import yaml
+
 from src.core.vault.init import VaultInitializer, VaultStructure
 
 
@@ -121,8 +123,6 @@ class TestVaultInitializer:
 
     def test_template_file_content_valid_yaml(self, tmp_path: Path) -> None:
         """テンプレートファイルの内容が有効な YAML である."""
-        import yaml
-
         vault_path = tmp_path / "test_vault"
         initializer = VaultInitializer(vault_path, "テスト作品")
         initializer.initialize()

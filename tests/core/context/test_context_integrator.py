@@ -304,7 +304,7 @@ class TestContextIntegratorImpl:
         mock_vault: Path,
         scene: SceneIdentifier,
         loader: FileLazyLoader,
-    ):
+    ) -> None:
         """Test integration with all collectors."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault)
 
@@ -330,7 +330,7 @@ class TestContextIntegratorImpl:
         mock_vault: Path,
         scene: SceneIdentifier,
         loader: FileLazyLoader,
-    ):
+    ) -> None:
         """Test integration with only some collectors."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault)
 
@@ -347,7 +347,7 @@ class TestContextIntegratorImpl:
         self,
         mock_vault: Path,
         scene: SceneIdentifier,
-    ):
+    ) -> None:
         """Test integration with no collectors."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault)
 
@@ -362,7 +362,7 @@ class TestContextIntegratorImpl:
     def test_integrate_sets_scene_id(
         self,
         mock_vault: Path,
-    ):
+    ) -> None:
         """Test that scene_id is correctly set."""
         scene = SceneIdentifier(episode_id="ep020")
         integrator = ContextIntegratorImpl(vault_root=mock_vault)
@@ -374,7 +374,7 @@ class TestContextIntegratorImpl:
     def test_integrate_sets_current_phase(
         self,
         mock_vault: Path,
-    ):
+    ) -> None:
         """Test that current_phase is correctly set."""
         scene = SceneIdentifier(episode_id="ep010", current_phase="finale")
         integrator = ContextIntegratorImpl(vault_root=mock_vault)
@@ -392,7 +392,7 @@ class TestContextIntegratorImplWithWarnings:
         mock_vault: Path,
         scene: SceneIdentifier,
         loader: FileLazyLoader,
-    ):
+    ) -> None:
         """Test that integrate_with_warnings returns a tuple."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault)
 
@@ -408,7 +408,7 @@ class TestContextIntegratorImplWithWarnings:
         self,
         mock_vault: Path,
         loader: FileLazyLoader,
-    ):
+    ) -> None:
         """Test with missing files - plot L3 should be None."""
         scene_missing = SceneIdentifier(
             episode_id="ep999",
@@ -434,7 +434,7 @@ class TestFilteredContextIntegration:
         mock_vault: Path,
         scene: SceneIdentifier,
         loader: FileLazyLoader,
-    ):
+    ) -> None:
         """Test that plot fields are correctly populated."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault)
 
@@ -452,7 +452,7 @@ class TestFilteredContextIntegration:
         mock_vault: Path,
         scene: SceneIdentifier,
         loader: FileLazyLoader,
-    ):
+    ) -> None:
         """Test that summary fields are correctly populated."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault)
 
@@ -470,7 +470,7 @@ class TestFilteredContextIntegration:
         mock_vault: Path,
         scene: SceneIdentifier,
         loader: FileLazyLoader,
-    ):
+    ) -> None:
         """Test that style guide is correctly populated."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault)
 
@@ -493,7 +493,7 @@ class TestContextIntegratorPerformance:
         mock_vault: Path,
         scene: SceneIdentifier,
         loader: FileLazyLoader,
-    ):
+    ) -> None:
         """Test that integration completes within 1 second."""
         integrator = ContextIntegratorImpl(vault_root=mock_vault)
 

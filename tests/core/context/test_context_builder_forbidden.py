@@ -4,6 +4,7 @@ import pytest
 
 from src.core.context.context_builder import ContextBuilder
 from src.core.context.forbidden_keyword_collector import ForbiddenKeywordResult
+from src.core.services.visibility_controller import VisibilityController
 
 
 @pytest.fixture
@@ -21,29 +22,29 @@ def builder_with_forbidden(tmp_path):
 class TestGetForbiddenKeywords:
     """Tests for get_forbidden_keywords()."""
 
-    def test_returns_list(self, builder, scene):
+    def test_returns_list(self, builder, scene) -> None:
         """T22: Returns a list of strings."""
         result = builder.get_forbidden_keywords(scene)
         assert isinstance(result, list)
 
-    def test_cache_works(self, builder, scene):
+    def test_cache_works(self, builder, scene) -> None:
         """T23: Second call uses cache."""
         result1 = builder.get_forbidden_keywords(scene)
         result2 = builder.get_forbidden_keywords(scene)
         assert result1 is result2
 
-    def test_cache_bypass(self, builder, scene):
+    def test_cache_bypass(self, builder, scene) -> None:
         """T23b: use_cache=False bypasses cache."""
         result1 = builder.get_forbidden_keywords(scene)
         result2 = builder.get_forbidden_keywords(scene, use_cache=False)
         assert result1 is not result2
 
-    def test_empty_without_sources(self, builder, scene):
+    def test_empty_without_sources(self, builder, scene) -> None:
         """T24: Returns empty list when no forbidden sources exist."""
         result = builder.get_forbidden_keywords(scene)
         assert result == []
 
-    def test_collects_from_file(self, builder_with_forbidden, scene):
+    def test_collects_from_file(self, builder_with_forbidden, scene) -> None:
         """T22b: Collects keywords from forbidden_keywords.txt."""
         result = builder_with_forbidden.get_forbidden_keywords(scene)
         assert "秘密の力" in result
@@ -56,12 +57,12 @@ class TestGetForbiddenKeywords:
 class TestGetForbiddenKeywordsWithSources:
     """Tests for get_forbidden_keywords_with_sources()."""
 
-    def test_returns_result(self, builder, scene):
+    def test_returns_result(self, builder, scene) -> None:
         """T25: Returns ForbiddenKeywordResult."""
         result = builder.get_forbidden_keywords_with_sources(scene)
         assert isinstance(result, ForbiddenKeywordResult)
 
-    def test_has_source_info(self, builder_with_forbidden, scene):
+    def test_has_source_info(self, builder_with_forbidden, scene) -> None:
         """T25b: Result contains source information."""
         result = builder_with_forbidden.get_forbidden_keywords_with_sources(scene)
         assert isinstance(result.sources, dict)
@@ -72,17 +73,17 @@ class TestGetForbiddenKeywordsWithSources:
 class TestGetForbiddenKeywordsAsPrompt:
     """Tests for get_forbidden_keywords_as_prompt()."""
 
-    def test_returns_string(self, builder, scene):
+    def test_returns_string(self, builder, scene) -> None:
         """T26: Returns formatted string."""
         result = builder.get_forbidden_keywords_as_prompt(scene)
         assert isinstance(result, str)
 
-    def test_empty_when_no_keywords(self, builder, scene):
+    def test_empty_when_no_keywords(self, builder, scene) -> None:
         """T26b: Returns empty string when no keywords."""
         result = builder.get_forbidden_keywords_as_prompt(scene)
         assert result == ""
 
-    def test_format_with_keywords(self, builder_with_forbidden, scene):
+    def test_format_with_keywords(self, builder_with_forbidden, scene) -> None:
         """T26c: Formats keywords for prompt."""
         result = builder_with_forbidden.get_forbidden_keywords_as_prompt(scene)
         assert len(result) > 0
@@ -92,7 +93,7 @@ class TestGetForbiddenKeywordsAsPrompt:
 class TestGetForbiddenBySource:
     """Tests for get_forbidden_by_source()."""
 
-    def test_returns_dict(self, builder, scene):
+    def test_returns_dict(self, builder, scene) -> None:
         """T27: Returns dict mapping source to keywords."""
         result = builder.get_forbidden_by_source(scene)
         assert isinstance(result, dict)
@@ -101,7 +102,7 @@ class TestGetForbiddenBySource:
 class TestCheckTextForForbidden:
     """Tests for check_text_for_forbidden()."""
 
-    def test_detect_forbidden(self, builder_with_forbidden, scene):
+    def test_detect_forbidden(self, builder_with_forbidden, scene) -> None:
         """T28: Detects forbidden keywords in text."""
         result = builder_with_forbidden.check_text_for_forbidden(
             scene, "彼女は秘密の力を持っている"
@@ -109,7 +110,7 @@ class TestCheckTextForForbidden:
         assert len(result) > 0
         assert "秘密の力" in result
 
-    def test_no_forbidden(self, builder_with_forbidden, scene):
+    def test_no_forbidden(self, builder_with_forbidden, scene) -> None:
         """T29: Returns empty when no forbidden keywords found."""
         result = builder_with_forbidden.check_text_for_forbidden(scene, "普通の日常の風景")
         assert result == []
@@ -118,13 +119,13 @@ class TestCheckTextForForbidden:
 class TestIsTextClean:
     """Tests for is_text_clean()."""
 
-    def test_clean_text(self, builder_with_forbidden, scene):
+    def test_clean_text(self, builder_with_forbidden, scene) -> None:
         """T30: Returns True for clean text."""
         assert (
             builder_with_forbidden.is_text_clean(scene, "普通の日常の風景") is True
         )
 
-    def test_dirty_text(self, builder_with_forbidden, scene):
+    def test_dirty_text(self, builder_with_forbidden, scene) -> None:
         """T30b: Returns False for text with forbidden keywords."""
         assert (
             builder_with_forbidden.is_text_clean(scene, "王家の血を引く者") is False
@@ -134,14 +135,14 @@ class TestIsTextClean:
 class TestClearForbiddenCache:
     """Tests for clear_forbidden_cache() and clear_all_caches()."""
 
-    def test_clear_forbidden_cache(self, builder, scene):
+    def test_clear_forbidden_cache(self, builder, scene) -> None:
         """T31: Clearing forbidden cache works."""
         result1 = builder.get_forbidden_keywords(scene)
         builder.clear_forbidden_cache()
         result2 = builder.get_forbidden_keywords(scene)
         assert result1 is not result2
 
-    def test_clear_all_caches(self, builder, scene):
+    def test_clear_all_caches(self, builder, scene) -> None:
         """T31b: clear_all_caches clears forbidden cache."""
         result1 = builder.get_forbidden_keywords(scene)
         builder.clear_all_caches()
@@ -152,10 +153,8 @@ class TestClearForbiddenCache:
 class TestStage2Integration:
     """Tests for Stage 2 integration with VisibilityFilteringService."""
 
-    def test_get_forbidden_keywords_stage2_integration(self, tmp_path, scene):
+    def test_get_forbidden_keywords_stage2_integration(self, tmp_path, scene) -> None:
         """Stage 2 integrates VisibilityFilteringService forbidden_keywords."""
-        from src.core.services.visibility_controller import VisibilityController
-
         # Setup vault with Stage 1 source
         ai_control = tmp_path / "_ai_control"
         ai_control.mkdir()
@@ -174,7 +173,7 @@ class TestStage2Integration:
         assert "Stage2キーワード" in result
         assert "追加キーワード" in result
 
-    def test_get_forbidden_keywords_without_visibility_controller(self, tmp_path, scene):
+    def test_get_forbidden_keywords_without_visibility_controller(self, tmp_path, scene) -> None:
         """Without visibility controller, Stage 2 is not applied."""
         ai_control = tmp_path / "_ai_control"
         ai_control.mkdir()

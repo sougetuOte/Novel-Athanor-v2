@@ -5,8 +5,10 @@ import pytest
 from src.core.parsers.frontmatter import (
     ParseError,
     ParseResult,
+    RecursionLimitError,
     parse_frontmatter,
     parse_frontmatter_with_fallback,
+    parse_with_depth_limit,
 )
 
 
@@ -216,8 +218,6 @@ class TestParseWithDepthLimit:
 
     def test_parse_normal_frontmatter_within_depth_limit(self) -> None:
         """通常の frontmatter が深度制限内で正常にパースされる."""
-        from src.core.parsers.frontmatter import parse_with_depth_limit
-
         content = """---
 type: episode
 title: "テスト"
@@ -236,11 +236,6 @@ nested:
 
     def test_parse_exceeds_depth_limit_raises_error(self) -> None:
         """深度制限を超える場合はエラーを発生させる."""
-        from src.core.parsers.frontmatter import (
-            RecursionLimitError,
-            parse_with_depth_limit,
-        )
-
         # 深いネスト構造
         content = """---
 level1:
@@ -267,11 +262,6 @@ level1:
 
     def test_parse_with_depth_limit_zero(self) -> None:
         """深度制限=0の場合、ネストがあるとエラーになる."""
-        from src.core.parsers.frontmatter import (
-            RecursionLimitError,
-            parse_with_depth_limit,
-        )
-
         content = """---
 nested:
   value: "test"
@@ -284,8 +274,6 @@ nested:
 
     def test_parse_with_depth_limit_one(self) -> None:
         """深度制限=1の場合、1レベルのネストは許可される."""
-        from src.core.parsers.frontmatter import parse_with_depth_limit
-
         content = """---
 title: "test"
 tags:
@@ -302,8 +290,6 @@ tags:
 
     def test_parse_flat_structure_always_succeeds(self) -> None:
         """フラットな構造は常に成功する."""
-        from src.core.parsers.frontmatter import parse_with_depth_limit
-
         content = """---
 title: "test"
 episode: 1

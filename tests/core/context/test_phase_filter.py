@@ -5,10 +5,14 @@ from datetime import date
 import pytest
 
 from src.core.context.phase_filter import (
+    CharacterPhaseFilter,
     InvalidPhaseError,
     PhaseFilter,
     PhaseFilterError,
+    WorldSettingPhaseFilter,
 )
+from src.core.models.character import AIVisibilitySettings, Character, Phase
+from src.core.models.world_setting import WorldSetting
 
 
 class TestPhaseFilterExceptions:
@@ -95,7 +99,7 @@ class TestPhaseFilterProtocol:
                 self.name = name
                 self.phases = phases
 
-        class CharacterPhaseFilter:
+        class CharacterPhaseFilterLocal:
             """Phase filter for CharacterData."""
 
             def filter_by_phase(
@@ -112,7 +116,7 @@ class TestPhaseFilterProtocol:
             def get_available_phases(self, entity: CharacterData) -> list[str]:
                 return list(entity.phases.keys())
 
-        filter_impl: PhaseFilter[CharacterData] = CharacterPhaseFilter()
+        filter_impl: PhaseFilter[CharacterData] = CharacterPhaseFilterLocal()
 
         character = CharacterData(
             name="Bob",
@@ -240,8 +244,6 @@ class TestCharacterPhaseFilter:
     @pytest.fixture
     def character(self):
         """Create a test character with phases."""
-        from src.core.models.character import Character, Phase
-
         return Character(
             name="Alice",
             phases=[
@@ -261,11 +263,9 @@ class TestCharacterPhaseFilter:
     @pytest.fixture
     def filter(self, phase_order):
         """Create CharacterPhaseFilter instance."""
-        from src.core.context.phase_filter import CharacterPhaseFilter
-
         return CharacterPhaseFilter(phase_order)
 
-    def test_filter_by_phase_initial(self, filter, character):
+    def test_filter_by_phase_initial(self, filter, character) -> None:
         """Filter character at initial phase - should only see initial phase."""
         filtered = filter.filter_by_phase(character, "initial")
         assert filtered.name == "Alice"
@@ -276,7 +276,7 @@ class TestCharacterPhaseFilter:
         assert "arc_1" not in phase_names
         assert "finale" not in phase_names
 
-    def test_filter_by_phase_arc_1(self, filter, character):
+    def test_filter_by_phase_arc_1(self, filter, character) -> None:
         """Filter at arc_1 - should see initial + arc_1, but not finale."""
         filtered = filter.filter_by_phase(character, "arc_1")
         phase_names = [p.name for p in filtered.phases]
@@ -284,7 +284,7 @@ class TestCharacterPhaseFilter:
         assert "arc_1" in phase_names
         assert "finale" not in phase_names
 
-    def test_filter_by_phase_finale(self, filter, character):
+    def test_filter_by_phase_finale(self, filter, character) -> None:
         """Filter at finale - should see all phases."""
         filtered = filter.filter_by_phase(character, "finale")
         phase_names = [p.name for p in filtered.phases]
@@ -292,7 +292,7 @@ class TestCharacterPhaseFilter:
         assert "arc_1" in phase_names
         assert "finale" in phase_names
 
-    def test_filter_by_phase_arc_2_no_data(self, filter, character):
+    def test_filter_by_phase_arc_2_no_data(self, filter, character) -> None:
         """Filter at arc_2 - character has no arc_2 data, but filter should work."""
         # arc_2 is in phase_order but not in character's phases
         filtered = filter.filter_by_phase(character, "arc_2")
@@ -303,13 +303,13 @@ class TestCharacterPhaseFilter:
         assert "arc_2" not in phase_names
         assert "finale" not in phase_names
 
-    def test_filter_by_phase_invalid(self, filter, character):
+    def test_filter_by_phase_invalid(self, filter, character) -> None:
         """Filter with invalid phase should raise InvalidPhaseError."""
         with pytest.raises(InvalidPhaseError) as exc_info:
             filter.filter_by_phase(character, "unknown_phase")
         assert "unknown_phase" in str(exc_info.value)
 
-    def test_get_available_phases(self, filter, character):
+    def test_get_available_phases(self, filter, character) -> None:
         """Get phases that are available in the character."""
         phases = filter.get_available_phases(character)
         assert "initial" in phases
@@ -318,10 +318,8 @@ class TestCharacterPhaseFilter:
         # arc_2 is in phase_order but not in character
         assert "arc_2" not in phases
 
-    def test_get_available_phases_empty(self, filter):
+    def test_get_available_phases_empty(self, filter) -> None:
         """Get phases from character with no phases."""
-        from src.core.models.character import Character
-
         char = Character(
             name="NPC",
             created=date(2026, 1, 26),
@@ -330,13 +328,13 @@ class TestCharacterPhaseFilter:
         phases = filter.get_available_phases(char)
         assert phases == []
 
-    def test_to_context_string(self, filter, character):
+    def test_to_context_string(self, filter, character) -> None:
         """Convert filtered character to context string."""
         context = filter.to_context_string(character, "initial")
         assert "Alice" in context
         assert "basic" in context.lower() or "Basic info" in context
 
-    def test_filter_preserves_other_fields(self, filter, character):
+    def test_filter_preserves_other_fields(self, filter, character) -> None:
         """Filter should preserve other fields like name, sections, etc."""
         filtered = filter.filter_by_phase(character, "initial")
         assert filtered.name == character.name
@@ -345,14 +343,12 @@ class TestCharacterPhaseFilter:
         assert filtered.updated == character.updated
         assert filtered.tags == character.tags
 
-    def test_filter_preserves_all_fields_via_model_copy(self, filter):
+    def test_filter_preserves_all_fields_via_model_copy(self, filter) -> None:
         """filter_by_phase preserves all fields including any new ones.
 
         This test validates that using model_copy(update={...}) ensures
         all fields are preserved even if new fields are added to the model.
         """
-        from src.core.models.character import AIVisibilitySettings, Character, Phase
-
         # Character with all fields populated
         character = Character(
             name="Test",
@@ -395,8 +391,6 @@ class TestWorldSettingPhaseFilter:
     @pytest.fixture
     def world_setting(self):
         """Create a test world setting with phases."""
-        from src.core.models.world_setting import Phase, WorldSetting
-
         return WorldSetting(
             name="Magic System",
             category="System",
@@ -415,11 +409,9 @@ class TestWorldSettingPhaseFilter:
     @pytest.fixture
     def filter(self, phase_order):
         """Create WorldSettingPhaseFilter instance."""
-        from src.core.context.phase_filter import WorldSettingPhaseFilter
-
         return WorldSettingPhaseFilter(phase_order)
 
-    def test_filter_by_phase_initial(self, filter, world_setting):
+    def test_filter_by_phase_initial(self, filter, world_setting) -> None:
         """Filter world setting at initial phase."""
         filtered = filter.filter_by_phase(world_setting, "initial")
         assert filtered.name == "Magic System"
@@ -429,26 +421,26 @@ class TestWorldSettingPhaseFilter:
         assert "initial" in phase_names
         assert "arc_2" not in phase_names
 
-    def test_filter_by_phase_arc_1(self, filter, world_setting):
+    def test_filter_by_phase_arc_1(self, filter, world_setting) -> None:
         """Filter at arc_1 - should see initial but not arc_2."""
         filtered = filter.filter_by_phase(world_setting, "arc_1")
         phase_names = [p.name for p in filtered.phases]
         assert "initial" in phase_names
         assert "arc_2" not in phase_names
 
-    def test_filter_by_phase_arc_2(self, filter, world_setting):
+    def test_filter_by_phase_arc_2(self, filter, world_setting) -> None:
         """Filter at arc_2 - should see both initial and arc_2."""
         filtered = filter.filter_by_phase(world_setting, "arc_2")
         phase_names = [p.name for p in filtered.phases]
         assert "initial" in phase_names
         assert "arc_2" in phase_names
 
-    def test_filter_by_phase_invalid(self, filter, world_setting):
+    def test_filter_by_phase_invalid(self, filter, world_setting) -> None:
         """Invalid phase should raise InvalidPhaseError."""
         with pytest.raises(InvalidPhaseError):
             filter.filter_by_phase(world_setting, "unknown_phase")
 
-    def test_get_available_phases(self, filter, world_setting):
+    def test_get_available_phases(self, filter, world_setting) -> None:
         """Get available phases from world setting."""
         phases = filter.get_available_phases(world_setting)
         assert "initial" in phases
@@ -457,13 +449,13 @@ class TestWorldSettingPhaseFilter:
         assert "arc_1" not in phases
         assert "finale" not in phases
 
-    def test_to_context_string(self, filter, world_setting):
+    def test_to_context_string(self, filter, world_setting) -> None:
         """Convert filtered world setting to context string."""
         context = filter.to_context_string(world_setting, "initial")
         assert "Magic System" in context
         assert "System" in context
 
-    def test_filter_preserves_other_fields(self, filter, world_setting):
+    def test_filter_preserves_other_fields(self, filter, world_setting) -> None:
         """Filter should preserve other fields."""
         filtered = filter.filter_by_phase(world_setting, "initial")
         assert filtered.name == world_setting.name
@@ -472,15 +464,12 @@ class TestWorldSettingPhaseFilter:
         assert filtered.created == world_setting.created
         assert filtered.updated == world_setting.updated
 
-    def test_filter_preserves_all_fields_via_model_copy(self, filter):
+    def test_filter_preserves_all_fields_via_model_copy(self, filter) -> None:
         """filter_by_phase preserves all fields including any new ones.
 
         This test validates that using model_copy(update={...}) ensures
         all fields are preserved even if new fields are added to the model.
         """
-        from src.core.models.character import AIVisibilitySettings, Phase
-        from src.core.models.world_setting import WorldSetting
-
         # WorldSetting with all fields populated
         world_setting = WorldSetting(
             name="TestSetting",

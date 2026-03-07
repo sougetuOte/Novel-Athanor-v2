@@ -10,7 +10,12 @@ from src.core.models.foreshadowing import (
     TimelineEntry,
     TimelineInfo,
 )
-from src.core.services.timeline_index import TimelineEvent, TimelineIndex
+from src.core.services.timeline_index import (
+    TimelineEvent,
+    TimelineIndex,
+    _episode_number,
+    _episodes_match,
+)
 
 
 def make_foreshadowing(
@@ -439,8 +444,6 @@ class TestHelperFunctions:
 
     def test_episode_number_extraction(self) -> None:
         """_episode_number extracts episode numbers correctly."""
-        from src.core.services.timeline_index import _episode_number
-
         assert _episode_number("ep010") == 10
         assert _episode_number("010") == 10
         assert _episode_number("10") == 10
@@ -449,15 +452,11 @@ class TestHelperFunctions:
 
     def test_episode_number_invalid(self) -> None:
         """_episode_number returns 0 for invalid input."""
-        from src.core.services.timeline_index import _episode_number
-
         assert _episode_number("invalid") == 0
         assert _episode_number("") == 0
 
     def test_episodes_match(self) -> None:
         """_episodes_match compares episode IDs correctly."""
-        from src.core.services.timeline_index import _episodes_match
-
         assert _episodes_match("ep010", "010")
         assert _episodes_match("ep010", "10")
         assert _episodes_match("010", "10")

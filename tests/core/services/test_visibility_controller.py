@@ -4,7 +4,12 @@
 """
 
 
-from src.core.models.ai_visibility import AIVisibilityLevel
+from src.core.models.ai_visibility import (
+    AIVisibilityLevel,
+    EntityVisibilityConfig,
+    SectionVisibility,
+    VisibilityConfig,
+)
 from src.core.services.visibility_controller import (
     VisibilityController,
     VisibilityFilteredContent,
@@ -72,8 +77,6 @@ class TestFilterContentByVisibility:
 
     def test_level2_includes_content_with_restrictions(self) -> None:
         """Level 2 (KNOW) includes content but adds forbidden keywords."""
-        from src.core.models.ai_visibility import SectionVisibility
-
         content = """## 秘密設定
 <!-- ai_visibility: 2 -->
 アイラは王族の血筋を持つ
@@ -103,8 +106,6 @@ class TestFilterContentByVisibility:
 
     def test_level3_includes_content_without_restrictions(self) -> None:
         """Level 3 (USE) includes content WITHOUT adding forbidden keywords."""
-        from src.core.models.ai_visibility import SectionVisibility
-
         content = """## 公開情報
 <!-- ai_visibility: 3 -->
 アイラは優秀な魔法使いである
@@ -132,8 +133,6 @@ class TestFilterContentByVisibility:
 
     def test_level2_vs_level3_different_behavior(self) -> None:
         """Level 2 and Level 3 produce different results for same content."""
-        from src.core.models.ai_visibility import SectionVisibility
-
         same_content = "王族の秘密"
 
         # Level 2 section
@@ -284,12 +283,6 @@ class TestVisibilityController:
 
     def test_controller_with_config(self) -> None:
         """VisibilityController が config を受け取れる."""
-        from src.core.models.ai_visibility import (
-            EntityVisibilityConfig,
-            SectionVisibility,
-            VisibilityConfig,
-        )
-
         config = VisibilityConfig(
             entities=[
                 EntityVisibilityConfig(
@@ -314,12 +307,6 @@ class TestVisibilityController:
 
     def test_controller_config_merges_forbidden_keywords(self) -> None:
         """config と直接指定の forbidden_keywords がマージされる."""
-        from src.core.models.ai_visibility import (
-            EntityVisibilityConfig,
-            SectionVisibility,
-            VisibilityConfig,
-        )
-
         config = VisibilityConfig(
             entities=[
                 EntityVisibilityConfig(
@@ -397,8 +384,6 @@ class TestTemplateGeneration:
 
     def test_templates_integrated_into_filter(self) -> None:
         """Templates are integrated into filter output."""
-        from src.core.models.ai_visibility import SectionVisibility
-
         # Level 1 with template
         content_level1 = """## 秘密
 <!-- ai_visibility: 1 -->
@@ -494,8 +479,6 @@ class TestRenameToVisibilityFilteredContent:
 
     def test_renamed_class_exists(self) -> None:
         """VisibilityFilteredContent is importable from visibility_controller."""
-        from src.core.services.visibility_controller import VisibilityFilteredContent
-
         assert VisibilityFilteredContent is not None
 
     def test_old_name_not_exported_in_init(self) -> None:
@@ -510,11 +493,6 @@ class TestRenameToVisibilityFilteredContent:
 
     def test_filter_returns_new_type(self) -> None:
         """VisibilityController.filter() returns VisibilityFilteredContent."""
-        from src.core.services.visibility_controller import (
-            VisibilityController,
-            VisibilityFilteredContent,
-        )
-
         controller = VisibilityController()
         content = "## Test\n<!-- ai_visibility: 3 -->\nTest content"
         result = controller.filter(content)
@@ -523,11 +501,6 @@ class TestRenameToVisibilityFilteredContent:
 
     def test_function_returns_new_type(self) -> None:
         """filter_content_by_visibility() returns VisibilityFilteredContent."""
-        from src.core.services.visibility_controller import (
-            VisibilityFilteredContent,
-            filter_content_by_visibility,
-        )
-
         content = "## Test\n<!-- ai_visibility: 3 -->\nTest content"
         result = filter_content_by_visibility(content)
 
@@ -535,8 +508,6 @@ class TestRenameToVisibilityFilteredContent:
 
     def test_new_class_has_all_attributes(self) -> None:
         """VisibilityFilteredContent has all expected attributes."""
-        from src.core.services.visibility_controller import VisibilityFilteredContent
-
         ctx = VisibilityFilteredContent(
             content="test",
             hints=["hint"],

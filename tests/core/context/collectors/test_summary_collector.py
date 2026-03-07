@@ -59,7 +59,7 @@ class TestSummaryContext:
 class TestSummaryCollectorCollect:
     """Test SummaryCollector.collect() method."""
 
-    def test_collect_all_present(self, tmp_path: Path):
+    def test_collect_all_present(self, tmp_path: Path) -> None:
         """Test collect() when L1/L2/L3 all exist."""
         # Arrange
         vault_root = tmp_path / "vault"
@@ -84,7 +84,7 @@ class TestSummaryCollectorCollect:
         assert result.l2_chapter == "L2 chapter summary"
         assert result.l3_recent == "L3 recent summary"
 
-    def test_collect_l1_only(self, tmp_path: Path):
+    def test_collect_l1_only(self, tmp_path: Path) -> None:
         """Test collect() when only L1 exists (L2/L3 missing)."""
         # Arrange
         vault_root = tmp_path / "vault"
@@ -106,7 +106,7 @@ class TestSummaryCollectorCollect:
         assert result.l2_chapter is None
         assert result.l3_recent is None
 
-    def test_collect_all_missing(self, tmp_path: Path):
+    def test_collect_all_missing(self, tmp_path: Path) -> None:
         """Test collect() when all summaries are missing."""
         # Arrange
         vault_root = tmp_path / "vault"
@@ -130,7 +130,7 @@ class TestSummaryCollectorCollect:
 class TestSummaryCollectorL2:
     """Test SummaryCollector._collect_l2() method."""
 
-    def test_collect_l2_no_chapter_id(self, tmp_path: Path):
+    def test_collect_l2_no_chapter_id(self, tmp_path: Path) -> None:
         """Test _collect_l2() when chapter_id is None."""
         # Arrange
         vault_root = tmp_path / "vault"
@@ -145,7 +145,7 @@ class TestSummaryCollectorL2:
         # Assert
         assert result is None
 
-    def test_collect_l2_with_chapter_id(self, tmp_path: Path):
+    def test_collect_l2_with_chapter_id(self, tmp_path: Path) -> None:
         """Test _collect_l2() with chapter_id."""
         # Arrange
         vault_root = tmp_path / "vault"
@@ -169,7 +169,7 @@ class TestSummaryCollectorL2:
 class TestSummaryCollectorL3:
     """Test SummaryCollector._collect_l3() method."""
 
-    def test_collect_l3_with_previous_episode(self, tmp_path: Path):
+    def test_collect_l3_with_previous_episode(self, tmp_path: Path) -> None:
         """Test _collect_l3() when previous episode summary exists."""
         # Arrange
         vault_root = tmp_path / "vault"
@@ -189,7 +189,7 @@ class TestSummaryCollectorL3:
         # Assert
         assert result == "Previous episode summary"
 
-    def test_collect_l3_first_episode(self, tmp_path: Path):
+    def test_collect_l3_first_episode(self, tmp_path: Path) -> None:
         """Test _collect_l3() when it's the first episode (no previous)."""
         # Arrange
         vault_root = tmp_path / "vault"
@@ -208,7 +208,7 @@ class TestSummaryCollectorL3:
 class TestGetPreviousEpisodeId:
     """Test SummaryCollector._get_previous_episode_id() method."""
 
-    def test_get_previous_episode_id_standard(self, tmp_path: Path):
+    def test_get_previous_episode_id_standard(self, tmp_path: Path) -> None:
         """Test _get_previous_episode_id() with standard format (ep010 -> ep009)."""
         # Arrange
         vault_root = tmp_path / "vault"
@@ -222,7 +222,7 @@ class TestGetPreviousEpisodeId:
         # Assert
         assert result == "ep009"
 
-    def test_get_previous_episode_id_first_episode(self, tmp_path: Path):
+    def test_get_previous_episode_id_first_episode(self, tmp_path: Path) -> None:
         """Test _get_previous_episode_id() with ep001 returns None."""
         # Arrange
         vault_root = tmp_path / "vault"
@@ -236,7 +236,7 @@ class TestGetPreviousEpisodeId:
         # Assert
         assert result is None
 
-    def test_get_previous_episode_id_numeric_only(self, tmp_path: Path):
+    def test_get_previous_episode_id_numeric_only(self, tmp_path: Path) -> None:
         """Test _get_previous_episode_id() with numeric format (010 -> 009)."""
         # Arrange
         vault_root = tmp_path / "vault"
@@ -250,7 +250,7 @@ class TestGetPreviousEpisodeId:
         # Assert
         assert result == "009"
 
-    def test_get_previous_episode_id_episode_prefix(self, tmp_path: Path):
+    def test_get_previous_episode_id_episode_prefix(self, tmp_path: Path) -> None:
         """Test _get_previous_episode_id() with 'episode' prefix."""
         # Arrange
         vault_root = tmp_path / "vault"
@@ -264,7 +264,7 @@ class TestGetPreviousEpisodeId:
         # Assert
         assert result == "episode009"
 
-    def test_get_previous_episode_id_invalid_format(self, tmp_path: Path):
+    def test_get_previous_episode_id_invalid_format(self, tmp_path: Path) -> None:
         """Test _get_previous_episode_id() with invalid format returns None."""
         # Arrange
         vault_root = tmp_path / "vault"
@@ -282,7 +282,7 @@ class TestGetPreviousEpisodeId:
 class TestSummaryCollectorAsString:
     """Test SummaryCollector.collect_as_string() method."""
 
-    def test_collect_as_string_all_present(self, tmp_path: Path):
+    def test_collect_as_string_all_present(self, tmp_path: Path) -> None:
         """Test collect_as_string() with all summaries."""
         # Arrange
         vault_root = tmp_path / "vault"
@@ -310,7 +310,7 @@ class TestSummaryCollectorAsString:
         assert "## 直近シーン要約（L3）" in result
         assert "L3 recent" in result
 
-    def test_collect_as_string_l1_only(self, tmp_path: Path):
+    def test_collect_as_string_l1_only(self, tmp_path: Path) -> None:
         """Test collect_as_string() with L1 only."""
         # Arrange
         vault_root = tmp_path / "vault"
@@ -334,7 +334,7 @@ class TestSummaryCollectorAsString:
         assert "## 章要約（L2）" not in result
         assert "## 直近シーン要約（L3）" not in result
 
-    def test_collect_as_string_all_missing(self, tmp_path: Path):
+    def test_collect_as_string_all_missing(self, tmp_path: Path) -> None:
         """Test collect_as_string() when all summaries are missing."""
         # Arrange
         vault_root = tmp_path / "vault"

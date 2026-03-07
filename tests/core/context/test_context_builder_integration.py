@@ -86,7 +86,7 @@ def vault(tmp_path):
 class TestE2EFullBuild:
     """E2E tests for complete context build pipeline."""
 
-    def test_full_build_all_components(self, vault, scene):
+    def test_full_build_all_components(self, vault, scene) -> None:
         """T32: Full build with all components integrated."""
         vc = VisibilityController()
         builder = ContextBuilder(
@@ -106,7 +106,7 @@ class TestE2EFullBuild:
         # Visibility context should exist since controller is provided
         assert isinstance(result.visibility_context, VisibilityAwareContext)
 
-    def test_build_without_l2_services(self, vault, scene):
+    def test_build_without_l2_services(self, vault, scene) -> None:
         """T33: Build succeeds without any L2 services."""
         builder = ContextBuilder(vault_root=vault)
         result = builder.build_context(scene)
@@ -116,7 +116,7 @@ class TestE2EFullBuild:
         assert result.visibility_context is None
         assert len(result.foreshadow_instructions.instructions) == 0
 
-    def test_build_l2_service_failure_graceful(self, vault, scene):
+    def test_build_l2_service_failure_graceful(self, vault, scene) -> None:
         """T34: Build handles L2 service failures gracefully."""
         # Create a controller with invalid state to test graceful degradation
         builder = ContextBuilder(vault_root=vault)
@@ -130,14 +130,14 @@ class TestE2EFullBuild:
 class TestE2EForeshadowing:
     """E2E tests for foreshadowing instructions."""
 
-    def test_foreshadow_instructions_retrieve(self, vault, scene):
+    def test_foreshadow_instructions_retrieve(self, vault, scene) -> None:
         """T35: Foreshadowing instructions can be retrieved."""
         builder = ContextBuilder(vault_root=vault)
 
         instructions = builder.get_foreshadow_instructions(scene)
         assert isinstance(instructions, ForeshadowInstructions)
 
-    def test_foreshadow_prompt_format(self, vault, scene):
+    def test_foreshadow_prompt_format(self, vault, scene) -> None:
         """T35b: Foreshadowing instructions can be formatted as prompt."""
         builder = ContextBuilder(vault_root=vault)
 
@@ -148,7 +148,7 @@ class TestE2EForeshadowing:
 class TestE2EForbiddenKeywords:
     """E2E tests for forbidden keyword integration."""
 
-    def test_forbidden_keywords_all_sources(self, vault, scene):
+    def test_forbidden_keywords_all_sources(self, vault, scene) -> None:
         """T36: Forbidden keywords collected from all sources."""
         builder = ContextBuilder(vault_root=vault)
 
@@ -163,7 +163,7 @@ class TestE2EForbiddenKeywords:
         assert "真の名前" in keywords
         assert "隠された力" in keywords
 
-    def test_forbidden_by_source(self, vault, scene):
+    def test_forbidden_by_source(self, vault, scene) -> None:
         """T36b: Forbidden keywords are tracked by source."""
         builder = ContextBuilder(vault_root=vault)
 
@@ -172,7 +172,7 @@ class TestE2EForbiddenKeywords:
         assert "global" in by_source
         assert "visibility" in by_source
 
-    def test_text_validation(self, vault, scene):
+    def test_text_validation(self, vault, scene) -> None:
         """T37: Text can be validated against forbidden keywords."""
         builder = ContextBuilder(vault_root=vault)
 
@@ -188,7 +188,7 @@ class TestE2EForbiddenKeywords:
         assert found_clean == []
         assert builder.is_text_clean(scene, clean_text) is True
 
-    def test_forbidden_prompt_format(self, vault, scene):
+    def test_forbidden_prompt_format(self, vault, scene) -> None:
         """T37b: Forbidden keywords can be formatted as prompt."""
         builder = ContextBuilder(vault_root=vault)
 
@@ -203,7 +203,7 @@ class TestE2EForbiddenKeywords:
 class TestPerformance:
     """Performance tests for ContextBuilder."""
 
-    def test_initial_build_performance(self, vault, scene):
+    def test_initial_build_performance(self, vault, scene) -> None:
         """T38: Initial build completes within reasonable time."""
         builder = ContextBuilder(vault_root=vault)
 
@@ -215,7 +215,7 @@ class TestPerformance:
         # Should complete within 500ms (generous for CI)
         assert elapsed < 0.5, f"Initial build took {elapsed:.3f}s (> 0.5s)"
 
-    def test_cached_performance(self, vault, scene):
+    def test_cached_performance(self, vault, scene) -> None:
         """T39: Cached operations are significantly faster."""
         builder = ContextBuilder(vault_root=vault)
 
@@ -236,7 +236,7 @@ class TestPerformance:
 class TestCacheIntegration:
     """Tests for cache interactions across methods."""
 
-    def test_build_context_populates_instruction_cache(self, vault, scene):
+    def test_build_context_populates_instruction_cache(self, vault, scene) -> None:
         """build_context populates instruction cache for later use."""
         builder = ContextBuilder(vault_root=vault)
         builder.build_context(scene)
@@ -245,7 +245,7 @@ class TestCacheIntegration:
         cache_key = f"{scene.episode_id}:{scene.sequence_id}"
         assert cache_key in builder._instruction_cache
 
-    def test_clear_all_caches_resets_everything(self, vault, scene):
+    def test_clear_all_caches_resets_everything(self, vault, scene) -> None:
         """clear_all_caches resets both instruction and forbidden caches."""
         builder = ContextBuilder(vault_root=vault)
 
@@ -265,7 +265,7 @@ class TestCacheIntegration:
         assert cache_key not in builder._instruction_cache
         assert cache_key not in builder._forbidden_cache
 
-    def test_multiple_scenes_independent_caches(self, vault):
+    def test_multiple_scenes_independent_caches(self, vault) -> None:
         """Different scenes have independent cache entries."""
         builder = ContextBuilder(vault_root=vault)
 
@@ -287,7 +287,7 @@ class TestCacheIntegration:
 class TestCacheBounds:
     """Tests for cache size limits."""
 
-    def test_instruction_cache_evicts_oldest(self, vault):
+    def test_instruction_cache_evicts_oldest(self, vault) -> None:
         """Cache evicts oldest entries when exceeding max size."""
         builder = ContextBuilder(vault_root=vault)
         builder._MAX_CACHE_SIZE = 3  # Small limit for testing
@@ -306,7 +306,7 @@ class TestCacheBounds:
         assert "ep003:seq_01" in builder._instruction_cache
         assert "ep004:seq_01" in builder._instruction_cache
 
-    def test_forbidden_cache_evicts_oldest(self, vault):
+    def test_forbidden_cache_evicts_oldest(self, vault) -> None:
         """Forbidden cache also respects size limit."""
         builder = ContextBuilder(vault_root=vault)
         builder._MAX_CACHE_SIZE = 2

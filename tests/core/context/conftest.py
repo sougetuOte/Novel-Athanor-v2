@@ -18,6 +18,7 @@ from src.core.models.foreshadowing import (
     TimelineEntry,
     TimelineInfo,
 )
+from src.core.repositories.foreshadowing import ForeshadowingRepository
 
 
 @pytest.fixture
@@ -32,6 +33,24 @@ def scene() -> SceneIdentifier:
 def builder(tmp_path: Path) -> ContextBuilder:
     """Create a ContextBuilder with empty vault."""
     return ContextBuilder(vault_root=tmp_path)
+
+
+@pytest.fixture
+def foreshadow_vault(tmp_path: Path) -> Path:
+    """Create a vault with test_work/_foreshadowing directory.
+
+    Used by foreshadowing_identifier and instruction_generator tests.
+    Returns the vault root (not the work dir).
+    """
+    vault = tmp_path / "vault"
+    (vault / "test_work" / "_foreshadowing").mkdir(parents=True)
+    return vault
+
+
+@pytest.fixture
+def foreshadow_repository(foreshadow_vault: Path) -> ForeshadowingRepository:
+    """Create a ForeshadowingRepository backed by foreshadow_vault."""
+    return ForeshadowingRepository(foreshadow_vault, "test_work")
 
 
 def create_foreshadowing(

@@ -35,14 +35,14 @@ if TYPE_CHECKING:
 # --- Exception tests ---
 
 
-def test_write_facade_error_hierarchy():
+def test_write_facade_error_hierarchy() -> None:
     """Test that exception hierarchy is correct."""
     assert issubclass(WriteFacadeError, Exception)
     assert issubclass(WriteOperationError, WriteFacadeError)
     assert issubclass(DependencyNotConfiguredError, WriteFacadeError)
 
 
-def test_write_operation_error_with_cause():
+def test_write_operation_error_with_cause() -> None:
     """Test WriteOperationError stores cause."""
     cause = ValueError("Original error")
     error = WriteOperationError("Write failed", cause=cause)
@@ -50,7 +50,7 @@ def test_write_operation_error_with_cause():
     assert error.cause is cause
 
 
-def test_dependency_not_configured_error():
+def test_dependency_not_configured_error() -> None:
     """Test DependencyNotConfiguredError message format."""
     error = DependencyNotConfiguredError("foreshadowing_repository", "update_foreshadowing_status")
     assert "foreshadowing_repository" in str(error)
@@ -62,13 +62,13 @@ def test_dependency_not_configured_error():
 # --- Initialization tests ---
 
 
-def test_write_facade_init_minimal(tmp_path: Path):
+def test_write_facade_init_minimal(tmp_path: Path) -> None:
     """Test WriteFacade initialization with minimal arguments."""
     facade = WriteFacade(vault_root=tmp_path)
     assert facade is not None
 
 
-def test_write_facade_init_with_all_dependencies(tmp_path: Path):
+def test_write_facade_init_with_all_dependencies(tmp_path: Path) -> None:
     """Test WriteFacade initialization with all dependencies."""
     fs_repo = ForeshadowingRepository(tmp_path, work_name="test_work")
     char_repo = CharacterRepository(tmp_path)
@@ -89,7 +89,7 @@ def test_write_facade_init_with_all_dependencies(tmp_path: Path):
 # --- Dependency check tests ---
 
 
-def test_update_foreshadowing_status_without_repository(tmp_path: Path):
+def test_update_foreshadowing_status_without_repository(tmp_path: Path) -> None:
     """Test update_foreshadowing_status raises error when repository is not configured."""
     facade = WriteFacade(vault_root=tmp_path)
 
@@ -100,7 +100,7 @@ def test_update_foreshadowing_status_without_repository(tmp_path: Path):
     assert exc_info.value.method_name == "update_foreshadowing_status"
 
 
-def test_update_foreshadowing_status_without_manager(tmp_path: Path):
+def test_update_foreshadowing_status_without_manager(tmp_path: Path) -> None:
     """Test update_foreshadowing_status raises error when manager is not configured."""
     fs_repo = ForeshadowingRepository(tmp_path, work_name="test_work")
     facade = WriteFacade(
@@ -115,7 +115,7 @@ def test_update_foreshadowing_status_without_manager(tmp_path: Path):
     assert exc_info.value.dependency_name == "foreshadowing_manager"
 
 
-def test_add_foreshadowing_event_without_repository(tmp_path: Path):
+def test_add_foreshadowing_event_without_repository(tmp_path: Path) -> None:
     """Test add_foreshadowing_event raises error when repository is not configured."""
     facade = WriteFacade(vault_root=tmp_path)
     event = TimelineEntry(
@@ -132,7 +132,7 @@ def test_add_foreshadowing_event_without_repository(tmp_path: Path):
     assert exc_info.value.dependency_name == "foreshadowing_repository"
 
 
-def test_save_character_without_repository(tmp_path: Path):
+def test_save_character_without_repository(tmp_path: Path) -> None:
     """Test save_character raises error when repository is not configured."""
     facade = WriteFacade(vault_root=tmp_path)
     character = Character(name="Alice", created=date.today(), updated=date.today())
@@ -143,7 +143,7 @@ def test_save_character_without_repository(tmp_path: Path):
     assert exc_info.value.dependency_name == "character_repository"
 
 
-def test_save_world_setting_without_repository(tmp_path: Path):
+def test_save_world_setting_without_repository(tmp_path: Path) -> None:
     """Test save_world_setting raises error when repository is not configured."""
     facade = WriteFacade(vault_root=tmp_path)
     ws = WorldSetting(name="Magic System", category="Magic", created=date.today(), updated=date.today())
@@ -154,7 +154,7 @@ def test_save_world_setting_without_repository(tmp_path: Path):
     assert exc_info.value.dependency_name == "world_setting_repository"
 
 
-def test_get_all_characters_without_repository(tmp_path: Path):
+def test_get_all_characters_without_repository(tmp_path: Path) -> None:
     """Test get_all_characters raises error when repository is not configured."""
     facade = WriteFacade(vault_root=tmp_path)
 
@@ -164,7 +164,7 @@ def test_get_all_characters_without_repository(tmp_path: Path):
     assert exc_info.value.dependency_name == "character_repository"
 
 
-def test_get_all_world_settings_without_repository(tmp_path: Path):
+def test_get_all_world_settings_without_repository(tmp_path: Path) -> None:
     """Test get_all_world_settings raises error when repository is not configured."""
     facade = WriteFacade(vault_root=tmp_path)
 
@@ -174,7 +174,7 @@ def test_get_all_world_settings_without_repository(tmp_path: Path):
     assert exc_info.value.dependency_name == "world_setting_repository"
 
 
-def test_get_all_foreshadowings_without_repository(tmp_path: Path):
+def test_get_all_foreshadowings_without_repository(tmp_path: Path) -> None:
     """Test get_all_foreshadowings raises error when repository is not configured."""
     facade = WriteFacade(vault_root=tmp_path)
 
@@ -187,7 +187,7 @@ def test_get_all_foreshadowings_without_repository(tmp_path: Path):
 # --- update_foreshadowing_status tests ---
 
 
-def test_update_foreshadowing_status_success(tmp_path: Path):
+def test_update_foreshadowing_status_success(tmp_path: Path) -> None:
     """Test successful foreshadowing status transition."""
     fs_repo = ForeshadowingRepository(tmp_path, work_name="test_work")
     fs_manager = ForeshadowingManager()
@@ -220,7 +220,7 @@ def test_update_foreshadowing_status_success(tmp_path: Path):
     assert updated.status == ForeshadowingStatus.PLANTED
 
 
-def test_update_foreshadowing_status_invalid_transition(tmp_path: Path):
+def test_update_foreshadowing_status_invalid_transition(tmp_path: Path) -> None:
     """Test invalid status transition raises ValueError."""
     fs_repo = ForeshadowingRepository(tmp_path, work_name="test_work")
     fs_manager = ForeshadowingManager()
@@ -251,7 +251,7 @@ def test_update_foreshadowing_status_invalid_transition(tmp_path: Path):
         )
 
 
-def test_update_foreshadowing_status_nonexistent_id(tmp_path: Path):
+def test_update_foreshadowing_status_nonexistent_id(tmp_path: Path) -> None:
     """Test update_foreshadowing_status with nonexistent ID raises error."""
     fs_repo = ForeshadowingRepository(tmp_path, work_name="test_work")
     fs_manager = ForeshadowingManager()
@@ -273,7 +273,7 @@ def test_update_foreshadowing_status_nonexistent_id(tmp_path: Path):
 # --- add_foreshadowing_event tests ---
 
 
-def test_add_foreshadowing_event_success(tmp_path: Path):
+def test_add_foreshadowing_event_success(tmp_path: Path) -> None:
     """Test adding event to foreshadowing timeline."""
     fs_repo = ForeshadowingRepository(tmp_path, work_name="test_work")
 
@@ -309,7 +309,7 @@ def test_add_foreshadowing_event_success(tmp_path: Path):
     assert updated.timeline.events[0].episode == "EP-01"
 
 
-def test_add_foreshadowing_event_creates_timeline(tmp_path: Path):
+def test_add_foreshadowing_event_creates_timeline(tmp_path: Path) -> None:
     """Test adding event to foreshadowing without timeline creates timeline."""
     fs_repo = ForeshadowingRepository(tmp_path, work_name="test_work")
 
@@ -348,7 +348,7 @@ def test_add_foreshadowing_event_creates_timeline(tmp_path: Path):
 # --- save_character tests ---
 
 
-def test_save_character_create(tmp_path: Path):
+def test_save_character_create(tmp_path: Path) -> None:
     """Test saving new character creates file."""
     char_repo = CharacterRepository(tmp_path)
     facade = WriteFacade(
@@ -363,7 +363,7 @@ def test_save_character_create(tmp_path: Path):
     assert path.name == "Alice.md"
 
 
-def test_save_character_update(tmp_path: Path):
+def test_save_character_update(tmp_path: Path) -> None:
     """Test saving existing character updates file."""
     char_repo = CharacterRepository(tmp_path)
     facade = WriteFacade(
@@ -387,7 +387,7 @@ def test_save_character_update(tmp_path: Path):
 # --- save_world_setting tests ---
 
 
-def test_save_world_setting_create(tmp_path: Path):
+def test_save_world_setting_create(tmp_path: Path) -> None:
     """Test saving new world setting creates file."""
     ws_repo = WorldSettingRepository(tmp_path)
     facade = WriteFacade(
@@ -402,7 +402,7 @@ def test_save_world_setting_create(tmp_path: Path):
     assert path.name == "Magic System.md"
 
 
-def test_save_world_setting_update(tmp_path: Path):
+def test_save_world_setting_update(tmp_path: Path) -> None:
     """Test saving existing world setting updates file."""
     ws_repo = WorldSettingRepository(tmp_path)
     facade = WriteFacade(
@@ -426,7 +426,7 @@ def test_save_world_setting_update(tmp_path: Path):
 # --- save_summary tests ---
 
 
-def test_save_summary_l1(tmp_path: Path):
+def test_save_summary_l1(tmp_path: Path) -> None:
     """Test saving L1 summary."""
     facade = WriteFacade(vault_root=tmp_path, work_name="test_work")
 
@@ -440,7 +440,7 @@ def test_save_summary_l1(tmp_path: Path):
     assert path.read_text(encoding="utf-8") == "Overall story summary"
 
 
-def test_save_summary_l2(tmp_path: Path):
+def test_save_summary_l2(tmp_path: Path) -> None:
     """Test saving L2 summary."""
     facade = WriteFacade(vault_root=tmp_path, work_name="test_work")
 
@@ -456,7 +456,7 @@ def test_save_summary_l2(tmp_path: Path):
     assert "Chapter summary" in path.read_text(encoding="utf-8")
 
 
-def test_save_summary_l3(tmp_path: Path):
+def test_save_summary_l3(tmp_path: Path) -> None:
     """Test saving L3 summary."""
     facade = WriteFacade(vault_root=tmp_path, work_name="test_work")
 
@@ -473,7 +473,7 @@ def test_save_summary_l3(tmp_path: Path):
     assert "Scene summary" in path.read_text(encoding="utf-8")
 
 
-def test_save_summary_l2_missing_chapter_info(tmp_path: Path):
+def test_save_summary_l2_missing_chapter_info(tmp_path: Path) -> None:
     """Test save_summary L2 with missing chapter info raises error."""
     facade = WriteFacade(vault_root=tmp_path, work_name="test_work")
 
@@ -486,7 +486,7 @@ def test_save_summary_l2_missing_chapter_info(tmp_path: Path):
         )
 
 
-def test_save_summary_l3_missing_sequence_number(tmp_path: Path):
+def test_save_summary_l3_missing_sequence_number(tmp_path: Path) -> None:
     """Test save_summary L3 with missing sequence_number raises error."""
     facade = WriteFacade(vault_root=tmp_path, work_name="test_work")
 
@@ -504,7 +504,7 @@ def test_save_summary_l3_missing_sequence_number(tmp_path: Path):
 # --- _atomic_write tests ---
 
 
-def test_atomic_write_creates_parent_directory(tmp_path: Path):
+def test_atomic_write_creates_parent_directory(tmp_path: Path) -> None:
     """Test _atomic_write creates parent directory if it doesn't exist."""
     facade = WriteFacade(vault_root=tmp_path)
 
@@ -515,7 +515,7 @@ def test_atomic_write_creates_parent_directory(tmp_path: Path):
     assert target_path.read_text(encoding="utf-8") == "test content"
 
 
-def test_atomic_write_overwrites_existing_file(tmp_path: Path):
+def test_atomic_write_overwrites_existing_file(tmp_path: Path) -> None:
     """Test _atomic_write overwrites existing file."""
     facade = WriteFacade(vault_root=tmp_path)
 
@@ -530,7 +530,7 @@ def test_atomic_write_overwrites_existing_file(tmp_path: Path):
 # --- get_all_* tests ---
 
 
-def test_get_all_characters(tmp_path: Path):
+def test_get_all_characters(tmp_path: Path) -> None:
     """Test get_all_characters returns all characters."""
     char_repo = CharacterRepository(tmp_path)
     facade = WriteFacade(
@@ -550,7 +550,7 @@ def test_get_all_characters(tmp_path: Path):
     assert "Bob" in names
 
 
-def test_get_all_world_settings(tmp_path: Path):
+def test_get_all_world_settings(tmp_path: Path) -> None:
     """Test get_all_world_settings returns all world settings."""
     ws_repo = WorldSettingRepository(tmp_path)
     facade = WriteFacade(
@@ -570,7 +570,7 @@ def test_get_all_world_settings(tmp_path: Path):
     assert "Geography" in names
 
 
-def test_get_all_foreshadowings(tmp_path: Path):
+def test_get_all_foreshadowings(tmp_path: Path) -> None:
     """Test get_all_foreshadowings returns all foreshadowings."""
     fs_repo = ForeshadowingRepository(tmp_path, work_name="test_work")
     facade = WriteFacade(
@@ -604,7 +604,7 @@ def test_get_all_foreshadowings(tmp_path: Path):
     assert len(foreshadowings) == 2
 
 
-def test_get_all_foreshadowings_with_status_filter(tmp_path: Path):
+def test_get_all_foreshadowings_with_status_filter(tmp_path: Path) -> None:
     """Test get_all_foreshadowings with status filter."""
     fs_repo = ForeshadowingRepository(tmp_path, work_name="test_work")
     facade = WriteFacade(

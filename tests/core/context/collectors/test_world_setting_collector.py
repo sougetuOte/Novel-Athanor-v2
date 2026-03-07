@@ -104,7 +104,7 @@ class TestWorldSettingCollector:
         mock_resolver: Mock,
         mock_loader: Mock,
         temp_vault: Path,
-    ):
+    ) -> None:
         """Test Case 1: collect() single setting."""
         # Arrange
         scene = SceneIdentifier(episode_id="010", current_phase="initial")
@@ -142,7 +142,7 @@ updated: 2026-01-26
         mock_resolver: Mock,
         mock_loader: Mock,
         temp_vault: Path,
-    ):
+    ) -> None:
         """Test Case 2: collect() multiple settings."""
         # Arrange
         scene = SceneIdentifier(episode_id="010", current_phase="arc_1")
@@ -195,7 +195,7 @@ updated: 2026-01-26
         self,
         collector: WorldSettingCollector,
         mock_resolver: Mock,
-    ):
+    ) -> None:
         """Test Case 3: collect() no settings - empty context."""
         # Arrange
         scene = SceneIdentifier(episode_id="010")
@@ -214,7 +214,7 @@ updated: 2026-01-26
         mock_resolver: Mock,
         mock_loader: Mock,
         temp_vault: Path,
-    ):
+    ) -> None:
         """Test Case 4: collect() with Phase filtering."""
         # Arrange
         scene = SceneIdentifier(episode_id="010", current_phase="initial")
@@ -255,7 +255,7 @@ updated: 2026-01-26
         mock_resolver: Mock,
         mock_loader: Mock,
         temp_vault: Path,
-    ):
+    ) -> None:
         """Test Case 5: collect() without Phase - all information."""
         # Arrange
         scene = SceneIdentifier(episode_id="010", current_phase=None)
@@ -289,7 +289,7 @@ updated: 2026-01-26
         mock_resolver: Mock,
         mock_loader: Mock,
         temp_vault: Path,
-    ):
+    ) -> None:
         """Test Case 6: collect() subdirectory - hierarchy support."""
         # Arrange
         scene = SceneIdentifier(episode_id="010")
@@ -319,7 +319,7 @@ updated: 2026-01-26
         self,
         collector: WorldSettingCollector,
         temp_vault: Path,
-    ):
+    ) -> None:
         """Test Case 7: _parse_world_setting() parsing."""
         # Arrange
         path = temp_vault / "world" / "test.md"
@@ -361,7 +361,7 @@ tags: [test, sample]
         mock_resolver: Mock,
         mock_loader: Mock,
         temp_vault: Path,
-    ):
+    ) -> None:
         """Test Case 8: collect_as_string() integration."""
         # Arrange
         scene = SceneIdentifier(episode_id="010")
@@ -416,7 +416,7 @@ updated: 2026-01-26
         mock_resolver: Mock,
         mock_loader: Mock,
         temp_vault: Path,
-    ):
+    ) -> None:
         """Test Case 9: load failure adds warning."""
         # Arrange
         scene = SceneIdentifier(episode_id="010")

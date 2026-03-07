@@ -4,12 +4,13 @@ Tests the ContextBuilder class definition and ContextBuildResult data class.
 """
 
 
-
 from src.core.context.context_builder import ContextBuilder, ContextBuildResult
 from src.core.context.filtered_context import FilteredContext
 from src.core.context.foreshadow_instruction import ForeshadowInstructions
 from src.core.context.hint_collector import HintCollection
 from src.core.context.visibility_context import VisibilityAwareContext
+from src.core.repositories.foreshadowing import ForeshadowingRepository
+from src.core.services.visibility_controller import VisibilityController
 
 
 class TestContextBuildResult:
@@ -116,17 +117,14 @@ class TestContextBuildResult:
 class TestContextBuilderInit:
     """Tests for ContextBuilder initialization."""
 
-    def test_create_minimal(self, tmp_path):
+    def test_create_minimal(self, tmp_path) -> None:
         """T3: ContextBuilder can be created with vault_root only."""
         builder = ContextBuilder(vault_root=tmp_path)
 
         assert builder._vault_root == tmp_path
 
-    def test_create_with_all_options(self, tmp_path):
+    def test_create_with_all_options(self, tmp_path) -> None:
         """T4: ContextBuilder can be created with all optional parameters."""
-        from src.core.repositories.foreshadowing import ForeshadowingRepository
-        from src.core.services.visibility_controller import VisibilityController
-
         vc = VisibilityController()
         repo = ForeshadowingRepository(vault_root=tmp_path, work_name="test_work")
 
@@ -142,7 +140,7 @@ class TestContextBuilderInit:
         assert builder._visibility_controller is vc
         assert builder._foreshadowing_reader is repo
 
-    def test_internal_components_initialized(self, tmp_path):
+    def test_internal_components_initialized(self, tmp_path) -> None:
         """T5: Internal components are correctly initialized."""
         builder = ContextBuilder(vault_root=tmp_path)
 
@@ -165,7 +163,7 @@ class TestContextBuilderInit:
         # Hint collector should be created
         assert builder._hint_collector is not None
 
-    def test_foreshadowing_components_without_repo(self, tmp_path):
+    def test_foreshadowing_components_without_repo(self, tmp_path) -> None:
         """T5b: Without repository, foreshadowing components are None."""
         builder = ContextBuilder(vault_root=tmp_path)
 
@@ -173,10 +171,8 @@ class TestContextBuilderInit:
         assert builder._foreshadowing_identifier is None
         assert builder._instruction_generator is None
 
-    def test_foreshadowing_components_with_repo(self, tmp_path):
+    def test_foreshadowing_components_with_repo(self, tmp_path) -> None:
         """T5c: With repository, foreshadowing components are initialized."""
-        from src.core.repositories.foreshadowing import ForeshadowingRepository
-
         repo = ForeshadowingRepository(vault_root=tmp_path, work_name="test")
 
         builder = ContextBuilder(
@@ -189,17 +185,15 @@ class TestContextBuilderInit:
         assert builder._foreshadowing_identifier is not None
         assert builder._instruction_generator is not None
 
-    def test_visibility_components_without_controller(self, tmp_path):
+    def test_visibility_components_without_controller(self, tmp_path) -> None:
         """T5d: Without controller, visibility components are None."""
         builder = ContextBuilder(vault_root=tmp_path)
 
         assert builder._visibility_controller is None
         assert builder._visibility_filtering_service is None
 
-    def test_visibility_components_with_controller(self, tmp_path):
+    def test_visibility_components_with_controller(self, tmp_path) -> None:
         """T5e: With controller, visibility components are initialized."""
-        from src.core.services.visibility_controller import VisibilityController
-
         vc = VisibilityController()
 
         builder = ContextBuilder(
@@ -210,13 +204,13 @@ class TestContextBuilderInit:
         assert builder._visibility_controller is vc
         assert builder._visibility_filtering_service is not None
 
-    def test_forbidden_keyword_collector_initialized(self, tmp_path):
+    def test_forbidden_keyword_collector_initialized(self, tmp_path) -> None:
         """T5f: ForbiddenKeywordCollector is always initialized."""
         builder = ContextBuilder(vault_root=tmp_path)
 
         assert builder._forbidden_keyword_collector is not None
 
-    def test_stub_methods_exist(self, tmp_path):
+    def test_stub_methods_exist(self, tmp_path) -> None:
         """Verify stub methods exist on the class."""
         builder = ContextBuilder(vault_root=tmp_path)
 

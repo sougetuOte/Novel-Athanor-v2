@@ -2,8 +2,16 @@
 
 
 from src.core.context.filtered_context import FilteredContext
+from src.core.context.filtered_context import FilteredContext as L3FilteredContext
 from src.core.context.visibility_context import VisibilityAwareContext
+from src.core.context.visibility_filtering import (
+    FilteringResult,
+    VisibilityFilteringService,
+)
 from src.core.services.visibility_controller import VisibilityController
+from src.core.services.visibility_controller import (
+    VisibilityFilteredContent as L2VisibilityFilteredContent,
+)
 
 
 class TestVisibilityFilteringServiceImport:
@@ -11,11 +19,6 @@ class TestVisibilityFilteringServiceImport:
 
     def test_import(self) -> None:
         """VisibilityFilteringService can be imported."""
-        from src.core.context.visibility_filtering import (
-            FilteringResult,
-            VisibilityFilteringService,
-        )
-
         assert VisibilityFilteringService is not None
         assert FilteringResult is not None
 
@@ -25,8 +28,6 @@ class TestFilteringResult:
 
     def test_create(self) -> None:
         """Create FilteringResult."""
-        from src.core.context.visibility_filtering import FilteringResult
-
         result = FilteringResult(
             filtered_data={"key": "value"},
             removed_count=2,
@@ -42,8 +43,6 @@ class TestVisibilityFilteringServiceBasic:
 
     def test_filter_context_returns_visibility_aware_context(self) -> None:
         """filter_context returns VisibilityAwareContext."""
-        from src.core.context.visibility_filtering import VisibilityFilteringService
-
         controller = VisibilityController()
         service = VisibilityFilteringService(controller)
 
@@ -63,8 +62,6 @@ class TestVisibilityFilteringServiceCharacters:
 
     def test_filter_characters_no_visibility_comments(self) -> None:
         """Characters without visibility comments pass through."""
-        from src.core.context.visibility_filtering import VisibilityFilteringService
-
         controller = VisibilityController()
         service = VisibilityFilteringService(controller)
 
@@ -81,8 +78,6 @@ class TestVisibilityFilteringServiceCharacters:
 
     def test_filter_characters_with_hidden_section(self) -> None:
         """Characters with HIDDEN sections have those sections removed."""
-        from src.core.context.visibility_filtering import VisibilityFilteringService
-
         controller = VisibilityController()
         service = VisibilityFilteringService(controller)
 
@@ -106,8 +101,6 @@ She is actually a princess.
 
     def test_filter_characters_with_aware_section_generates_hint(self) -> None:
         """Characters with AWARE sections generate hints."""
-        from src.core.context.visibility_filtering import VisibilityFilteringService
-
         controller = VisibilityController()
         service = VisibilityFilteringService(controller)
 
@@ -137,8 +130,6 @@ class TestVisibilityFilteringServiceWorldSettings:
 
     def test_filter_world_settings_no_visibility_comments(self) -> None:
         """World settings without visibility comments pass through."""
-        from src.core.context.visibility_filtering import VisibilityFilteringService
-
         controller = VisibilityController()
         service = VisibilityFilteringService(controller)
 
@@ -155,8 +146,6 @@ class TestVisibilityFilteringServiceWorldSettings:
 
     def test_filter_world_settings_with_hidden_section(self) -> None:
         """World settings with HIDDEN sections have those sections removed."""
-        from src.core.context.visibility_filtering import VisibilityFilteringService
-
         controller = VisibilityController()
         service = VisibilityFilteringService(controller)
 
@@ -184,8 +173,6 @@ class TestVisibilityFilteringServiceFull:
 
     def test_filter_context_combines_all_filters(self) -> None:
         """filter_context filters all categories."""
-        from src.core.context.visibility_filtering import VisibilityFilteringService
-
         controller = VisibilityController()
         service = VisibilityFilteringService(controller)
 
@@ -229,8 +216,6 @@ class TestVisibilityFilteringServiceWithForbiddenKeywords:
 
     def test_forbidden_keywords_collected(self) -> None:
         """Forbidden keywords from controller are collected."""
-        from src.core.context.visibility_filtering import VisibilityFilteringService
-
         controller = VisibilityController(
             forbidden_keywords=["secret", "hidden"]
         )
@@ -252,8 +237,6 @@ class TestVisibilityFilteringServiceEmptyContext:
 
     def test_empty_context(self) -> None:
         """Empty context returns empty VisibilityAwareContext."""
-        from src.core.context.visibility_filtering import VisibilityFilteringService
-
         controller = VisibilityController()
         service = VisibilityFilteringService(controller)
 
@@ -267,8 +250,6 @@ class TestVisibilityFilteringServiceEmptyContext:
 
     def test_none_characters(self) -> None:
         """Context with no characters works."""
-        from src.core.context.visibility_filtering import VisibilityFilteringService
-
         controller = VisibilityController()
         service = VisibilityFilteringService(controller)
 
@@ -287,14 +268,6 @@ class TestVisibilityFilteringServiceTypeImports:
 
     def test_l2_filtered_context_not_confused_with_l3(self) -> None:
         """L2 VisibilityFilteredContent import is distinct from L3 FilteredContext."""
-        from src.core.context.filtered_context import (
-            FilteredContext as L3FilteredContext,
-        )
-        from src.core.context.visibility_filtering import VisibilityFilteringService
-        from src.core.services.visibility_controller import (
-            VisibilityFilteredContent as L2VisibilityFilteredContent,
-        )
-
         # L2 and L3 should be different types (name collision resolved)
         assert L2VisibilityFilteredContent is not L3FilteredContext
 
@@ -310,8 +283,6 @@ class TestVisibilityFilteringServiceTypeImports:
 
     def test_filtering_returns_l2_visibility_filtered_content(self) -> None:
         """filter() method returns L2 VisibilityFilteredContent type."""
-        from src.core.context.visibility_filtering import VisibilityFilteringService
-
         controller = VisibilityController()
         service = VisibilityFilteringService(controller)
 

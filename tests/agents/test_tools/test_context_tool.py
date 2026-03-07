@@ -10,6 +10,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from src.agents.tools.context_tool import (
+    format_context_as_markdown,
+    run_build_context,
+    serialize_context_result,
+)
 from src.core.context.context_builder import ContextBuildResult
 from src.core.context.filtered_context import FilteredContext
 from src.core.context.foreshadow_instruction import (
@@ -59,8 +64,6 @@ def make_build_result(
 
 def test_serialize_minimal() -> None:
     """最小限の ContextBuildResult → dict 変換."""
-    from src.agents.tools.context_tool import serialize_context_result
-
     result = make_build_result()
     data = serialize_context_result(result)
 
@@ -74,8 +77,6 @@ def test_serialize_minimal() -> None:
 
 def test_serialize_with_characters() -> None:
     """キャラクター情報ありの変換."""
-    from src.agents.tools.context_tool import serialize_context_result
-
     result = make_build_result(
         characters={"Alice": "主人公、25歳", "Bob": "相棒、30歳"}
     )
@@ -88,8 +89,6 @@ def test_serialize_with_characters() -> None:
 
 def test_serialize_with_foreshadow_instructions() -> None:
     """伏線指示あり（PLANT + NONE → active のみ出力）."""
-    from src.agents.tools.context_tool import serialize_context_result
-
     instructions = [
         ForeshadowInstruction(
             foreshadowing_id="FS-001",
@@ -120,8 +119,6 @@ def test_serialize_with_foreshadow_instructions() -> None:
 
 def test_serialize_with_forbidden_keywords() -> None:
     """禁止キーワードあり."""
-    from src.agents.tools.context_tool import serialize_context_result
-
     result = make_build_result(forbidden_keywords=["royal", "princess", "crown"])
     data = serialize_context_result(result)
 
@@ -130,8 +127,6 @@ def test_serialize_with_forbidden_keywords() -> None:
 
 def test_serialize_warnings_merged() -> None:
     """result.warnings + context.warnings がマージされる."""
-    from src.agents.tools.context_tool import serialize_context_result
-
     ctx = FilteredContext(plot_l1="Theme", scene_id="ep010/seq_01")
     ctx.add_warning("context warning 1")
     ctx.add_warning("context warning 2")
@@ -158,8 +153,6 @@ def test_serialize_warnings_merged() -> None:
 
 def test_serialize_error_result() -> None:
     """success=False, errors あり."""
-    from src.agents.tools.context_tool import serialize_context_result
-
     result = make_build_result(
         success=False,
         errors=["Error 1", "Error 2"],
@@ -177,8 +170,6 @@ def test_serialize_error_result() -> None:
 
 def test_format_minimal() -> None:
     """最小限の dict → Markdown."""
-    from src.agents.tools.context_tool import format_context_as_markdown
-
     data = {
         "success": True,
         "errors": [],
@@ -196,8 +187,6 @@ def test_format_minimal() -> None:
 
 def test_format_with_characters() -> None:
     """キャラクター情報の Markdown 出力."""
-    from src.agents.tools.context_tool import format_context_as_markdown
-
     data = {
         "success": True,
         "errors": [],
@@ -222,8 +211,6 @@ def test_format_with_characters() -> None:
 
 def test_format_with_world_settings() -> None:
     """世界観設定の出力."""
-    from src.agents.tools.context_tool import format_context_as_markdown
-
     data = {
         "success": True,
         "errors": [],
@@ -247,8 +234,6 @@ def test_format_with_world_settings() -> None:
 
 def test_format_with_foreshadow_instructions() -> None:
     """伏線指示の出力."""
-    from src.agents.tools.context_tool import format_context_as_markdown
-
     data = {
         "success": True,
         "errors": [],
@@ -276,8 +261,6 @@ def test_format_with_foreshadow_instructions() -> None:
 
 def test_format_with_forbidden_keywords() -> None:
     """禁止キーワードの出力."""
-    from src.agents.tools.context_tool import format_context_as_markdown
-
     data = {
         "success": True,
         "errors": [],
@@ -297,8 +280,6 @@ def test_format_with_forbidden_keywords() -> None:
 
 def test_format_empty() -> None:
     """空の dict → 空文字列."""
-    from src.agents.tools.context_tool import format_context_as_markdown
-
     data = {
         "success": True,
         "errors": [],
@@ -321,8 +302,6 @@ def test_format_empty() -> None:
 
 def test_run_build_context_minimal_vault(tmp_path: Path) -> None:
     """tmp_path に最小限の vault を作成、build_context が成功すること."""
-    from src.agents.tools.context_tool import run_build_context
-
     # 最小限のディレクトリ構造を作成（空の vault でも success=True になる）
     vault_root = tmp_path / "vault"
     vault_root.mkdir()

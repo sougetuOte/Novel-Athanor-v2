@@ -7,6 +7,12 @@ from src.core.context.foreshadow_instruction import (
     ForeshadowInstructions,
     InstructionAction,
 )
+from src.core.context.hint_collector import (
+    CollectedHint,
+    HintCollection,
+    HintCollector,
+    HintSource,
+)
 from src.core.context.visibility_context import (
     VisibilityAwareContext,
     VisibilityHint,
@@ -19,13 +25,6 @@ class TestHintCollectorImport:
 
     def test_import(self) -> None:
         """HintCollector can be imported."""
-        from src.core.context.hint_collector import (
-            CollectedHint,
-            HintCollection,
-            HintCollector,
-            HintSource,
-        )
-
         assert HintCollector is not None
         assert HintCollection is not None
         assert CollectedHint is not None
@@ -37,8 +36,6 @@ class TestHintSource:
 
     def test_source_values(self) -> None:
         """HintSource has expected values."""
-        from src.core.context.hint_collector import HintSource
-
         assert HintSource.FORESHADOWING.value == "foreshadowing"
         assert HintSource.VISIBILITY.value == "visibility"
 
@@ -48,8 +45,6 @@ class TestCollectedHint:
 
     def test_priority_calculation(self) -> None:
         """Priority is calculated based on source and strength."""
-        from src.core.context.hint_collector import CollectedHint, HintSource
-
         hint = CollectedHint(
             source=HintSource.FORESHADOWING,
             category="foreshadowing",
@@ -63,8 +58,6 @@ class TestCollectedHint:
 
     def test_priority_visibility_source(self) -> None:
         """Visibility source has lower weight."""
-        from src.core.context.hint_collector import CollectedHint, HintSource
-
         hint = CollectedHint(
             source=HintSource.VISIBILITY,
             category="character",
@@ -82,12 +75,6 @@ class TestHintCollection:
 
     def test_add_hint(self) -> None:
         """Add hint to collection."""
-        from src.core.context.hint_collector import (
-            CollectedHint,
-            HintCollection,
-            HintSource,
-        )
-
         collection = HintCollection()
         hint = CollectedHint(
             source=HintSource.FORESHADOWING,
@@ -104,12 +91,6 @@ class TestHintCollection:
 
     def test_sort_by_priority(self) -> None:
         """Sort hints by priority descending."""
-        from src.core.context.hint_collector import (
-            CollectedHint,
-            HintCollection,
-            HintSource,
-        )
-
         collection = HintCollection()
         collection.add(
             CollectedHint(
@@ -137,12 +118,6 @@ class TestHintCollection:
 
     def test_get_top_hints(self) -> None:
         """Get top N hints."""
-        from src.core.context.hint_collector import (
-            CollectedHint,
-            HintCollection,
-            HintSource,
-        )
-
         collection = HintCollection()
         for i in range(10):
             collection.add(
@@ -166,8 +141,6 @@ class TestHintCollectorCollectAll:
 
     def test_collect_all_empty(self) -> None:
         """Collect with no sources returns empty collection."""
-        from src.core.context.hint_collector import HintCollector
-
         collector = HintCollector()
         result = collector.collect_all()
 
@@ -175,8 +148,6 @@ class TestHintCollectorCollectAll:
 
     def test_collect_from_visibility_context(self) -> None:
         """Collect hints from visibility context."""
-        from src.core.context.hint_collector import HintCollector
-
         visibility_context = VisibilityAwareContext(
             base_context=FilteredContext(),
         )
@@ -197,8 +168,6 @@ class TestHintCollectorCollectAll:
 
     def test_collect_from_foreshadow_instructions(self) -> None:
         """Collect hints from foreshadow instructions (HINT action only)."""
-        from src.core.context.hint_collector import HintCollector
-
         instructions = ForeshadowInstructions()
         instructions.add_instruction(
             ForeshadowInstruction(
@@ -226,8 +195,6 @@ class TestHintCollectorCollectAll:
 
     def test_collect_all_combined(self) -> None:
         """Collect from both visibility and foreshadowing."""
-        from src.core.context.hint_collector import HintCollector
-
         visibility_context = VisibilityAwareContext(
             base_context=FilteredContext(),
         )
@@ -264,8 +231,6 @@ class TestHintCollectorFormat:
 
     def test_format_for_prompt_empty(self) -> None:
         """Empty collection returns empty string."""
-        from src.core.context.hint_collector import HintCollection, HintCollector
-
         collector = HintCollector()
         collection = HintCollection()
 
@@ -275,13 +240,6 @@ class TestHintCollectorFormat:
 
     def test_format_for_prompt_with_hints(self) -> None:
         """Format hints for prompt."""
-        from src.core.context.hint_collector import (
-            CollectedHint,
-            HintCollection,
-            HintCollector,
-            HintSource,
-        )
-
         collection = HintCollection()
         collection.add(
             CollectedHint(
@@ -302,13 +260,6 @@ class TestHintCollectorFormat:
 
     def test_format_by_category(self) -> None:
         """Format hints by category."""
-        from src.core.context.hint_collector import (
-            CollectedHint,
-            HintCollection,
-            HintCollector,
-            HintSource,
-        )
-
         collection = HintCollection()
         collection.add(
             CollectedHint(
@@ -340,8 +291,6 @@ class TestHintCollectorStrengthMapping:
 
     def test_strength_to_word(self) -> None:
         """Strength is mapped to descriptive words."""
-        from src.core.context.hint_collector import HintCollector
-
         collector = HintCollector()
 
         assert collector._strength_to_word(0.9) == "重要"

@@ -11,23 +11,23 @@ from src.core.context.foreshadow_instruction import (
 class TestGetForeshadowInstructions:
     """Tests for get_foreshadow_instructions()."""
 
-    def test_returns_instructions(self, builder, scene):
+    def test_returns_instructions(self, builder, scene) -> None:
         """T12: get_foreshadow_instructions returns ForeshadowInstructions."""
         result = builder.get_foreshadow_instructions(scene)
         assert isinstance(result, ForeshadowInstructions)
 
-    def test_without_repository_returns_empty(self, builder, scene):
+    def test_without_repository_returns_empty(self, builder, scene) -> None:
         """T15: Without repository, returns empty instructions."""
         result = builder.get_foreshadow_instructions(scene)
         assert len(result.instructions) == 0
 
-    def test_with_cache(self, builder, scene):
+    def test_with_cache(self, builder, scene) -> None:
         """T13: Second call uses cache."""
         result1 = builder.get_foreshadow_instructions(scene)
         result2 = builder.get_foreshadow_instructions(scene)
         assert result1 is result2  # Same object from cache
 
-    def test_cache_bypass(self, builder, scene):
+    def test_cache_bypass(self, builder, scene) -> None:
         """T14: use_cache=False bypasses cache."""
         result1 = builder.get_foreshadow_instructions(scene)
         result2 = builder.get_foreshadow_instructions(scene, use_cache=False)
@@ -38,12 +38,12 @@ class TestGetForeshadowInstructions:
 class TestGetForeshadowInstructionsAsPrompt:
     """Tests for get_foreshadow_instructions_as_prompt()."""
 
-    def test_returns_string(self, builder, scene):
+    def test_returns_string(self, builder, scene) -> None:
         """T16: Returns formatted string."""
         result = builder.get_foreshadow_instructions_as_prompt(scene)
         assert isinstance(result, str)
 
-    def test_empty_when_no_instructions(self, builder, scene):
+    def test_empty_when_no_instructions(self, builder, scene) -> None:
         """T16b: Returns empty string when no instructions."""
         result = builder.get_foreshadow_instructions_as_prompt(scene)
         assert result == ""
@@ -52,7 +52,7 @@ class TestGetForeshadowInstructionsAsPrompt:
 class TestFormatInstructionsForPrompt:
     """Tests for _format_instructions_for_prompt()."""
 
-    def test_format_plant(self, builder):
+    def test_format_plant(self, builder) -> None:
         """T17: PLANT action formats correctly."""
         instructions = ForeshadowInstructions()
         instructions.add_instruction(ForeshadowInstruction(
@@ -65,7 +65,7 @@ class TestFormatInstructionsForPrompt:
         assert "FS-001" in result
         assert "設置" in result or "PLANT" in result or "植え付け" in result
 
-    def test_format_reinforce(self, builder):
+    def test_format_reinforce(self, builder) -> None:
         """T17b: REINFORCE action formats correctly."""
         instructions = ForeshadowInstructions()
         instructions.add_instruction(ForeshadowInstruction(
@@ -76,7 +76,7 @@ class TestFormatInstructionsForPrompt:
         result = builder._format_instructions_for_prompt(instructions)
         assert "FS-002" in result
 
-    def test_format_hint(self, builder):
+    def test_format_hint(self, builder) -> None:
         """T17c: HINT action formats correctly."""
         instructions = ForeshadowInstructions()
         instructions.add_instruction(ForeshadowInstruction(
@@ -87,7 +87,7 @@ class TestFormatInstructionsForPrompt:
         result = builder._format_instructions_for_prompt(instructions)
         assert "FS-003" in result
 
-    def test_format_none_excluded(self, builder):
+    def test_format_none_excluded(self, builder) -> None:
         """T18: NONE action items are excluded from prompt."""
         instructions = ForeshadowInstructions()
         instructions.add_instruction(ForeshadowInstruction(
@@ -97,7 +97,7 @@ class TestFormatInstructionsForPrompt:
         result = builder._format_instructions_for_prompt(instructions)
         assert "FS-004" not in result
 
-    def test_format_empty(self, builder):
+    def test_format_empty(self, builder) -> None:
         """T18b: Empty instructions return empty string."""
         instructions = ForeshadowInstructions()
         result = builder._format_instructions_for_prompt(instructions)
@@ -107,12 +107,12 @@ class TestFormatInstructionsForPrompt:
 class TestGetActiveForeshadowings:
     """Tests for get_active_foreshadowings()."""
 
-    def test_returns_id_list(self, builder, scene):
+    def test_returns_id_list(self, builder, scene) -> None:
         """T19: Returns list of foreshadowing IDs."""
         result = builder.get_active_foreshadowings(scene)
         assert isinstance(result, list)
 
-    def test_empty_without_repository(self, builder, scene):
+    def test_empty_without_repository(self, builder, scene) -> None:
         """T19b: Returns empty list without repository."""
         result = builder.get_active_foreshadowings(scene)
         assert result == []
@@ -121,12 +121,12 @@ class TestGetActiveForeshadowings:
 class TestGetForeshadowingSummary:
     """Tests for get_foreshadowing_summary()."""
 
-    def test_returns_dict(self, builder, scene):
+    def test_returns_dict(self, builder, scene) -> None:
         """T20: Returns action-count dictionary."""
         result = builder.get_foreshadowing_summary(scene)
         assert isinstance(result, dict)
 
-    def test_empty_without_repository(self, builder, scene):
+    def test_empty_without_repository(self, builder, scene) -> None:
         """T20b: Returns empty dict without repository."""
         result = builder.get_foreshadowing_summary(scene)
         assert result == {}
@@ -135,7 +135,7 @@ class TestGetForeshadowingSummary:
 class TestClearInstructionCache:
     """Tests for clear_instruction_cache()."""
 
-    def test_clear_cache(self, builder, scene):
+    def test_clear_cache(self, builder, scene) -> None:
         """T21: Cache is cleared after clear_instruction_cache()."""
         # Build cache
         result1 = builder.get_foreshadow_instructions(scene)

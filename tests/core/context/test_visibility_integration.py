@@ -137,7 +137,7 @@ class TestVisibilityIntegrationCompleteFlow:
         self,
         visibility_controller: VisibilityController,
         sample_context: FilteredContext,
-    ):
+    ) -> None:
         """Complete flow: context -> filter -> hints."""
         # Setup
         filtering_service = VisibilityFilteringService(visibility_controller)
@@ -173,7 +173,7 @@ class TestVisibilityIntegrationCompleteFlow:
         visibility_controller: VisibilityController,
         sample_context: FilteredContext,
         sample_instructions: ForeshadowInstructions,
-    ):
+    ) -> None:
         """Complete flow with foreshadowing instructions."""
         filtering_service = VisibilityFilteringService(visibility_controller)
         hint_collector = HintCollector()
@@ -202,7 +202,7 @@ class TestVisibilityIntegrationHiddenBehavior:
         self,
         visibility_controller: VisibilityController,
         sample_context: FilteredContext,
-    ):
+    ) -> None:
         """HIDDEN sections are completely excluded from output."""
         service = VisibilityFilteringService(visibility_controller)
         result = service.filter_context(sample_context)
@@ -219,7 +219,7 @@ class TestVisibilityIntegrationHiddenBehavior:
         self,
         visibility_controller: VisibilityController,
         sample_context: FilteredContext,
-    ):
+    ) -> None:
         """HIDDEN sections do not generate hints (only AWARE does)."""
         service = VisibilityFilteringService(visibility_controller)
         result = service.filter_context(sample_context)
@@ -237,7 +237,7 @@ class TestVisibilityIntegrationAwareBehavior:
         self,
         visibility_controller: VisibilityController,
         sample_context: FilteredContext,
-    ):
+    ) -> None:
         """AWARE sections generate hints."""
         service = VisibilityFilteringService(visibility_controller)
         result = service.filter_context(sample_context)
@@ -253,7 +253,7 @@ class TestVisibilityIntegrationAwareBehavior:
         self,
         visibility_controller: VisibilityController,
         sample_context: FilteredContext,
-    ):
+    ) -> None:
         """AWARE sections have their content excluded."""
         service = VisibilityFilteringService(visibility_controller)
         result = service.filter_context(sample_context)
@@ -274,7 +274,7 @@ class TestVisibilityIntegrationUseBehavior:
         self,
         visibility_controller: VisibilityController,
         sample_context: FilteredContext,
-    ):
+    ) -> None:
         """USE (default) sections are fully included."""
         service = VisibilityFilteringService(visibility_controller)
         result = service.filter_context(sample_context)
@@ -296,7 +296,7 @@ class TestVisibilityIntegrationForbiddenKeywords:
         self,
         visibility_controller: VisibilityController,
         sample_context: FilteredContext,
-    ):
+    ) -> None:
         """Forbidden keywords from controller are collected."""
         service = VisibilityFilteringService(visibility_controller)
         result = service.filter_context(sample_context)
@@ -314,7 +314,7 @@ class TestVisibilityIntegrationPromptFormat:
         visibility_controller: VisibilityController,
         sample_context: FilteredContext,
         sample_instructions: ForeshadowInstructions,
-    ):
+    ) -> None:
         """Hints can be formatted for prompt."""
         service = VisibilityFilteringService(visibility_controller)
         hint_collector = HintCollector()
@@ -342,7 +342,7 @@ class TestVisibilityIntegrationPerformance:
         visibility_controller: VisibilityController,
         sample_context: FilteredContext,
         sample_instructions: ForeshadowInstructions,
-    ):
+    ) -> None:
         """Complete flow finishes within 100ms."""
         service = VisibilityFilteringService(visibility_controller)
         hint_collector = HintCollector()
@@ -368,7 +368,7 @@ class TestVisibilityIntegrationGhostWriterOutput:
         self,
         visibility_controller: VisibilityController,
         sample_context: FilteredContext,
-    ):
+    ) -> None:
         """VisibilityAwareContext can generate Ghost Writer context."""
         service = VisibilityFilteringService(visibility_controller)
         result = service.filter_context(sample_context)

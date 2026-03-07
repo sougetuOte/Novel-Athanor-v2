@@ -17,15 +17,15 @@ from src.core.context.lazy_loader import (
 class TestLoadPriority:
     """Test LoadPriority enum."""
 
-    def test_required_exists(self):
+    def test_required_exists(self) -> None:
         """REQUIRED 優先度が存在する."""
         assert LoadPriority.REQUIRED.value == "required"
 
-    def test_optional_exists(self):
+    def test_optional_exists(self) -> None:
         """OPTIONAL 優先度が存在する."""
         assert LoadPriority.OPTIONAL.value == "optional"
 
-    def test_all_priorities(self):
+    def test_all_priorities(self) -> None:
         """全ての優先度が定義されている."""
         priorities = list(LoadPriority)
         assert len(priorities) == 2
@@ -34,7 +34,7 @@ class TestLoadPriority:
 class TestLazyLoadResult:
     """Test LazyLoadResult data class."""
 
-    def test_create_success_result(self):
+    def test_create_success_result(self) -> None:
         """成功結果を生成できる."""
         result = LazyLoadResult(success=True, data="test_data")
         assert result.success is True
@@ -42,7 +42,7 @@ class TestLazyLoadResult:
         assert result.error is None
         assert result.warnings == []
 
-    def test_create_failure_result(self):
+    def test_create_failure_result(self) -> None:
         """失敗結果を生成できる."""
         result = LazyLoadResult(
             success=False, data=None, error="File not found"
@@ -51,28 +51,28 @@ class TestLazyLoadResult:
         assert result.data is None
         assert result.error == "File not found"
 
-    def test_ok_factory_method(self):
+    def test_ok_factory_method(self) -> None:
         """ok() ファクトリメソッドで成功結果を生成."""
         result = LazyLoadResult.ok("test_data")
         assert result.success is True
         assert result.data == "test_data"
         assert result.error is None
 
-    def test_ok_with_warnings(self):
+    def test_ok_with_warnings(self) -> None:
         """ok() で警告付きの成功結果を生成."""
         result = LazyLoadResult.ok("test_data", warnings=["warning1", "warning2"])
         assert result.success is True
         assert result.data == "test_data"
         assert result.warnings == ["warning1", "warning2"]
 
-    def test_fail_factory_method(self):
+    def test_fail_factory_method(self) -> None:
         """fail() ファクトリメソッドで失敗結果を生成."""
         result: LazyLoadResult[str] = LazyLoadResult.fail("Error occurred")
         assert result.success is False
         assert result.data is None
         assert result.error == "Error occurred"
 
-    def test_generic_type(self):
+    def test_generic_type(self) -> None:
         """ジェネリック型として動作する."""
         result: LazyLoadResult[int] = LazyLoadResult.ok(42)
         assert result.data == 42
@@ -84,7 +84,7 @@ class TestLazyLoadResult:
 class TestLazyLoaderProtocol:
     """Test LazyLoader protocol compliance."""
 
-    def test_protocol_compliance(self):
+    def test_protocol_compliance(self) -> None:
         """Protocol を満たす具象クラスを作成できる."""
 
         class MockLazyLoader:
@@ -123,7 +123,7 @@ class TestLazyLoaderProtocol:
         # clear_cache メソッドが動作する
         loader.clear_cache()
 
-    def test_required_priority_behavior(self):
+    def test_required_priority_behavior(self) -> None:
         """REQUIRED 優先度の挙動テスト."""
 
         class StrictLoader:
@@ -148,7 +148,7 @@ class TestLazyLoaderProtocol:
         assert result.success is False
         assert result.error == "Required data not found"
 
-    def test_optional_priority_behavior(self):
+    def test_optional_priority_behavior(self) -> None:
         """OPTIONAL 優先度の挙動テスト."""
 
         class GracefulLoader:
@@ -180,7 +180,7 @@ class TestLazyLoaderProtocol:
 class TestLazyLoadResultHelpers:
     """Test LazyLoadResult helper methods."""
 
-    def test_result_with_multiple_warnings(self):
+    def test_result_with_multiple_warnings(self) -> None:
         """複数警告を持つ結果."""
         result = LazyLoadResult(
             success=True,
@@ -189,7 +189,7 @@ class TestLazyLoadResultHelpers:
         )
         assert len(result.warnings) == 3
 
-    def test_empty_warnings_default(self):
+    def test_empty_warnings_default(self) -> None:
         """警告のデフォルトは空リスト."""
         result = LazyLoadResult(success=True, data="data")
         assert result.warnings == []
@@ -199,7 +199,7 @@ class TestLazyLoadResultHelpers:
 class TestContentType:
     """Test ContentType enum."""
 
-    def test_content_type_values(self):
+    def test_content_type_values(self) -> None:
         """全種別（PLOT, SUMMARY, CHARACTER, WORLD_SETTING, STYLE_GUIDE, FORESHADOWING, REFERENCE）が存在."""
         assert ContentType.PLOT.value == "plot"
         assert ContentType.SUMMARY.value == "summary"
@@ -209,7 +209,7 @@ class TestContentType:
         assert ContentType.FORESHADOWING.value == "foreshadowing"
         assert ContentType.REFERENCE.value == "reference"
 
-    def test_all_content_types(self):
+    def test_all_content_types(self) -> None:
         """全てのコンテンツタイプが定義されている."""
         content_types = list(ContentType)
         assert len(content_types) == 7
@@ -218,7 +218,7 @@ class TestContentType:
 class TestLazyLoadedContent:
     """Test LazyLoadedContent data class."""
 
-    def test_lazy_loaded_content_creation(self):
+    def test_lazy_loaded_content_creation(self) -> None:
         """基本生成（content, source_path, content_type, priority）."""
         path = Path("/vault/test/characters/hero.md")
         content = LazyLoadedContent(
@@ -232,7 +232,7 @@ class TestLazyLoadedContent:
         assert content.content_type == ContentType.CHARACTER
         assert content.priority == LoadPriority.REQUIRED
 
-    def test_lazy_loaded_content_loaded_at_default(self):
+    def test_lazy_loaded_content_loaded_at_default(self) -> None:
         """loaded_at が現在時刻で自動設定される."""
         before = datetime.now()
         content = LazyLoadedContent(
@@ -244,7 +244,7 @@ class TestLazyLoadedContent:
         after = datetime.now()
         assert before <= content.loaded_at <= after
 
-    def test_lazy_loaded_content_is_stale_true(self):
+    def test_lazy_loaded_content_is_stale_true(self) -> None:
         """古いコンテンツ（max_age_seconds 超過）."""
         old_time = datetime.now() - timedelta(seconds=10)
         content = LazyLoadedContent(
@@ -257,7 +257,7 @@ class TestLazyLoadedContent:
         # 5秒で古くなると定義
         assert content.is_stale(max_age_seconds=5.0)
 
-    def test_lazy_loaded_content_is_stale_false(self):
+    def test_lazy_loaded_content_is_stale_false(self) -> None:
         """新しいコンテンツ."""
         content = LazyLoadedContent(
             content="Fresh content",
@@ -268,7 +268,7 @@ class TestLazyLoadedContent:
         # デフォルト300秒では新しい
         assert not content.is_stale()
 
-    def test_lazy_loaded_content_get_identifier_with_cache_key(self):
+    def test_lazy_loaded_content_get_identifier_with_cache_key(self) -> None:
         """cache_key がある場合."""
         content = LazyLoadedContent(
             content="Data",
@@ -279,7 +279,7 @@ class TestLazyLoadedContent:
         )
         assert content.get_identifier() == "custom_key_123"
 
-    def test_lazy_loaded_content_get_identifier_without_cache_key(self):
+    def test_lazy_loaded_content_get_identifier_without_cache_key(self) -> None:
         """cache_key がない場合は source_path."""
         path = Path("/vault/world/magic.md")
         content = LazyLoadedContent(
@@ -290,7 +290,7 @@ class TestLazyLoadedContent:
         )
         assert content.get_identifier() == str(path)
 
-    def test_lazy_loaded_content_generic_type(self):
+    def test_lazy_loaded_content_generic_type(self) -> None:
         """ジェネリック型として動作する."""
         # str型
         str_content: LazyLoadedContent[str] = LazyLoadedContent(
@@ -317,7 +317,7 @@ class TestLazyLoadedContent:
 class TestCacheEntry:
     """Test CacheEntry data class."""
 
-    def test_create_cache_entry(self):
+    def test_create_cache_entry(self) -> None:
         """CacheEntryを作成."""
         from src.core.context.lazy_loader import CacheEntry
 
@@ -328,7 +328,7 @@ class TestCacheEntry:
         )
         assert entry.data == "test content"
 
-    def test_is_expired_false(self):
+    def test_is_expired_false(self) -> None:
         """期限切れでない."""
         from src.core.context.lazy_loader import CacheEntry
 
@@ -339,7 +339,7 @@ class TestCacheEntry:
         )
         assert not entry.is_expired(300.0)
 
-    def test_is_expired_true(self):
+    def test_is_expired_true(self) -> None:
         """期限切れ."""
         from src.core.context.lazy_loader import CacheEntry
 
@@ -429,7 +429,7 @@ class TestFileLazyLoader:
 class TestGracefulLoadResult:
     """Test GracefulLoadResult data class."""
 
-    def test_create_success_result(self):
+    def test_create_success_result(self) -> None:
         """成功結果を作成."""
         from src.core.context.lazy_loader import GracefulLoadResult
 
@@ -441,7 +441,7 @@ class TestGracefulLoadResult:
         assert result.missing_required == []
         assert result.missing_optional == []
 
-    def test_create_with_data(self):
+    def test_create_with_data(self) -> None:
         """データ付き結果を作成."""
         from src.core.context.lazy_loader import GracefulLoadResult
 
@@ -452,7 +452,7 @@ class TestGracefulLoadResult:
         assert result.data["char"] == "content"
         assert result.data["plot"] == "plot content"
 
-    def test_create_failure_result(self):
+    def test_create_failure_result(self) -> None:
         """失敗結果を作成."""
         from src.core.context.lazy_loader import GracefulLoadResult
 

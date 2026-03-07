@@ -71,22 +71,22 @@ def collector(
 class TestWorldSettingContext:
     """Test WorldSettingContext dataclass."""
 
-    def test_get_names_empty(self):
+    def test_get_names_empty(self) -> None:
         """Empty context returns empty list."""
         context = WorldSettingContext()
         assert context.get_names() == []
 
-    def test_get_names_single(self):
+    def test_get_names_single(self) -> None:
         """Single setting returns one name."""
         context = WorldSettingContext(settings={"魔法体系": "content"})
         assert context.get_names() == ["魔法体系"]
 
-    def test_get_setting_exists(self):
+    def test_get_setting_exists(self) -> None:
         """get_setting returns content for existing name."""
         context = WorldSettingContext(settings={"魔法体系": "content"})
         assert context.get_setting("魔法体系") == "content"
 
-    def test_get_setting_not_exists(self):
+    def test_get_setting_not_exists(self) -> None:
         """get_setting returns None for non-existent name."""
         context = WorldSettingContext()
         assert context.get_setting("魔法体系") is None

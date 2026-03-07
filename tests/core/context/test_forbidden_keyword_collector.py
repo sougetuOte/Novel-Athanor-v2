@@ -81,7 +81,7 @@ def sample_instructions() -> ForeshadowInstructions:
 class TestForbiddenKeywordCollectorImport:
     """Test imports."""
 
-    def test_import(self):
+    def test_import(self) -> None:
         """ForbiddenKeywordCollector can be imported."""
         from src.core.context.forbidden_keyword_collector import (
             ForbiddenKeywordCollector,
@@ -95,7 +95,7 @@ class TestForbiddenKeywordCollectorImport:
 class TestForbiddenKeywordResult:
     """Tests for ForbiddenKeywordResult."""
 
-    def test_add_from_source(self):
+    def test_add_from_source(self) -> None:
         """Add keywords from source."""
         from src.core.context.forbidden_keyword_collector import ForbiddenKeywordResult
 
@@ -107,7 +107,7 @@ class TestForbiddenKeywordResult:
         assert "global" in result.sources
         assert result.sources["foreshadowing"] == ["王族", "血筋"]
 
-    def test_finalize_deduplicates(self):
+    def test_finalize_deduplicates(self) -> None:
         """Finalize deduplicates keywords."""
         from src.core.context.forbidden_keyword_collector import ForbiddenKeywordResult
 
@@ -121,7 +121,7 @@ class TestForbiddenKeywordResult:
         assert "血筋" in result.keywords
         assert "禁忌" in result.keywords
 
-    def test_finalize_sorts(self):
+    def test_finalize_sorts(self) -> None:
         """Finalize sorts keywords."""
         from src.core.context.forbidden_keyword_collector import ForbiddenKeywordResult
 

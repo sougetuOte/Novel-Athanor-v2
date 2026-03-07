@@ -17,7 +17,7 @@ from src.core.models.ai_visibility import AIVisibilityLevel
 class TestHintCollectorImport:
     """Test imports."""
 
-    def test_import(self):
+    def test_import(self) -> None:
         """HintCollector can be imported."""
         from src.core.context.hint_collector import (
             CollectedHint,
@@ -35,7 +35,7 @@ class TestHintCollectorImport:
 class TestHintSource:
     """Tests for HintSource enum."""
 
-    def test_source_values(self):
+    def test_source_values(self) -> None:
         """HintSource has expected values."""
         from src.core.context.hint_collector import HintSource
 
@@ -46,7 +46,7 @@ class TestHintSource:
 class TestCollectedHint:
     """Tests for CollectedHint dataclass."""
 
-    def test_priority_calculation(self):
+    def test_priority_calculation(self) -> None:
         """Priority is calculated based on source and strength."""
         from src.core.context.hint_collector import CollectedHint, HintSource
 
@@ -61,7 +61,7 @@ class TestCollectedHint:
         # FORESHADOWING weight = 1.0, strength = 0.5
         assert hint.priority == 0.5
 
-    def test_priority_visibility_source(self):
+    def test_priority_visibility_source(self) -> None:
         """Visibility source has lower weight."""
         from src.core.context.hint_collector import CollectedHint, HintSource
 
@@ -80,7 +80,7 @@ class TestCollectedHint:
 class TestHintCollection:
     """Tests for HintCollection."""
 
-    def test_add_hint(self):
+    def test_add_hint(self) -> None:
         """Add hint to collection."""
         from src.core.context.hint_collector import (
             CollectedHint,
@@ -102,7 +102,7 @@ class TestHintCollection:
         assert "foreshadowing" in collection.by_category
         assert "FS-001" in collection.by_entity
 
-    def test_sort_by_priority(self):
+    def test_sort_by_priority(self) -> None:
         """Sort hints by priority descending."""
         from src.core.context.hint_collector import (
             CollectedHint,
@@ -135,7 +135,7 @@ class TestHintCollection:
         assert collection.hints[0].entity_id == "FS-001"
         assert collection.hints[1].entity_id == "Alice"
 
-    def test_get_top_hints(self):
+    def test_get_top_hints(self) -> None:
         """Get top N hints."""
         from src.core.context.hint_collector import (
             CollectedHint,
@@ -164,7 +164,7 @@ class TestHintCollection:
 class TestHintCollectorCollectAll:
     """Tests for collect_all method."""
 
-    def test_collect_all_empty(self):
+    def test_collect_all_empty(self) -> None:
         """Collect with no sources returns empty collection."""
         from src.core.context.hint_collector import HintCollector
 
@@ -173,7 +173,7 @@ class TestHintCollectorCollectAll:
 
         assert len(result.hints) == 0
 
-    def test_collect_from_visibility_context(self):
+    def test_collect_from_visibility_context(self) -> None:
         """Collect hints from visibility context."""
         from src.core.context.hint_collector import HintCollector
 
@@ -195,7 +195,7 @@ class TestHintCollectorCollectAll:
         assert len(result.hints) == 1
         assert result.hints[0].hint_text == "Alice has a mysterious past"
 
-    def test_collect_from_foreshadow_instructions(self):
+    def test_collect_from_foreshadow_instructions(self) -> None:
         """Collect hints from foreshadow instructions (HINT action only)."""
         from src.core.context.hint_collector import HintCollector
 
@@ -224,7 +224,7 @@ class TestHintCollectorCollectAll:
         assert len(result.hints) == 1
         assert result.hints[0].entity_id == "FS-001"
 
-    def test_collect_all_combined(self):
+    def test_collect_all_combined(self) -> None:
         """Collect from both visibility and foreshadowing."""
         from src.core.context.hint_collector import HintCollector
 
@@ -262,7 +262,7 @@ class TestHintCollectorCollectAll:
 class TestHintCollectorFormat:
     """Tests for formatting methods."""
 
-    def test_format_for_prompt_empty(self):
+    def test_format_for_prompt_empty(self) -> None:
         """Empty collection returns empty string."""
         from src.core.context.hint_collector import HintCollection, HintCollector
 
@@ -273,7 +273,7 @@ class TestHintCollectorFormat:
 
         assert result == ""
 
-    def test_format_for_prompt_with_hints(self):
+    def test_format_for_prompt_with_hints(self) -> None:
         """Format hints for prompt."""
         from src.core.context.hint_collector import (
             CollectedHint,
@@ -300,7 +300,7 @@ class TestHintCollectorFormat:
         assert "執筆時のヒント" in result
         assert "Hint about the secret" in result
 
-    def test_format_by_category(self):
+    def test_format_by_category(self) -> None:
         """Format hints by category."""
         from src.core.context.hint_collector import (
             CollectedHint,
@@ -338,7 +338,7 @@ class TestHintCollectorFormat:
 class TestHintCollectorStrengthMapping:
     """Tests for strength to word mapping."""
 
-    def test_strength_to_word(self):
+    def test_strength_to_word(self) -> None:
         """Strength is mapped to descriptive words."""
         from src.core.context.hint_collector import HintCollector
 

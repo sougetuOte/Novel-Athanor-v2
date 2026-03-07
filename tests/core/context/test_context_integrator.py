@@ -22,7 +22,7 @@ from src.core.context.scene_identifier import SceneIdentifier
 class TestContextCollectorProtocol:
     """Test ContextCollector protocol compliance."""
 
-    def test_mock_implements_protocol(self):
+    def test_mock_implements_protocol(self) -> None:
         """Mock が ContextCollector プロトコルを満たす"""
 
         class MockCollector:
@@ -33,7 +33,7 @@ class TestContextCollectorProtocol:
         scene = SceneIdentifier(episode_id="010")
         assert collector.collect(scene) == "collected content"
 
-    def test_collect_returns_none(self):
+    def test_collect_returns_none(self) -> None:
         """collect() が None を返せる"""
 
         class MockCollector:
@@ -49,7 +49,7 @@ class TestContextCollectorProtocol:
 class TestContextIntegratorProtocol:
     """Test ContextIntegrator protocol compliance."""
 
-    def test_mock_implements_protocol(self):
+    def test_mock_implements_protocol(self) -> None:
         """Mock が ContextIntegrator プロトコルを満たす"""
 
         class MockIntegrator:
@@ -77,7 +77,7 @@ class TestContextIntegratorProtocol:
         result = integrator.integrate(scene)
         assert isinstance(result, FilteredContext)
 
-    def test_integrate_with_all_collectors(self):
+    def test_integrate_with_all_collectors(self) -> None:
         """全コレクター指定で統合"""
 
         class MockCollector:
@@ -125,7 +125,7 @@ class TestContextIntegratorProtocol:
         assert result.plot_l1 == "plot content"
         assert result.summary_l1 == "summary content"
 
-    def test_integrate_with_partial_collectors(self):
+    def test_integrate_with_partial_collectors(self) -> None:
         """一部コレクターのみで統合"""
 
         class MockCollector:
@@ -168,7 +168,7 @@ class TestContextIntegratorProtocol:
         assert result.plot_l1 == "plot only"
         assert result.summary_l1 is None
 
-    def test_integrate_with_no_collectors(self):
+    def test_integrate_with_no_collectors(self) -> None:
         """コレクターなしで空のFilteredContext"""
 
         class MockIntegrator:
@@ -200,7 +200,7 @@ class TestContextIntegratorProtocol:
         assert result.plot_l1 is None
         assert result.summary_l1 is None
 
-    def test_integrate_with_warnings(self):
+    def test_integrate_with_warnings(self) -> None:
         """警告付き統合"""
 
         class MockIntegrator:
@@ -483,6 +483,8 @@ class TestFilteredContextIntegration:
         assert "スタイルガイド" in result.style_guide
 
 
+
+@pytest.mark.slow
 class TestContextIntegratorPerformance:
     """Performance tests for ContextIntegrator."""
 

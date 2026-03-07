@@ -9,7 +9,7 @@ from src.core.services.visibility_controller import VisibilityController
 class TestVisibilityFilteringServiceImport:
     """Test imports."""
 
-    def test_import(self):
+    def test_import(self) -> None:
         """VisibilityFilteringService can be imported."""
         from src.core.context.visibility_filtering import (
             FilteringResult,
@@ -23,7 +23,7 @@ class TestVisibilityFilteringServiceImport:
 class TestFilteringResult:
     """Tests for FilteringResult dataclass."""
 
-    def test_create(self):
+    def test_create(self) -> None:
         """Create FilteringResult."""
         from src.core.context.visibility_filtering import FilteringResult
 
@@ -40,7 +40,7 @@ class TestFilteringResult:
 class TestVisibilityFilteringServiceBasic:
     """Basic tests for VisibilityFilteringService."""
 
-    def test_filter_context_returns_visibility_aware_context(self):
+    def test_filter_context_returns_visibility_aware_context(self) -> None:
         """filter_context returns VisibilityAwareContext."""
         from src.core.context.visibility_filtering import VisibilityFilteringService
 
@@ -61,7 +61,7 @@ class TestVisibilityFilteringServiceBasic:
 class TestVisibilityFilteringServiceCharacters:
     """Tests for character filtering."""
 
-    def test_filter_characters_no_visibility_comments(self):
+    def test_filter_characters_no_visibility_comments(self) -> None:
         """Characters without visibility comments pass through."""
         from src.core.context.visibility_filtering import VisibilityFilteringService
 
@@ -79,7 +79,7 @@ class TestVisibilityFilteringServiceCharacters:
         assert "Bob" in result.filtered_data
         assert result.removed_count == 0
 
-    def test_filter_characters_with_hidden_section(self):
+    def test_filter_characters_with_hidden_section(self) -> None:
         """Characters with HIDDEN sections have those sections removed."""
         from src.core.context.visibility_filtering import VisibilityFilteringService
 
@@ -104,7 +104,7 @@ She is actually a princess.
         # The HIDDEN section should be excluded
         assert "princess" not in result.filtered_data["Alice"]
 
-    def test_filter_characters_with_aware_section_generates_hint(self):
+    def test_filter_characters_with_aware_section_generates_hint(self) -> None:
         """Characters with AWARE sections generate hints."""
         from src.core.context.visibility_filtering import VisibilityFilteringService
 
@@ -135,7 +135,7 @@ There's something hidden about her past.
 class TestVisibilityFilteringServiceWorldSettings:
     """Tests for world setting filtering."""
 
-    def test_filter_world_settings_no_visibility_comments(self):
+    def test_filter_world_settings_no_visibility_comments(self) -> None:
         """World settings without visibility comments pass through."""
         from src.core.context.visibility_filtering import VisibilityFilteringService
 
@@ -153,7 +153,7 @@ class TestVisibilityFilteringServiceWorldSettings:
         assert "Geography" in result.filtered_data
         assert result.removed_count == 0
 
-    def test_filter_world_settings_with_hidden_section(self):
+    def test_filter_world_settings_with_hidden_section(self) -> None:
         """World settings with HIDDEN sections have those sections removed."""
         from src.core.context.visibility_filtering import VisibilityFilteringService
 
@@ -182,7 +182,7 @@ The true source of magic is dark.
 class TestVisibilityFilteringServiceFull:
     """Tests for full context filtering."""
 
-    def test_filter_context_combines_all_filters(self):
+    def test_filter_context_combines_all_filters(self) -> None:
         """filter_context filters all categories."""
         from src.core.context.visibility_filtering import VisibilityFilteringService
 
@@ -227,7 +227,7 @@ She knows the culprit.
 class TestVisibilityFilteringServiceWithForbiddenKeywords:
     """Tests for forbidden keyword handling."""
 
-    def test_forbidden_keywords_collected(self):
+    def test_forbidden_keywords_collected(self) -> None:
         """Forbidden keywords from controller are collected."""
         from src.core.context.visibility_filtering import VisibilityFilteringService
 
@@ -250,7 +250,7 @@ class TestVisibilityFilteringServiceWithForbiddenKeywords:
 class TestVisibilityFilteringServiceEmptyContext:
     """Tests for empty context scenarios."""
 
-    def test_empty_context(self):
+    def test_empty_context(self) -> None:
         """Empty context returns empty VisibilityAwareContext."""
         from src.core.context.visibility_filtering import VisibilityFilteringService
 
@@ -265,7 +265,7 @@ class TestVisibilityFilteringServiceEmptyContext:
         assert result.filtered_characters == {}
         assert result.filtered_world_settings == {}
 
-    def test_none_characters(self):
+    def test_none_characters(self) -> None:
         """Context with no characters works."""
         from src.core.context.visibility_filtering import VisibilityFilteringService
 
@@ -285,7 +285,7 @@ class TestVisibilityFilteringServiceEmptyContext:
 class TestVisibilityFilteringServiceTypeImports:
     """Tests for type imports (W2B-3)."""
 
-    def test_l2_filtered_context_not_confused_with_l3(self):
+    def test_l2_filtered_context_not_confused_with_l3(self) -> None:
         """L2 VisibilityFilteredContent import is distinct from L3 FilteredContext."""
         from src.core.context.filtered_context import (
             FilteredContext as L3FilteredContext,
@@ -308,7 +308,7 @@ class TestVisibilityFilteringServiceTypeImports:
         result = service.filter_context(l3_context)
         assert isinstance(result, VisibilityAwareContext)
 
-    def test_filtering_returns_l2_visibility_filtered_content(self):
+    def test_filtering_returns_l2_visibility_filtered_content(self) -> None:
         """filter() method returns L2 VisibilityFilteredContent type."""
         from src.core.context.visibility_filtering import VisibilityFilteringService
 

@@ -198,6 +198,8 @@ class TestE2EForbiddenKeywords:
         assert "竜王の秘密" in prompt
 
 
+
+@pytest.mark.slow
 class TestPerformance:
     """Performance tests for ContextBuilder."""
 
@@ -323,13 +325,13 @@ class TestCacheBounds:
 class TestModuleExports:
     """Tests for __init__.py exports."""
 
-    def test_context_builder_exported(self):
+    def test_context_builder_exported(self) -> None:
         """ContextBuilder is accessible from the context package."""
         from src.core.context import ContextBuilder as CB
 
         assert CB is ContextBuilder
 
-    def test_context_build_result_exported(self):
+    def test_context_build_result_exported(self) -> None:
         """ContextBuildResult is accessible from the context package."""
         from src.core.context import ContextBuildResult as CBR
 

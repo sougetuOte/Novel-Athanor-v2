@@ -15,7 +15,7 @@ from src.core.context.scene_identifier import SceneIdentifier
 class TestPlotContext:
     """Tests for PlotContext data class."""
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         """Test to_dict() conversion."""
         # Arrange
         context = PlotContext(
@@ -34,7 +34,7 @@ class TestPlotContext:
             "plot_l3": "Scene structure",
         }
 
-    def test_to_dict_partial(self):
+    def test_to_dict_partial(self) -> None:
         """Test to_dict() with partial data."""
         # Arrange
         context = PlotContext(l1_theme="Theme only")

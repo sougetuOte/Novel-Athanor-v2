@@ -13,14 +13,14 @@ from src.core.context.scene_identifier import SceneIdentifier
 class TestSummaryContext:
     """Test SummaryContext data class."""
 
-    def test_create_empty(self):
+    def test_create_empty(self) -> None:
         """Test creating an empty SummaryContext."""
         context = SummaryContext()
         assert context.l1_overall is None
         assert context.l2_chapter is None
         assert context.l3_recent is None
 
-    def test_create_with_all_fields(self):
+    def test_create_with_all_fields(self) -> None:
         """Test creating SummaryContext with all fields."""
         context = SummaryContext(
             l1_overall="Overall summary",
@@ -31,7 +31,7 @@ class TestSummaryContext:
         assert context.l2_chapter == "Chapter summary"
         assert context.l3_recent == "Recent scene summary"
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         """Test converting SummaryContext to dictionary."""
         context = SummaryContext(
             l1_overall="Overall summary",
@@ -45,7 +45,7 @@ class TestSummaryContext:
             "summary_l3": "Recent scene summary",
         }
 
-    def test_to_dict_with_none_values(self):
+    def test_to_dict_with_none_values(self) -> None:
         """Test to_dict with None values."""
         context = SummaryContext(l1_overall="Overall")
         result = context.to_dict()

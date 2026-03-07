@@ -12,7 +12,7 @@ from src.core.models.ai_visibility import AIVisibilityLevel
 class TestVisibilityHint:
     """Test VisibilityHint data class."""
 
-    def test_create_basic(self):
+    def test_create_basic(self) -> None:
         """基本的なヒント生成."""
         hint = VisibilityHint(
             category="character",
@@ -26,7 +26,7 @@ class TestVisibilityHint:
         assert hint.hint_text == "There seems to be something hidden about Alice."
         assert hint.level == AIVisibilityLevel.AWARE
 
-    def test_create_with_know_level(self):
+    def test_create_with_know_level(self) -> None:
         """KNOW レベルのヒント."""
         hint = VisibilityHint(
             category="world",
@@ -36,7 +36,7 @@ class TestVisibilityHint:
         )
         assert hint.level == AIVisibilityLevel.KNOW
 
-    def test_create_with_different_levels(self):
+    def test_create_with_different_levels(self) -> None:
         """各可視性レベルでヒント生成可能."""
         for level in [AIVisibilityLevel.HIDDEN, AIVisibilityLevel.AWARE,
                       AIVisibilityLevel.KNOW, AIVisibilityLevel.USE]:
@@ -52,7 +52,7 @@ class TestVisibilityHint:
 class TestVisibilityAwareContextCreation:
     """Test VisibilityAwareContext instance creation."""
 
-    def test_create_minimal(self):
+    def test_create_minimal(self) -> None:
         """最小限のパラメータで生成."""
         base = FilteredContext()
         ctx = VisibilityAwareContext(base_context=base)
@@ -62,7 +62,7 @@ class TestVisibilityAwareContextCreation:
         assert ctx.current_visibility_level == AIVisibilityLevel.USE
         assert ctx.forbidden_keywords == []
 
-    def test_create_with_all_fields(self):
+    def test_create_with_all_fields(self) -> None:
         """全フィールドを指定して生成."""
         base = FilteredContext(
             plot_l1="Theme: Redemption",
@@ -91,7 +91,7 @@ class TestVisibilityAwareContextCreation:
 class TestVisibilityAwareContextGetHintsByLevel:
     """Test get_hints_by_level() method."""
 
-    def test_get_hints_by_level_single_match(self):
+    def test_get_hints_by_level_single_match(self) -> None:
         """単一レベルのヒント取得."""
         hints = [
             VisibilityHint(category="section", entity_id="sec1", hint_text="hint1", level=AIVisibilityLevel.AWARE),
@@ -106,7 +106,7 @@ class TestVisibilityAwareContextGetHintsByLevel:
         assert len(aware_hints) == 2
         assert all(h.level == AIVisibilityLevel.AWARE for h in aware_hints)
 
-    def test_get_hints_by_level_no_match(self):
+    def test_get_hints_by_level_no_match(self) -> None:
         """マッチなしの場合は空リスト."""
         hints = [
             VisibilityHint(category="section", entity_id="sec1", hint_text="hint1", level=AIVisibilityLevel.AWARE),
@@ -118,7 +118,7 @@ class TestVisibilityAwareContextGetHintsByLevel:
         know_hints = ctx.get_hints_by_level(AIVisibilityLevel.KNOW)
         assert know_hints == []
 
-    def test_get_hints_by_level_empty_hints(self):
+    def test_get_hints_by_level_empty_hints(self) -> None:
         """ヒントリストが空の場合."""
         ctx = VisibilityAwareContext(base_context=FilteredContext())
         result = ctx.get_hints_by_level(AIVisibilityLevel.AWARE)
@@ -128,7 +128,7 @@ class TestVisibilityAwareContextGetHintsByLevel:
 class TestVisibilityAwareContextHasHints:
     """Test has_hints() method."""
 
-    def test_has_hints_true(self):
+    def test_has_hints_true(self) -> None:
         """ヒントが存在する場合 True."""
         hint = VisibilityHint(category="section", entity_id="sec1", hint_text="hint1", level=AIVisibilityLevel.AWARE)
         ctx = VisibilityAwareContext(
@@ -137,7 +137,7 @@ class TestVisibilityAwareContextHasHints:
         )
         assert ctx.has_hints() is True
 
-    def test_has_hints_false(self):
+    def test_has_hints_false(self) -> None:
         """ヒントがない場合 False."""
         ctx = VisibilityAwareContext(base_context=FilteredContext())
         assert ctx.has_hints() is False
@@ -146,12 +146,12 @@ class TestVisibilityAwareContextHasHints:
 class TestVisibilityAwareContextCountExcluded:
     """Test count_excluded() method."""
 
-    def test_count_excluded_empty(self):
+    def test_count_excluded_empty(self) -> None:
         """除外なしの場合 0."""
         ctx = VisibilityAwareContext(base_context=FilteredContext())
         assert ctx.count_excluded() == 0
 
-    def test_count_excluded_with_sections(self):
+    def test_count_excluded_with_sections(self) -> None:
         """除外セクションのカウント."""
         ctx = VisibilityAwareContext(
             base_context=FilteredContext(),
@@ -163,7 +163,7 @@ class TestVisibilityAwareContextCountExcluded:
 class TestVisibilityAwareContextAddHint:
     """Test add_hint() method."""
 
-    def test_add_hint_to_empty(self):
+    def test_add_hint_to_empty(self) -> None:
         """空リストにヒント追加."""
         ctx = VisibilityAwareContext(base_context=FilteredContext())
         hint = VisibilityHint(category="section", entity_id="sec1", hint_text="hint1", level=AIVisibilityLevel.AWARE)
@@ -171,7 +171,7 @@ class TestVisibilityAwareContextAddHint:
         assert len(ctx.hints) == 1
         assert ctx.hints[0].source_section == "section.sec1"
 
-    def test_add_multiple_hints(self):
+    def test_add_multiple_hints(self) -> None:
         """複数ヒント追加."""
         ctx = VisibilityAwareContext(base_context=FilteredContext())
         ctx.add_hint(VisibilityHint(category="section", entity_id="sec1", hint_text="hint1", level=AIVisibilityLevel.AWARE))
@@ -182,13 +182,13 @@ class TestVisibilityAwareContextAddHint:
 class TestVisibilityAwareContextAddExcludedSection:
     """Test add_excluded_section() method."""
 
-    def test_add_excluded_section_to_empty(self):
+    def test_add_excluded_section_to_empty(self) -> None:
         """空リストに除外セクション追加."""
         ctx = VisibilityAwareContext(base_context=FilteredContext())
         ctx.add_excluded_section("character.villain")
         assert "character.villain" in ctx.excluded_sections
 
-    def test_add_excluded_section_no_duplicate(self):
+    def test_add_excluded_section_no_duplicate(self) -> None:
         """重複するセクションは追加されない."""
         ctx = VisibilityAwareContext(
             base_context=FilteredContext(),
@@ -197,7 +197,7 @@ class TestVisibilityAwareContextAddExcludedSection:
         ctx.add_excluded_section("character.villain")
         assert ctx.excluded_sections.count("character.villain") == 1
 
-    def test_add_different_excluded_sections(self):
+    def test_add_different_excluded_sections(self) -> None:
         """異なるセクションは追加される."""
         ctx = VisibilityAwareContext(base_context=FilteredContext())
         ctx.add_excluded_section("sec1")
@@ -208,14 +208,14 @@ class TestVisibilityAwareContextAddExcludedSection:
 class TestVisibilityAwareContextMergeForbiddenKeywords:
     """Test merge_forbidden_keywords() method."""
 
-    def test_merge_to_empty(self):
+    def test_merge_to_empty(self) -> None:
         """空リストにマージ."""
         ctx = VisibilityAwareContext(base_context=FilteredContext())
         ctx.merge_forbidden_keywords(["royal", "princess"])
         assert "royal" in ctx.forbidden_keywords
         assert "princess" in ctx.forbidden_keywords
 
-    def test_merge_with_existing(self):
+    def test_merge_with_existing(self) -> None:
         """既存のキーワードとマージ."""
         ctx = VisibilityAwareContext(
             base_context=FilteredContext(),
@@ -227,7 +227,7 @@ class TestVisibilityAwareContextMergeForbiddenKeywords:
         assert "princess" in ctx.forbidden_keywords
         assert "queen" in ctx.forbidden_keywords
 
-    def test_merge_deduplicates(self):
+    def test_merge_deduplicates(self) -> None:
         """重複キーワードは除去."""
         ctx = VisibilityAwareContext(
             base_context=FilteredContext(),
@@ -236,7 +236,7 @@ class TestVisibilityAwareContextMergeForbiddenKeywords:
         ctx.merge_forbidden_keywords(["royal", "queen"])
         assert ctx.forbidden_keywords.count("royal") == 1
 
-    def test_merge_returns_sorted(self):
+    def test_merge_returns_sorted(self) -> None:
         """結果はソートされる."""
         ctx = VisibilityAwareContext(base_context=FilteredContext())
         ctx.merge_forbidden_keywords(["zebra", "apple", "middle"])
@@ -246,7 +246,7 @@ class TestVisibilityAwareContextMergeForbiddenKeywords:
 class TestVisibilityAwareContextToGhostWriterContext:
     """Test to_ghost_writer_context() method."""
 
-    def test_basic_conversion(self):
+    def test_basic_conversion(self) -> None:
         """基本的な変換."""
         base = FilteredContext(
             plot_l1="Theme: Adventure",
@@ -261,7 +261,7 @@ class TestVisibilityAwareContextToGhostWriterContext:
         assert result["_visibility_level"] == 3  # USE = 3
         assert result["_excluded_count"] == 0
 
-    def test_conversion_with_hints(self):
+    def test_conversion_with_hints(self) -> None:
         """ヒント付きの変換."""
         base = FilteredContext()
         ctx = VisibilityAwareContext(
@@ -276,7 +276,7 @@ class TestVisibilityAwareContextToGhostWriterContext:
         assert "Hint about secret" in result["foreshadow_hints"]
         assert "Another hint" in result["foreshadow_hints"]
 
-    def test_conversion_with_excluded_sections(self):
+    def test_conversion_with_excluded_sections(self) -> None:
         """除外セクション付きの変換."""
         base = FilteredContext()
         ctx = VisibilityAwareContext(
@@ -286,14 +286,14 @@ class TestVisibilityAwareContextToGhostWriterContext:
         result = ctx.to_ghost_writer_context()
         assert result["_excluded_count"] == 3
 
-    def test_conversion_no_hints_no_foreshadow_key(self):
+    def test_conversion_no_hints_no_foreshadow_key(self) -> None:
         """ヒントなしの場合 foreshadow_hints キーなし."""
         base = FilteredContext()
         ctx = VisibilityAwareContext(base_context=base)
         result = ctx.to_ghost_writer_context()
         assert "foreshadow_hints" not in result
 
-    def test_conversion_includes_base_context_fields(self):
+    def test_conversion_includes_base_context_fields(self) -> None:
         """base_context のフィールドが含まれる."""
         base = FilteredContext(
             plot_l1="Theme",
@@ -316,7 +316,7 @@ class TestVisibilityAwareContextToGhostWriterContext:
 class TestVisibilityAwareContextIntegration:
     """Integration tests for VisibilityAwareContext."""
 
-    def test_full_workflow(self):
+    def test_full_workflow(self) -> None:
         """完全なワークフローテスト."""
         # 1. Base context 作成
         base = FilteredContext(

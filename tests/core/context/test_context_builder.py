@@ -15,7 +15,7 @@ from src.core.context.visibility_context import VisibilityAwareContext
 class TestContextBuildResult:
     """Tests for ContextBuildResult data class."""
 
-    def test_create_with_all_fields(self):
+    def test_create_with_all_fields(self) -> None:
         """T1: ContextBuildResult can be created with all fields."""
         context = FilteredContext(plot_l1="Theme")
         visibility = VisibilityAwareContext(base_context=context)
@@ -42,7 +42,7 @@ class TestContextBuildResult:
         assert result.errors == []
         assert result.warnings == ["minor issue"]
 
-    def test_create_minimal(self):
+    def test_create_minimal(self) -> None:
         """T1b: ContextBuildResult can be created with minimal fields."""
         context = FilteredContext()
         instructions = ForeshadowInstructions()
@@ -62,7 +62,7 @@ class TestContextBuildResult:
         assert result.errors == []
         assert result.warnings == []
 
-    def test_has_errors(self):
+    def test_has_errors(self) -> None:
         """T2: has_errors() returns True when errors exist."""
         result = ContextBuildResult(
             context=FilteredContext(),
@@ -75,7 +75,7 @@ class TestContextBuildResult:
 
         assert result.has_errors() is True
 
-    def test_has_errors_empty(self):
+    def test_has_errors_empty(self) -> None:
         """T2b: has_errors() returns False when no errors."""
         result = ContextBuildResult(
             context=FilteredContext(),
@@ -87,7 +87,7 @@ class TestContextBuildResult:
 
         assert result.has_errors() is False
 
-    def test_has_warnings(self):
+    def test_has_warnings(self) -> None:
         """T2c: has_warnings() returns True when warnings exist."""
         result = ContextBuildResult(
             context=FilteredContext(),
@@ -100,7 +100,7 @@ class TestContextBuildResult:
 
         assert result.has_warnings() is True
 
-    def test_has_warnings_empty(self):
+    def test_has_warnings_empty(self) -> None:
         """T2d: has_warnings() returns False when no warnings."""
         result = ContextBuildResult(
             context=FilteredContext(),

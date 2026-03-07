@@ -65,7 +65,7 @@ def collector(vault_root: Path, loader: FileLazyLoader) -> StyleGuideCollector:
 class TestStyleGuideContext:
     """Test StyleGuideContext dataclass."""
 
-    def test_merged_default_only(self):
+    def test_merged_default_only(self) -> None:
         """Test merged property with default guide only."""
         context = StyleGuideContext(
             default_guide="# Default\n\n- Rule 1",
@@ -73,7 +73,7 @@ class TestStyleGuideContext:
         )
         assert context.merged == "# Default\n\n- Rule 1"
 
-    def test_merged_override_only(self):
+    def test_merged_override_only(self) -> None:
         """Test merged property with override only."""
         context = StyleGuideContext(
             default_guide=None,
@@ -81,7 +81,7 @@ class TestStyleGuideContext:
         )
         assert context.merged == "# Override\n\n- Rule 2"
 
-    def test_merged_both(self):
+    def test_merged_both(self) -> None:
         """Test merged property with both default and override."""
         context = StyleGuideContext(
             default_guide="# Default\n\n- Rule 1",
@@ -95,7 +95,7 @@ class TestStyleGuideContext:
         )
         assert context.merged == expected
 
-    def test_merged_none(self):
+    def test_merged_none(self) -> None:
         """Test merged property with no guides."""
         context = StyleGuideContext()
         assert context.merged is None

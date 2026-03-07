@@ -7,7 +7,7 @@ from src.core.context.filtered_context import FilteredContext
 class TestFilteredContextCreation:
     """Test FilteredContext instance creation."""
 
-    def test_create_empty_context(self):
+    def test_create_empty_context(self) -> None:
         """空のコンテキストを生成できる."""
         ctx = FilteredContext()
         assert ctx.plot_l1 is None
@@ -23,7 +23,7 @@ class TestFilteredContextCreation:
         assert ctx.current_phase is None
         assert ctx.warnings == []
 
-    def test_create_with_all_fields(self):
+    def test_create_with_all_fields(self) -> None:
         """全フィールドを指定して生成できる."""
         ctx = FilteredContext(
             plot_l1="Theme: Redemption",
@@ -48,22 +48,22 @@ class TestFilteredContextCreation:
 class TestFilteredContextHasPlot:
     """Test has_plot() method."""
 
-    def test_has_plot_with_l1_only(self):
+    def test_has_plot_with_l1_only(self) -> None:
         """plot_l1 のみで has_plot() は True."""
         ctx = FilteredContext(plot_l1="Theme")
         assert ctx.has_plot() is True
 
-    def test_has_plot_with_l2_only(self):
+    def test_has_plot_with_l2_only(self) -> None:
         """plot_l2 のみで has_plot() は True."""
         ctx = FilteredContext(plot_l2="Chapter goal")
         assert ctx.has_plot() is True
 
-    def test_has_plot_with_l3_only(self):
+    def test_has_plot_with_l3_only(self) -> None:
         """plot_l3 のみで has_plot() は True."""
         ctx = FilteredContext(plot_l3="Scene")
         assert ctx.has_plot() is True
 
-    def test_has_plot_false_when_empty(self):
+    def test_has_plot_false_when_empty(self) -> None:
         """プロット情報がない場合は False."""
         ctx = FilteredContext()
         assert ctx.has_plot() is False
@@ -72,17 +72,17 @@ class TestFilteredContextHasPlot:
 class TestFilteredContextHasSummary:
     """Test has_summary() method."""
 
-    def test_has_summary_with_l1_only(self):
+    def test_has_summary_with_l1_only(self) -> None:
         """summary_l1 のみで has_summary() は True."""
         ctx = FilteredContext(summary_l1="Overall")
         assert ctx.has_summary() is True
 
-    def test_has_summary_with_l3_only(self):
+    def test_has_summary_with_l3_only(self) -> None:
         """summary_l3 のみで has_summary() は True."""
         ctx = FilteredContext(summary_l3="Recent")
         assert ctx.has_summary() is True
 
-    def test_has_summary_false_when_empty(self):
+    def test_has_summary_false_when_empty(self) -> None:
         """サマリ情報がない場合は False."""
         ctx = FilteredContext()
         assert ctx.has_summary() is False
@@ -91,12 +91,12 @@ class TestFilteredContextHasSummary:
 class TestFilteredContextCharacters:
     """Test character-related methods."""
 
-    def test_get_character_names_empty(self):
+    def test_get_character_names_empty(self) -> None:
         """キャラクターがない場合は空リスト."""
         ctx = FilteredContext()
         assert ctx.get_character_names() == []
 
-    def test_get_character_names_with_characters(self):
+    def test_get_character_names_with_characters(self) -> None:
         """キャラクター名のリストを取得."""
         ctx = FilteredContext(
             characters={
@@ -115,7 +115,7 @@ class TestFilteredContextCharacters:
 class TestFilteredContextWarnings:
     """Test warning-related methods."""
 
-    def test_add_warning(self):
+    def test_add_warning(self) -> None:
         """警告を追加できる."""
         ctx = FilteredContext()
         ctx.add_warning("Warning 1")
@@ -124,7 +124,7 @@ class TestFilteredContextWarnings:
         assert "Warning 1" in ctx.warnings
         assert "Warning 2" in ctx.warnings
 
-    def test_initial_warnings_preserved(self):
+    def test_initial_warnings_preserved(self) -> None:
         """初期警告に追加できる."""
         ctx = FilteredContext(warnings=["Initial warning"])
         ctx.add_warning("New warning")
@@ -134,13 +134,13 @@ class TestFilteredContextWarnings:
 class TestFilteredContextToPromptDict:
     """Test to_prompt_dict() method."""
 
-    def test_empty_context_to_dict(self):
+    def test_empty_context_to_dict(self) -> None:
         """空コンテキストは空辞書を返す."""
         ctx = FilteredContext()
         d = ctx.to_prompt_dict()
         assert d == {}
 
-    def test_plot_fields_in_dict(self):
+    def test_plot_fields_in_dict(self) -> None:
         """プロットフィールドが辞書に含まれる."""
         ctx = FilteredContext(
             plot_l1="Theme",
@@ -152,7 +152,7 @@ class TestFilteredContextToPromptDict:
         assert d["plot_chapter"] == "Chapter"
         assert d["plot_scene"] == "Scene"
 
-    def test_summary_fields_in_dict(self):
+    def test_summary_fields_in_dict(self) -> None:
         """サマリフィールドが辞書に含まれる."""
         ctx = FilteredContext(
             summary_l1="Overall",
@@ -164,7 +164,7 @@ class TestFilteredContextToPromptDict:
         assert d["summary_chapter"] == "Chapter"
         assert d["summary_recent"] == "Recent"
 
-    def test_characters_in_dict(self):
+    def test_characters_in_dict(self) -> None:
         """キャラクター情報が辞書に含まれる."""
         ctx = FilteredContext(
             characters={"Alice": "Details", "Bob": "Info"}
@@ -173,7 +173,7 @@ class TestFilteredContextToPromptDict:
         assert d["character_Alice"] == "Details"
         assert d["character_Bob"] == "Info"
 
-    def test_world_settings_in_dict(self):
+    def test_world_settings_in_dict(self) -> None:
         """世界観設定が辞書に含まれる."""
         ctx = FilteredContext(
             world_settings={"Magic": "Rules", "Technology": "Limits"}
@@ -182,13 +182,13 @@ class TestFilteredContextToPromptDict:
         assert d["world_Magic"] == "Rules"
         assert d["world_Technology"] == "Limits"
 
-    def test_style_guide_in_dict(self):
+    def test_style_guide_in_dict(self) -> None:
         """スタイルガイドが辞書に含まれる."""
         ctx = FilteredContext(style_guide="Third person limited")
         d = ctx.to_prompt_dict()
         assert d["style_guide"] == "Third person limited"
 
-    def test_none_fields_excluded(self):
+    def test_none_fields_excluded(self) -> None:
         """None のフィールドは辞書に含まれない."""
         ctx = FilteredContext(plot_l1="Theme")  # Only plot_l1
         d = ctx.to_prompt_dict()
@@ -200,7 +200,7 @@ class TestFilteredContextToPromptDict:
 class TestFilteredContextMerge:
     """Test merge() method."""
 
-    def test_merge_empty_contexts(self):
+    def test_merge_empty_contexts(self) -> None:
         """空コンテキスト同士のマージ."""
         ctx1 = FilteredContext()
         ctx2 = FilteredContext()
@@ -208,14 +208,14 @@ class TestFilteredContextMerge:
         assert merged.plot_l1 is None
         assert merged.characters == {}
 
-    def test_merge_preserves_self_values(self):
+    def test_merge_preserves_self_values(self) -> None:
         """self の値が優先される."""
         ctx1 = FilteredContext(plot_l1="Original")
         ctx2 = FilteredContext(plot_l1="Other")
         merged = ctx1.merge(ctx2)
         assert merged.plot_l1 == "Original"
 
-    def test_merge_fills_none_values(self):
+    def test_merge_fills_none_values(self) -> None:
         """self が None の場合は other の値を使用."""
         ctx1 = FilteredContext(plot_l1="Theme")
         ctx2 = FilteredContext(plot_l2="Chapter")
@@ -223,7 +223,7 @@ class TestFilteredContextMerge:
         assert merged.plot_l1 == "Theme"
         assert merged.plot_l2 == "Chapter"
 
-    def test_merge_combines_characters(self):
+    def test_merge_combines_characters(self) -> None:
         """キャラクター辞書をマージ."""
         ctx1 = FilteredContext(characters={"Alice": "A"})
         ctx2 = FilteredContext(characters={"Bob": "B"})
@@ -231,7 +231,7 @@ class TestFilteredContextMerge:
         assert "Alice" in merged.characters
         assert "Bob" in merged.characters
 
-    def test_merge_combines_world_settings(self):
+    def test_merge_combines_world_settings(self) -> None:
         """世界観設定辞書をマージ."""
         ctx1 = FilteredContext(world_settings={"Magic": "Rules"})
         ctx2 = FilteredContext(world_settings={"Tech": "Limits"})
@@ -239,7 +239,7 @@ class TestFilteredContextMerge:
         assert "Magic" in merged.world_settings
         assert "Tech" in merged.world_settings
 
-    def test_merge_combines_warnings(self):
+    def test_merge_combines_warnings(self) -> None:
         """警告リストを結合."""
         ctx1 = FilteredContext(warnings=["W1"])
         ctx2 = FilteredContext(warnings=["W2"])

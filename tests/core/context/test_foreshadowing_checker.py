@@ -41,7 +41,7 @@ from src.core.models.foreshadowing import (
 class TestPlantSuggestion:
     """Tests for PlantSuggestion data class."""
 
-    def test_create_plant_suggestion(self):
+    def test_create_plant_suggestion(self) -> None:
         """Test creating a PlantSuggestion."""
         suggestion = PlantSuggestion(
             foreshadowing_id="FS-010-secret",
@@ -59,7 +59,7 @@ class TestPlantSuggestion:
         assert suggestion.subtlety_level == 7
         assert suggestion.related_characters == ["主人公"]
 
-    def test_plant_suggestion_defaults(self):
+    def test_plant_suggestion_defaults(self) -> None:
         """Test PlantSuggestion with default values."""
         suggestion = PlantSuggestion(
             foreshadowing_id="FS-010-secret",
@@ -75,7 +75,7 @@ class TestPlantSuggestion:
 class TestReinforceSuggestion:
     """Tests for ReinforceSuggestion data class."""
 
-    def test_create_reinforce_suggestion(self):
+    def test_create_reinforce_suggestion(self) -> None:
         """Test creating a ReinforceSuggestion."""
         suggestion = ReinforceSuggestion(
             foreshadowing_id="FS-010-secret",
@@ -97,7 +97,7 @@ class TestReinforceSuggestion:
 class TestPayoffApproaching:
     """Tests for PayoffApproaching data class."""
 
-    def test_create_payoff_approaching(self):
+    def test_create_payoff_approaching(self) -> None:
         """Test creating a PayoffApproaching."""
         payoff = PayoffApproaching(
             foreshadowing_id="FS-010-secret",
@@ -119,7 +119,7 @@ class TestPayoffApproaching:
 class TestForeshadowingAlert:
     """Tests for ForeshadowingAlert data class."""
 
-    def test_create_alert_payoff_reminder(self):
+    def test_create_alert_payoff_reminder(self) -> None:
         """Test creating a payoff reminder alert."""
         alert = ForeshadowingAlert(
             alert_type=AlertType.PAYOFF_REMINDER,
@@ -137,7 +137,7 @@ class TestForeshadowingAlert:
         assert alert.message == "伏線「主人公の秘密」の回収予定が近づいています"
         assert alert.data["remaining_episodes"] == 3
 
-    def test_create_alert_long_silence(self):
+    def test_create_alert_long_silence(self) -> None:
         """Test creating a long silence alert."""
         alert = ForeshadowingAlert(
             alert_type=AlertType.LONG_SILENCE,
@@ -155,7 +155,7 @@ class TestForeshadowingAlert:
 class TestSceneForeshadowingCheck:
     """Tests for SceneForeshadowingCheck data class."""
 
-    def test_create_empty_check(self):
+    def test_create_empty_check(self) -> None:
         """Test creating an empty SceneForeshadowingCheck."""
         check = SceneForeshadowingCheck(episode_id="EP-010")
 
@@ -167,7 +167,7 @@ class TestSceneForeshadowingCheck:
         assert check.alerts == []
         assert check.summary == ""
 
-    def test_has_suggestions_property(self):
+    def test_has_suggestions_property(self) -> None:
         """Test has_suggestions property."""
         check = SceneForeshadowingCheck(episode_id="EP-010")
         assert not check.has_suggestions
@@ -181,7 +181,7 @@ class TestSceneForeshadowingCheck:
         )
         assert check.has_suggestions
 
-    def test_has_alerts_property(self):
+    def test_has_alerts_property(self) -> None:
         """Test has_alerts property."""
         check = SceneForeshadowingCheck(episode_id="EP-010")
         assert not check.has_alerts
@@ -194,7 +194,7 @@ class TestSceneForeshadowingCheck:
         )
         assert check.has_alerts
 
-    def test_total_actions_property(self):
+    def test_total_actions_property(self) -> None:
         """Test total_actions property."""
         check = SceneForeshadowingCheck(episode_id="EP-010")
         assert check.total_actions == 0
@@ -227,7 +227,7 @@ class TestSceneForeshadowingCheck:
 
         assert check.total_actions == 3
 
-    def test_get_critical_alerts(self):
+    def test_get_critical_alerts(self) -> None:
         """Test get_critical_alerts method."""
         check = SceneForeshadowingCheck(episode_id="EP-010")
 

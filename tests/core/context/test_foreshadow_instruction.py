@@ -12,23 +12,23 @@ from src.core.context.foreshadow_instruction import (
 class TestInstructionAction:
     """Test InstructionAction enum."""
 
-    def test_plant_exists(self):
+    def test_plant_exists(self) -> None:
         """PLANT アクションが存在する."""
         assert InstructionAction.PLANT.value == "plant"
 
-    def test_reinforce_exists(self):
+    def test_reinforce_exists(self) -> None:
         """REINFORCE アクションが存在する."""
         assert InstructionAction.REINFORCE.value == "reinforce"
 
-    def test_hint_exists(self):
+    def test_hint_exists(self) -> None:
         """HINT アクションが存在する."""
         assert InstructionAction.HINT.value == "hint"
 
-    def test_none_exists(self):
+    def test_none_exists(self) -> None:
         """NONE アクションが存在する."""
         assert InstructionAction.NONE.value == "none"
 
-    def test_all_actions(self):
+    def test_all_actions(self) -> None:
         """全アクションが定義されている."""
         actions = list(InstructionAction)
         assert len(actions) == 4
@@ -37,7 +37,7 @@ class TestInstructionAction:
 class TestForeshadowInstructionCreation:
     """Test ForeshadowInstruction instance creation."""
 
-    def test_create_minimal(self):
+    def test_create_minimal(self) -> None:
         """最小限のパラメータで生成できる."""
         inst = ForeshadowInstruction(
             foreshadowing_id="FS-001",
@@ -50,7 +50,7 @@ class TestForeshadowInstructionCreation:
         assert inst.note is None
         assert inst.subtlety_target == 5
 
-    def test_create_with_all_fields(self):
+    def test_create_with_all_fields(self) -> None:
         """全フィールドを指定して生成できる."""
         inst = ForeshadowInstruction(
             foreshadowing_id="FS-002",
@@ -71,7 +71,7 @@ class TestForeshadowInstructionCreation:
 class TestForeshadowInstructionValidation:
     """Test ForeshadowInstruction validation."""
 
-    def test_subtlety_target_valid_range_1(self):
+    def test_subtlety_target_valid_range_1(self) -> None:
         """subtlety_target=1 は有効."""
         inst = ForeshadowInstruction(
             foreshadowing_id="FS-001",
@@ -80,7 +80,7 @@ class TestForeshadowInstructionValidation:
         )
         assert inst.subtlety_target == 1
 
-    def test_subtlety_target_valid_range_10(self):
+    def test_subtlety_target_valid_range_10(self) -> None:
         """subtlety_target=10 は有効."""
         inst = ForeshadowInstruction(
             foreshadowing_id="FS-001",
@@ -89,7 +89,7 @@ class TestForeshadowInstructionValidation:
         )
         assert inst.subtlety_target == 10
 
-    def test_subtlety_target_0_raises_error(self):
+    def test_subtlety_target_0_raises_error(self) -> None:
         """subtlety_target=0 は ValueError."""
         with pytest.raises(ValueError, match="subtlety_target must be 1-10"):
             ForeshadowInstruction(
@@ -98,7 +98,7 @@ class TestForeshadowInstructionValidation:
                 subtlety_target=0,
             )
 
-    def test_subtlety_target_11_raises_error(self):
+    def test_subtlety_target_11_raises_error(self) -> None:
         """subtlety_target=11 は ValueError."""
         with pytest.raises(ValueError, match="subtlety_target must be 1-10"):
             ForeshadowInstruction(
@@ -111,7 +111,7 @@ class TestForeshadowInstructionValidation:
 class TestForeshadowInstructionMethods:
     """Test ForeshadowInstruction methods."""
 
-    def test_should_act_true_for_plant(self):
+    def test_should_act_true_for_plant(self) -> None:
         """PLANT の場合 should_act() は True."""
         inst = ForeshadowInstruction(
             foreshadowing_id="FS-001",
@@ -119,7 +119,7 @@ class TestForeshadowInstructionMethods:
         )
         assert inst.should_act() is True
 
-    def test_should_act_true_for_reinforce(self):
+    def test_should_act_true_for_reinforce(self) -> None:
         """REINFORCE の場合 should_act() は True."""
         inst = ForeshadowInstruction(
             foreshadowing_id="FS-001",
@@ -127,7 +127,7 @@ class TestForeshadowInstructionMethods:
         )
         assert inst.should_act() is True
 
-    def test_should_act_true_for_hint(self):
+    def test_should_act_true_for_hint(self) -> None:
         """HINT の場合 should_act() は True."""
         inst = ForeshadowInstruction(
             foreshadowing_id="FS-001",
@@ -135,7 +135,7 @@ class TestForeshadowInstructionMethods:
         )
         assert inst.should_act() is True
 
-    def test_should_act_false_for_none(self):
+    def test_should_act_false_for_none(self) -> None:
         """NONE の場合 should_act() は False."""
         inst = ForeshadowInstruction(
             foreshadowing_id="FS-001",
@@ -143,7 +143,7 @@ class TestForeshadowInstructionMethods:
         )
         assert inst.should_act() is False
 
-    def test_is_planting_true(self):
+    def test_is_planting_true(self) -> None:
         """PLANT の場合 is_planting() は True."""
         inst = ForeshadowInstruction(
             foreshadowing_id="FS-001",
@@ -151,7 +151,7 @@ class TestForeshadowInstructionMethods:
         )
         assert inst.is_planting() is True
 
-    def test_is_planting_false_for_reinforce(self):
+    def test_is_planting_false_for_reinforce(self) -> None:
         """REINFORCE の場合 is_planting() は False."""
         inst = ForeshadowInstruction(
             foreshadowing_id="FS-001",
@@ -163,13 +163,13 @@ class TestForeshadowInstructionMethods:
 class TestForeshadowInstructionsCreation:
     """Test ForeshadowInstructions container creation."""
 
-    def test_create_empty(self):
+    def test_create_empty(self) -> None:
         """空のコンテナを生成できる."""
         container = ForeshadowInstructions()
         assert container.instructions == []
         assert container.global_forbidden_keywords == []
 
-    def test_create_with_instructions(self):
+    def test_create_with_instructions(self) -> None:
         """指示リストを持つコンテナを生成できる."""
         inst1 = ForeshadowInstruction(
             foreshadowing_id="FS-001",
@@ -190,12 +190,12 @@ class TestForeshadowInstructionsCreation:
 class TestForeshadowInstructionsGetAllForbidden:
     """Test get_all_forbidden() method."""
 
-    def test_get_all_forbidden_empty(self):
+    def test_get_all_forbidden_empty(self) -> None:
         """空コンテナは空リストを返す."""
         container = ForeshadowInstructions()
         assert container.get_all_forbidden() == []
 
-    def test_get_all_forbidden_global_only(self):
+    def test_get_all_forbidden_global_only(self) -> None:
         """グローバル禁止キーワードのみ."""
         container = ForeshadowInstructions(
             global_forbidden_keywords=["secret", "hidden"]
@@ -204,7 +204,7 @@ class TestForeshadowInstructionsGetAllForbidden:
         assert "secret" in forbidden
         assert "hidden" in forbidden
 
-    def test_get_all_forbidden_instructions_only(self):
+    def test_get_all_forbidden_instructions_only(self) -> None:
         """個別指示の禁止キーワードのみ."""
         inst = ForeshadowInstruction(
             foreshadowing_id="FS-001",
@@ -216,7 +216,7 @@ class TestForeshadowInstructionsGetAllForbidden:
         assert "royal" in forbidden
         assert "blood" in forbidden
 
-    def test_get_all_forbidden_combined(self):
+    def test_get_all_forbidden_combined(self) -> None:
         """グローバルと個別の両方を統合."""
         inst = ForeshadowInstruction(
             foreshadowing_id="FS-001",
@@ -231,7 +231,7 @@ class TestForeshadowInstructionsGetAllForbidden:
         assert "royal" in forbidden
         assert "secret" in forbidden
 
-    def test_get_all_forbidden_deduplicates(self):
+    def test_get_all_forbidden_deduplicates(self) -> None:
         """重複キーワードは除去される."""
         inst = ForeshadowInstruction(
             foreshadowing_id="FS-001",
@@ -250,12 +250,12 @@ class TestForeshadowInstructionsGetAllForbidden:
 class TestForeshadowInstructionsGetActive:
     """Test get_active_instructions() method."""
 
-    def test_get_active_empty(self):
+    def test_get_active_empty(self) -> None:
         """空コンテナは空リストを返す."""
         container = ForeshadowInstructions()
         assert container.get_active_instructions() == []
 
-    def test_get_active_filters_none_action(self):
+    def test_get_active_filters_none_action(self) -> None:
         """NONE アクションは除外される."""
         inst_active = ForeshadowInstruction(
             foreshadowing_id="FS-001",
@@ -276,7 +276,7 @@ class TestForeshadowInstructionsGetActive:
 class TestForeshadowInstructionsHelpers:
     """Test helper methods."""
 
-    def test_add_instruction(self):
+    def test_add_instruction(self) -> None:
         """指示を追加できる."""
         container = ForeshadowInstructions()
         inst = ForeshadowInstruction(
@@ -286,7 +286,7 @@ class TestForeshadowInstructionsHelpers:
         container.add_instruction(inst)
         assert len(container.instructions) == 1
 
-    def test_add_global_forbidden(self):
+    def test_add_global_forbidden(self) -> None:
         """グローバル禁止キーワードを追加できる."""
         container = ForeshadowInstructions()
         container.add_global_forbidden("secret")
@@ -294,14 +294,14 @@ class TestForeshadowInstructionsHelpers:
         assert "secret" in container.global_forbidden_keywords
         assert "hidden" in container.global_forbidden_keywords
 
-    def test_add_global_forbidden_no_duplicate(self):
+    def test_add_global_forbidden_no_duplicate(self) -> None:
         """重複するグローバル禁止キーワードは追加されない."""
         container = ForeshadowInstructions()
         container.add_global_forbidden("secret")
         container.add_global_forbidden("secret")  # 重複
         assert container.global_forbidden_keywords.count("secret") == 1
 
-    def test_count_by_action(self):
+    def test_count_by_action(self) -> None:
         """アクション別カウントを取得できる."""
         inst1 = ForeshadowInstruction(
             foreshadowing_id="FS-001", action=InstructionAction.PLANT

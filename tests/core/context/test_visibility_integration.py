@@ -332,6 +332,8 @@ class TestVisibilityIntegrationPromptFormat:
         assert "匂わせてください" in prompt_text
 
 
+
+@pytest.mark.slow
 class TestVisibilityIntegrationPerformance:
     """Performance tests."""
 

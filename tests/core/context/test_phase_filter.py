@@ -14,19 +14,19 @@ from src.core.context.phase_filter import (
 class TestPhaseFilterExceptions:
     """Test exception classes."""
 
-    def test_phase_filter_error_exists(self):
+    def test_phase_filter_error_exists(self) -> None:
         """PhaseFilterError が存在する."""
         error = PhaseFilterError("Test error")
         assert str(error) == "Test error"
         assert isinstance(error, Exception)
 
-    def test_invalid_phase_error_exists(self):
+    def test_invalid_phase_error_exists(self) -> None:
         """InvalidPhaseError が存在する."""
         error = InvalidPhaseError("Invalid phase: xyz")
         assert str(error) == "Invalid phase: xyz"
         assert isinstance(error, PhaseFilterError)
 
-    def test_invalid_phase_error_inheritance(self):
+    def test_invalid_phase_error_inheritance(self) -> None:
         """InvalidPhaseError は PhaseFilterError を継承."""
         error = InvalidPhaseError("test")
         assert isinstance(error, PhaseFilterError)
@@ -36,7 +36,7 @@ class TestPhaseFilterExceptions:
 class TestPhaseFilterProtocol:
     """Test PhaseFilter protocol compliance."""
 
-    def test_protocol_compliance_with_dict(self):
+    def test_protocol_compliance_with_dict(self) -> None:
         """Protocol を満たす具象クラスを作成できる（dict型）."""
 
         class DictPhaseFilter:
@@ -85,7 +85,7 @@ class TestPhaseFilterProtocol:
         assert filtered["name"] == "Alice"
         assert filtered["filtered_data"]["description"] == "Village girl"
 
-    def test_protocol_compliance_with_custom_class(self):
+    def test_protocol_compliance_with_custom_class(self) -> None:
         """Protocol を満たす具象クラスを作成できる（カスタムクラス型）."""
 
         class CharacterData:
@@ -126,7 +126,7 @@ class TestPhaseFilterProtocol:
         assert filtered.name == "Bob"
         assert "start" in filtered.phases
 
-    def test_invalid_phase_handling(self):
+    def test_invalid_phase_handling(self) -> None:
         """無効なフェーズが指定された場合の処理."""
 
         class StrictPhaseFilter:
@@ -155,7 +155,7 @@ class TestPhaseFilterProtocol:
 class TestPhaseFilterUseCases:
     """Test practical use cases for phase filtering."""
 
-    def test_character_phase_progression(self):
+    def test_character_phase_progression(self) -> None:
         """キャラクター情報のフェーズ進行テスト."""
 
         class CumulativePhaseFilter:
@@ -209,7 +209,7 @@ class TestPhaseFilterUseCases:
         assert "young farmer" in filtered_finale["info"]
         assert "evil lord" in filtered_finale["info"]
 
-    def test_empty_entity_handling(self):
+    def test_empty_entity_handling(self) -> None:
         """空のエンティティの処理."""
 
         class SafePhaseFilter:

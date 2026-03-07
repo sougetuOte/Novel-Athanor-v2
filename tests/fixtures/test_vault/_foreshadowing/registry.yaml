@@ -1,0 +1,62 @@
+foreshadowing:
+  - id: "FS-010-001"
+    title: "Airaの血統"
+    fs_type: plot_twist
+    status: planted
+    subtlety_level: 7
+    ai_visibility:
+      level: 2
+      forbidden_keywords:
+        - "末裔"
+        - "血統"
+        - "古代魔法使い"
+      allowed_expressions:
+        - "不思議な力"
+        - "隠された才能"
+        - "目覚め"
+    seed:
+      content: "Airaは古代魔法使いの末裔であり、輝晶石なしで魔法を行使できる唯一の存在"
+    payoff:
+      content: "Airaが自分の血統を知り、源泉の封印を解く決意をする"
+      planned_episode: "ep025"
+    timeline:
+      registered_at: "2026-01-01"
+      events:
+        - episode: "ep010"
+          type: planted
+          date: "2026-01-01"
+          expression: "窓辺の輝晶石に触れた瞬間、微かに光が戻った"
+          subtlety: 7
+    related:
+      characters:
+        - "Aira"
+      plot_threads: []
+      locations:
+        - "Luminara"
+  - id: "FS-010-002"
+    title: "Kaelの目的"
+    fs_type: character_secret
+    status: registered
+    subtlety_level: 8
+    ai_visibility:
+      level: 1
+      forbidden_keywords:
+        - "魔法学院"
+        - "卒業生"
+      allowed_expressions:
+        - "旅人"
+        - "探求者"
+    seed:
+      content: "KaelはAiraの両親を知っており、彼女を見つけるために村を訪れた"
+    payoff:
+      content: "KaelがAiraに両親との関係を明かす"
+      planned_episode: "ep015"
+    timeline:
+      registered_at: "2026-01-01"
+      events: []
+    related:
+      characters:
+        - "Kael"
+        - "Aira"
+      plot_threads: []
+      locations: []

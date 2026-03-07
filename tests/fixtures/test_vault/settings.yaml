@@ -1,0 +1,8 @@
+work_id: test_novel
+title: "Echoes of Twilight"
+author: "Test Author"
+genre: "Fantasy"
+target_audience: "Young Adult"
+episode_naming: "Episode {n}"
+volumes_enabled: false
+default_ai_visibility: 0

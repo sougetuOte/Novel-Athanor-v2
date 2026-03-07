@@ -301,7 +301,7 @@ Atom 7: StyleGuide  → 声、対話パターン
 Atom 8: Foreshadow  → 伏線指示（Level別）
 
 ※ 全Atom独立（相互依存なし）
-※ 現在は順次実行。将来的に asyncio / concurrent.futures で並列化予定
+※ ThreadPoolExecutor による並列実行を実装済み（`src/core/context/context_integrator.py`）
 ※ AI Information Control Layer 経由でフィルタリング
 ```
 

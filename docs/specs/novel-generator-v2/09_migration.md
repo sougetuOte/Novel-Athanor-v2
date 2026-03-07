@@ -53,7 +53,7 @@ vault/{作品名}/
 - 実は主人公は王族の血筋
 ```
 
-**移行後** (Auto-Novel-Athanor):
+**移行後** (Novel-Athanor-v2):
 ```yaml
 # _ai_control/visibility.yaml
 entities:
@@ -258,7 +258,7 @@ def generate_visibility_template(vault_path):
 
 ### 5.1 ファイル形式互換性
 
-| ファイル | Novel-Athanor | Auto-Novel-Athanor | 互換性 |
+| ファイル | Novel-Athanor | Novel-Athanor-v2 | 互換性 |
 |---------|--------------|-------------------|--------|
 | episodes/*.md | ✅ | ✅ | 完全互換 |
 | characters/*.md | ✅ | ✅ + ai_visibility | 上位互換 |
@@ -270,7 +270,7 @@ def generate_visibility_template(vault_path):
 
 ### 5.2 コマンド互換性
 
-| コマンド | Novel-Athanor | Auto-Novel-Athanor |
+| コマンド | Novel-Athanor | Novel-Athanor-v2 |
 |---------|--------------|-------------------|
 | /draft-scene | ✅ | ✅（拡張） |
 | /check-consistency | ✅ | ✅（拡張） |

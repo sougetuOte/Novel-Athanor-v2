@@ -31,7 +31,7 @@ docs/adr/                  # アーキテクチャ決定記録
 | `decision-making.md` | 意思決定プロトコル |
 | `self-modification.md` | **プロジェクト自己改造ルール（計画優先原則）** |
 | `audit-fix-policy.md` | 監査修正ポリシー（全重篤度対応義務） |
-| `building-checklist.md` | BUILDING 品質チェックリスト（R-1〜R-6） |
+| `building-checklist.md` | BUILDING 品質チェックリスト（R-1〜R-12, S-1〜S-2） |
 
 ## フェーズコマンド
 

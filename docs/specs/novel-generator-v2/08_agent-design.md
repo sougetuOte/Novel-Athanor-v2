@@ -714,16 +714,27 @@ if result.has_warnings():
 
 ```
 .claude/agents/
-├── chief-editor.md          # 統括（CLAUDE.mdに統合）
-├── continuity-director.md   # 門番
+│
+│  # MVP 生成エージェント（実装済み）
 ├── ghost-writer.md          # 執筆
 ├── reviewer.md              # 校閲
 ├── quality-agent.md         # 品質
-├── consistency-agent.md     # 整合性
-├── foreshadowing-agent.md   # 伏線
-├── extract-agent.md         # 抽出
-└── style-agent.md           # 文体
+├── style-agent.md           # 文体
+│
+│  # 開発支援エージェント（実装済み）
+├── design-architect.md      # 設計
+├── doc-writer.md            # ドキュメント
+├── quality-auditor.md       # 監査
+├── requirement-analyst.md   # 要件分析
+├── task-decomposer.md       # タスク分解
+├── tdd-developer.md         # TDD実装
+└── test-runner.md           # テスト実行
 ```
+
+> **将来実装予定**（Phase G 以降）: `chief-editor.md`（統括、現在は CLAUDE.md に統合）、
+> `continuity-director.md`（門番、現在は L3 ContextBuilder に統合）、
+> `consistency-agent.md`（整合性）、`foreshadowing-agent.md`（伏線）、
+> `extract-agent.md`（抽出）
 
 ### 9.2 エージェント定義テンプレート
 

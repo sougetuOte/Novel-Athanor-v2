@@ -49,3 +49,6 @@ docs/302_novel_writing-main/
 
 # Personal memos (not for sharing)
 docs/memo/
+
+# LAM save file
+SESSION_STATE.md

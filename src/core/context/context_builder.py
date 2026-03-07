@@ -331,7 +331,6 @@ class ContextBuilder:
             except (OSError, ValueError, KeyError, TypeError) as e:
                 logger.warning("Instruction generation failed for %s: %s", cache_key, e)
                 instructions = ForeshadowInstructions()
-                self._last_instruction_error = e
 
         self._cache_put(self._instruction_cache, cache_key, instructions)
         return instructions

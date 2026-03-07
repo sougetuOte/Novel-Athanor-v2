@@ -51,7 +51,7 @@ class PlotRepository(BaseRepository[Plot]):
             return self._path_resolver.resolve_plot(
                 "L2", chapter_number=chapter_number, chapter_name=chapter_name
             )
-        else:  # L3
+        elif level == "L3":
             chapter_number = int(parts[1])
             chapter_name = parts[2]
             sequence_number = int(parts[3])
@@ -61,6 +61,8 @@ class PlotRepository(BaseRepository[Plot]):
                 chapter_name=chapter_name,
                 sequence_number=sequence_number,
             )
+        else:
+            raise ValueError(f"Invalid level: {level}")
 
     def _model_class(self) -> type[Plot]:
         """Plot クラスを返す.
@@ -82,10 +84,12 @@ class PlotRepository(BaseRepository[Plot]):
             return "L1"
         elif entity.level == "L2":
             return f"L2-{entity.chapter_number}-{entity.chapter_name}"
-        else:  # L3
+        elif entity.level == "L3":
             # L3 の場合、chapter_name を取得
             chapter_name = self._get_chapter_name_for_l3(entity.chapter_number)
             return f"L3-{entity.chapter_number}-{chapter_name}-{entity.sequence_number}"
+        else:
+            raise ValueError(f"Invalid entity level: {entity.level}")
 
     def _read(self, path: Path) -> Plot:
         """ファイルからモデルを読み込み.
@@ -106,8 +110,10 @@ class PlotRepository(BaseRepository[Plot]):
             return PlotL1(**fm, content=body)
         elif level == "L2":
             return PlotL2(**fm, content=body)
-        else:
+        elif level == "L3":
             return PlotL3(**fm, content=body)
+        else:
+            raise ValueError(f"Invalid plot level: {level}")
 
     def get_by_level(self, level: Literal["L1", "L2", "L3"]) -> list[Plot]:
         """指定レベルのプロットを取得.
@@ -151,8 +157,9 @@ class PlotRepository(BaseRepository[Plot]):
                 ):
                     return chapter_dir.name.split("_", 1)[1]
 
-        # 見つからない場合はデフォルト
-        return "Chapter"
+        raise FileNotFoundError(
+            f"No chapter found for chapter_number={chapter_number}"
+        )
 
     def _serialize(self, entity: Plot) -> str:
         """Plot を Markdown 形式にシリアライズ.

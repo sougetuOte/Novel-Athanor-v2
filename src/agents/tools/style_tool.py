@@ -115,20 +115,9 @@ def run_analyze_style(
     # 既存ガイド読み込み
     existing_guide = load_existing_guide(vault_root, work)
 
-    # E-1 で定義される format_style_analysis_context() を使用
-    # 並行作業のため、このタイミングでは存在しない可能性がある
-    # その場合は簡易フォーマットで対応
-    try:
-        from src.agents.prompts.style_agent import format_style_analysis_context
+    from src.agents.prompts.style_agent import format_style_analysis_context
 
-        return format_style_analysis_context(texts, existing_guide)
-    except ImportError:
-        # E-1 が未完了の場合の fallback
-        combined = "\n\n---\n\n".join(texts)
-        prompt = f"## 分析対象テキスト\n\n{combined}"
-        if existing_guide:
-            prompt += f"\n\n## 既存ガイド\n\n作品: {existing_guide.work}"
-        return prompt
+    return format_style_analysis_context(texts, existing_guide)
 
 
 def run_save_style(

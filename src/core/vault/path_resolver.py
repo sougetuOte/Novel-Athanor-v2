@@ -117,7 +117,7 @@ class VaultPathResolver:
                 / "L2_chapters"
                 / f"{chapter_number:02d}_{chapter_name}.md"
             )
-        else:  # L3
+        elif level == "L3":
             return (
                 self.vault_root
                 / "_plot"
@@ -125,6 +125,8 @@ class VaultPathResolver:
                 / f"{chapter_number:02d}_{chapter_name}"
                 / f"seq_{sequence_number:03d}.md"
             )
+        else:
+            raise ValueError(f"Invalid plot level: {level}")
 
     def resolve_summary(
         self,
@@ -153,7 +155,7 @@ class VaultPathResolver:
                 / "L2_chapters"
                 / f"{chapter_number:02d}_{chapter_name}.md"
             )
-        else:  # L3
+        elif level == "L3":
             return (
                 self.vault_root
                 / "_summary"
@@ -161,6 +163,8 @@ class VaultPathResolver:
                 / f"{chapter_number:02d}_{chapter_name}"
                 / f"seq_{sequence_number:03d}.md"
             )
+        else:
+            raise ValueError(f"Invalid summary level: {level}")
 
     def resolve_foreshadowing(self) -> Path:
         """伏線レジストリのパスを解決.

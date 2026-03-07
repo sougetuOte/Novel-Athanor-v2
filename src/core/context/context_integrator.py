@@ -202,7 +202,12 @@ class ContextIntegratorImpl:
         world_collector: ContextCollector | None = None,
         style_collector: ContextCollector | None = None,
     ) -> None:
-        """Integrate collectors in parallel using ThreadPoolExecutor."""
+        """Integrate collectors in parallel using ThreadPoolExecutor.
+
+        Each collector runs in its own thread and produces an isolated
+        FilteredContext. Results are merged into ctx on the main thread
+        to avoid data races.
+        """
         import concurrent.futures
 
         collectors: dict[str, ContextCollector] = {}
@@ -223,38 +228,57 @@ class ContextIntegratorImpl:
         with concurrent.futures.ThreadPoolExecutor(
             max_workers=self._max_workers
         ) as executor:
-            futures: dict[str, concurrent.futures.Future[None]] = {}
+            futures: dict[str, concurrent.futures.Future[FilteredContext]] = {}
             for name, collector in collectors.items():
                 futures[name] = executor.submit(
-                    self._run_collector, ctx, name, collector, scene
+                    self._run_collector_isolated, name, collector, scene
                 )
 
             for name, future in futures.items():
                 try:
-                    future.result()
+                    partial_ctx = future.result()
+                    ctx.plot_l1 = ctx.plot_l1 or partial_ctx.plot_l1
+                    ctx.plot_l2 = ctx.plot_l2 or partial_ctx.plot_l2
+                    ctx.plot_l3 = ctx.plot_l3 or partial_ctx.plot_l3
+                    ctx.summary_l1 = ctx.summary_l1 or partial_ctx.summary_l1
+                    ctx.summary_l2 = ctx.summary_l2 or partial_ctx.summary_l2
+                    ctx.summary_l3 = ctx.summary_l3 or partial_ctx.summary_l3
+                    ctx.characters.update(partial_ctx.characters)
+                    ctx.world_settings.update(partial_ctx.world_settings)
+                    if partial_ctx.style_guide is not None:
+                        ctx.style_guide = partial_ctx.style_guide
+                    ctx.warnings.extend(partial_ctx.warnings)
                 except Exception as e:
                     ctx.warnings.append(
                         f"Parallel collection failed for {name}: {e}"
                     )
 
-    def _run_collector(
+    def _run_collector_isolated(
         self,
-        ctx: FilteredContext,
         name: str,
         collector: ContextCollector,
         scene: SceneIdentifier,
-    ) -> None:
-        """Run a single collector and merge results into ctx."""
+    ) -> FilteredContext:
+        """Run a single collector and return an isolated FilteredContext.
+
+        This method is safe to call from any thread because it writes
+        only to its own local FilteredContext instance.
+        """
+        local_ctx = FilteredContext(
+            scene_id=scene.episode_id,
+            current_phase=scene.current_phase,
+        )
         if name == "plot":
-            self._integrate_plot(ctx, collector, scene)
+            self._integrate_plot(local_ctx, collector, scene)
         elif name == "summary":
-            self._integrate_summary(ctx, collector, scene)
+            self._integrate_summary(local_ctx, collector, scene)
         elif name == "character":
-            self._integrate_character(ctx, collector, scene)
+            self._integrate_character(local_ctx, collector, scene)
         elif name == "world":
-            self._integrate_world_setting(ctx, collector, scene)
+            self._integrate_world_setting(local_ctx, collector, scene)
         elif name == "style":
-            ctx.style_guide = collector.collect_as_string(scene)
+            local_ctx.style_guide = collector.collect_as_string(scene)
+        return local_ctx
 
     def _integrate_plot(
         self,

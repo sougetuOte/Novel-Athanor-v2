@@ -161,18 +161,18 @@ class FilteredContext:
         merged_warnings = self.warnings + other.warnings
 
         return FilteredContext(
-            plot_l1=self.plot_l1 if self.plot_l1 else other.plot_l1,
-            plot_l2=self.plot_l2 if self.plot_l2 else other.plot_l2,
-            plot_l3=self.plot_l3 if self.plot_l3 else other.plot_l3,
-            summary_l1=self.summary_l1 if self.summary_l1 else other.summary_l1,
-            summary_l2=self.summary_l2 if self.summary_l2 else other.summary_l2,
-            summary_l3=self.summary_l3 if self.summary_l3 else other.summary_l3,
+            plot_l1=self.plot_l1 if self.plot_l1 is not None else other.plot_l1,
+            plot_l2=self.plot_l2 if self.plot_l2 is not None else other.plot_l2,
+            plot_l3=self.plot_l3 if self.plot_l3 is not None else other.plot_l3,
+            summary_l1=self.summary_l1 if self.summary_l1 is not None else other.summary_l1,
+            summary_l2=self.summary_l2 if self.summary_l2 is not None else other.summary_l2,
+            summary_l3=self.summary_l3 if self.summary_l3 is not None else other.summary_l3,
             characters=merged_characters,
             world_settings=merged_world_settings,
-            style_guide=self.style_guide if self.style_guide else other.style_guide,
+            style_guide=self.style_guide if self.style_guide is not None else other.style_guide,
             scene_id=self.scene_id if self.scene_id else other.scene_id,
             current_phase=(
-                self.current_phase if self.current_phase else other.current_phase
+                self.current_phase if self.current_phase is not None else other.current_phase
             ),
             warnings=merged_warnings,
         )

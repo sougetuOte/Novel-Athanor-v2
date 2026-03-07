@@ -28,10 +28,7 @@ Expected LLM output format:
 
 from __future__ import annotations
 
-import re
 from typing import Any
-
-import yaml
 
 from src.agents.models.quality_result import (
     QualityAssessment,
@@ -40,6 +37,7 @@ from src.agents.models.quality_result import (
     QualityScore,
 )
 from src.agents.models.review_result import IssueSeverity
+from src.agents.parsers._yaml_utils import extract_yaml_block, parse_yaml
 
 
 def parse_quality_output(text: str) -> QualityResult:
@@ -58,34 +56,9 @@ def parse_quality_output(text: str) -> QualityResult:
         ValueError: If no YAML block is found, YAML is malformed,
                     or required fields are missing/invalid.
     """
-    yaml_content = _extract_yaml_block(text)
-    data = _parse_yaml(yaml_content)
+    yaml_content = extract_yaml_block(text)
+    data = parse_yaml(yaml_content)
     return _build_quality_result(data)
-
-
-def _extract_yaml_block(text: str) -> str:
-    """Extract YAML content from a fenced code block."""
-    pattern = r"```yaml\s*\n(.*?)```"
-    match = re.search(pattern, text, re.DOTALL)
-    if match is None:
-        msg = "No YAML code block found in the output."
-        raise ValueError(msg)
-    return match.group(1)
-
-
-def _parse_yaml(content: str) -> dict[str, Any]:
-    """Parse YAML string into a dictionary."""
-    try:
-        data = yaml.safe_load(content)
-    except yaml.YAMLError as e:
-        msg = f"Failed to parse YAML: {e}"
-        raise ValueError(msg) from e
-
-    if not isinstance(data, dict):
-        msg = f"Expected YAML dict, got {type(data).__name__}"
-        raise ValueError(msg)
-
-    return data
 
 
 def _build_quality_result(data: dict[str, Any]) -> QualityResult:

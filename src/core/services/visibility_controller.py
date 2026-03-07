@@ -202,7 +202,7 @@ def filter_content_by_visibility(
     Returns:
         フィルタ済みコンテンツ
     """
-    forbidden_keywords = forbidden_keywords or []
+    forbidden_keywords = list(forbidden_keywords) if forbidden_keywords else []
     hints = list(global_hints) if global_hints else []
     excluded_sections: list[str] = []
     section_configs = section_configs or {}

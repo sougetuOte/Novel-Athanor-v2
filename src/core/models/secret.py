@@ -69,5 +69,5 @@ class Secret(BaseModel):
         Returns:
             調整後の閾値
         """
-        adjustment = _THRESHOLD_ADJUSTMENTS.get(self.importance, 0.0)
+        adjustment = _THRESHOLD_ADJUSTMENTS[self.importance]
         return base_threshold + adjustment

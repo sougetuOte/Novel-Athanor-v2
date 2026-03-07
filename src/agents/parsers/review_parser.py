@@ -17,10 +17,7 @@ Expected LLM output format:
 
 from __future__ import annotations
 
-import re
 from typing import Any
-
-import yaml
 
 from src.agents.models.review_result import (
     IssueSeverity,
@@ -29,6 +26,7 @@ from src.agents.models.review_result import (
     ReviewResult,
     ReviewStatus,
 )
+from src.agents.parsers._yaml_utils import extract_yaml_block, parse_yaml
 
 
 def parse_review_output(text: str) -> ReviewResult:
@@ -47,54 +45,9 @@ def parse_review_output(text: str) -> ReviewResult:
         ValueError: If no YAML block is found, YAML is malformed,
                     or required fields are missing.
     """
-    yaml_content = _extract_yaml_block(text)
-    data = _parse_yaml(yaml_content)
+    yaml_content = extract_yaml_block(text)
+    data = parse_yaml(yaml_content)
     return _build_review_result(data)
-
-
-def _extract_yaml_block(text: str) -> str:
-    """Extract YAML content from a fenced code block.
-
-    Args:
-        text: Text potentially containing a ```yaml ... ``` block.
-
-    Returns:
-        The YAML content string.
-
-    Raises:
-        ValueError: If no YAML block is found.
-    """
-    pattern = r"```yaml\s*\n(.*?)```"
-    match = re.search(pattern, text, re.DOTALL)
-    if match is None:
-        msg = "No YAML code block found in the output."
-        raise ValueError(msg)
-    return match.group(1)
-
-
-def _parse_yaml(content: str) -> dict[str, Any]:
-    """Parse YAML string into a dictionary.
-
-    Args:
-        content: YAML string.
-
-    Returns:
-        Parsed dictionary.
-
-    Raises:
-        ValueError: If YAML parsing fails or result is not a dict.
-    """
-    try:
-        data = yaml.safe_load(content)
-    except yaml.YAMLError as e:
-        msg = f"Failed to parse YAML: {e}"
-        raise ValueError(msg) from e
-
-    if not isinstance(data, dict):
-        msg = f"Expected YAML dict, got {type(data).__name__}"
-        raise ValueError(msg)
-
-    return data
 
 
 def _build_review_result(data: dict[str, Any]) -> ReviewResult:

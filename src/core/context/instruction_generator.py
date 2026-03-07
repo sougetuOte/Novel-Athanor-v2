@@ -205,7 +205,7 @@ class InstructionGeneratorImpl:
         Returns:
             Subtlety target (1-10).
         """
-        base = self._BASE_SUBTLETY.get(action, 5)
+        base = self._BASE_SUBTLETY[action]
 
         # Adjust based on foreshadowing's own subtlety_level
         if fs.subtlety_level >= 7:

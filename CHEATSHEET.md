@@ -153,6 +153,8 @@ requirements → [承認] → design → [承認] → tasks → [承認] → BUI
 | `/adr-create` | ADR作成支援 |
 | `/security-review` | セキュリティレビュー |
 | `/impact-analysis` | 変更の影響分析 |
+| `/draft-scene` | シーンドラフト生成パイプライン（コンテキスト→執筆→レビュー→品質評価） |
+| `/analyze-style` | 文体分析・StyleGuide/Profile 自動生成 |
 
 ## 参照ドキュメント (SSOT)
 

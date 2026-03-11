@@ -23,11 +23,10 @@ docs/adr/                  # アーキテクチャ決定記録
 | ファイル | 内容 |
 |---------|------|
 | `core-identity.md` | Living Architect 行動規範 |
-| `phase-planning.md` | PLANNING ガードレール |
-| `phase-building.md` | BUILDING ガードレール |
-| `phase-auditing.md` | AUDITING ガードレール |
-| `security-commands.md` | コマンド安全基準（Allow/Deny List） |
-| `model-selection.md` | モデル選定ガイド |
+| `phase-rules.md` | フェーズ別ガードレール（PLANNING/BUILDING/AUDITING 統合） |
+| `permission-levels.md` | 権限等級分類基準（PG/SE/PM 三段階） |
+| `upstream-first.md` | 上流仕様優先原則 |
+| `security-commands.md` | コマンド安全基準（Layer 0/1/2） |
 | `decision-making.md` | 意思決定プロトコル |
 | `self-modification.md` | **プロジェクト自己改造ルール（計画優先原則）** |
 | `audit-fix-policy.md` | 監査修正ポリシー（全重篤度対応義務） |
@@ -39,7 +38,7 @@ docs/adr/                  # アーキテクチャ決定記録
 |---------|------|---------|
 | `/planning` | 要件定義・設計・タスク分解 | コード生成禁止 |
 | `/building` | TDD実装 | 仕様なし実装禁止 |
-| `/auditing` | レビュー・監査・リファクタ | 修正の直接実施禁止 |
+| `/auditing` | レビュー・監査・リファクタ | PM級修正禁止（PG/SE級は許可） |
 | `/project-status` | 進捗状況の表示 | - |
 
 ## 承認ゲート

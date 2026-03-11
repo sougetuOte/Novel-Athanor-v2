@@ -29,6 +29,5 @@ _TDD実装フェーズ_
 - `/auditing` コマンド実行時 → `AUDITING`
 
 ### 参照するルール
-- `rules/phase-planning.md` - PLANNINGフェーズのガードレール
-- `rules/phase-building.md` - BUILDINGフェーズのガードレール
-- `rules/phase-auditing.md` - AUDITINGフェーズのガードレール
+- `rules/phase-rules.md` - フェーズ別ガードレール（統合版）
+- `rules/permission-levels.md` - 権限等級分類基準（PG/SE/PM）

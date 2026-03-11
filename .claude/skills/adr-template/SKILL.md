@@ -5,6 +5,7 @@ description: |
   docs/adr/ へのADR作成時に自動適用され、
   06_DECISION_MAKING.md の3 Agents Modelに準拠した構造を提案する。
   アーキテクチャ決定、技術選定、設計方針の記録時に活用される。
+version: 1.0.0
 ---
 
 # ADRテンプレートスキル
@@ -208,7 +209,23 @@ Proposed → Accepted → [Deprecated | Superseded]
 | 関連ADR | Supersedes [ADR-YYYY](./YYYY-*.md) |
 ```
 
+## `/ship` からの自動起票フロー（v4.0.0）
+
+`/ship` Phase 2 で PM級の設計判断が検出された場合、ADR 起票を提案する:
+
+```
+/ship Phase 2 (Doc Sync チェック)
+  → PM級の変更を検出
+  → 「ADR を起票しますか？」とユーザーに提案
+  → 承認 → /adr-create を呼び出し、変更内容をコンテキストとして渡す
+  → スキップ → ADR 起票なしで /ship を続行
+```
+
+この連携により、PM級の設計判断が暗黙的にコードベースに埋もれることを防ぐ。
+
 ## 参照ドキュメント
 
 - `docs/internal/06_DECISION_MAKING.md`
+- `.claude/rules/permission-levels.md`（PG/SE/PM 分類基準）
 - `/adr-create` コマンド
+- `/ship` コマンド (Phase 2: Doc Sync チェック)

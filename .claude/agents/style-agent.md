@@ -3,6 +3,7 @@ name: style-agent
 description: >
   既存テキストの文体を分析し、StyleGuide（定性）とStyleProfile（定量）を自動生成する文体分析エージェント。
   Use proactively when analyzing writing style or generating style guides from existing episodes.
+# permission-level: SE
 tools: Read, Bash, Glob, Grep, Write
 model: sonnet
 memory: project

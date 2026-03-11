@@ -5,7 +5,7 @@ description: "セキュリティレビュー - 変更内容の安全性を検証
 # セキュリティレビュー
 
 変更内容に対する包括的なセキュリティ分析を実施する。
-`docs/internal/06_DECISION_MAKING.md` の **Critical Agent（批判者）** の視点で評価する。
+セキュリティチェック完了後、改善提案フェーズで `docs/internal/06_DECISION_MAKING.md` の **Critical Agent（批判者）** の視点も適用する。
 
 ## 実行ステップ
 
@@ -51,7 +51,36 @@ description: "セキュリティレビュー - 変更内容の安全性を検証
 - [具体的な対応項目]
 ```
 
+## 権限等級対応表
+
+セキュリティリスクと権限等級の対応:
+
+| リスクレベル | 権限等級 | 対応 |
+|-------------|---------|------|
+| Critical/High | PM | 即時報告、承認ゲート。修正禁止 |
+| Medium | SE | 修正後報告。計画的に対応 |
+| Low | PG | 自動修正可。報告不要 |
+
+権限等級の詳細: `.claude/rules/permission-levels.md`（存在する場合）
+
+## 自動化ツール連携
+
+以下のツールが利用可能な場合、自動実行して結果をレポートに含める:
+
+| チェック項目 | ツール | コマンド |
+|:---|:---|:---|
+| 依存脆弱性 (Python) | pip-audit / safety | `pip-audit --desc` / `safety check` |
+| シークレット漏洩 | grep パターン | `grep -rE '(password\|secret\|api_key)\s*=\s*["'"'"'][^"'"'"']{8,}' src/` |
+
+ツールが未インストールの場合は手動チェックリストのみ実施する。
+
+## 公式セキュリティツール参照
+
+- **[security-guidance plugin](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/security-guidance)**: Anthropic 公式のリアルタイムセキュリティ警告 plugin。9 パターン（コマンドインジェクション、XSS、eval、pickle 等）を自動検出
+- **[claude-code-security-review](https://github.com/anthropics/claude-code-security-review)**: GitHub Action。PR 単位の AI セキュリティレビュー
+- **[OWASP Top 10 (2025)](https://owasp.org/www-project-top-ten/)**: セキュリティチェックリストの基盤
+
 ## 関連ドキュメント
 
 - `docs/internal/06_DECISION_MAKING.md` - Critical Agent の役割
-- `docs/internal/07_SECURITY_AND_AUTOMATION.md` - コマンド安全基準
+- `docs/internal/07_SECURITY_AND_AUTOMATION.md` - コマンド安全基準 + 推奨セキュリティツール

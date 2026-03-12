@@ -1,5 +1,5 @@
 ---
-description: "クイックロード - 軽量セッション復元"
+description: "SESSION_STATE.md を読んで簡潔に報告"
 ---
 
 # クイックロード

@@ -87,7 +87,7 @@ full-review 開始時に context7 MCP の利用可否を確認する。
 
 | エージェント | 観点 | 出力要件 |
 |-------------|------|---------|
-| `code-reviewer` (1) | ソースコード品質（命名、構造、エラー処理）**+ プロジェクト固有ルール（building-checklist R-1〜R-12）適合性** | 各 Issue に PG/SE/PM 分類を付与 |
+| `code-reviewer` (1) | ソースコード品質（命名、構造、エラー処理）**+ プロジェクト固有ルール（building-checklist R-1〜R-13）適合性** | 各 Issue に PG/SE/PM 分類を付与 |
 | `code-reviewer` (2) | テストコード品質（網羅性、可読性、テストパターン）**+ テスト衛生（R-12: `-> None` 注釈, `@pytest.mark.slow`, conftest 集約, import 位置）** | 各 Issue に PG/SE/PM 分類を付与 |
 | `quality-auditor` | アーキテクチャ・仕様整合性（依存関係、**仕様ドリフト**、**構造整合性**）**+ A-5 仕様突合（`docs/specs/` のデータモデル・アーキテクチャ図・Agent 定義）** | 仕様ドリフト + 構造整合性結果を含む |
 | `code-reviewer` (3) | セキュリティ（OWASP Top 10、シークレット漏洩、依存脆弱性、インジェクション）**+ Python 安全性パターン（R-7〜R-9）** | 各 Issue にリスクレベル (Critical/High/Medium/Low) + PG/SE/PM 分類を付与 |

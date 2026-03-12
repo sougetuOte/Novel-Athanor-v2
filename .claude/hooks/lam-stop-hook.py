@@ -271,7 +271,7 @@ def _detect_security_tools(check_dir: Path) -> list[tuple[str, list[str]]]:
     return tools
 
 
-def _run_tests(check_dir: Path, log_file: Path) -> tuple[int, int]:
+def _run_tests(check_dir: Path, log_file: Path) -> tuple[CheckResult, int]:
     """
     テストを実行して (result, test_count) を返す。
     result: CheckResult.PASS / CheckResult.FAIL
@@ -311,7 +311,7 @@ def _run_tests(check_dir: Path, log_file: Path) -> tuple[int, int]:
     return (CheckResult.FAIL, 0)
 
 
-def _run_lint(check_dir: Path, log_file: Path) -> int:
+def _run_lint(check_dir: Path, log_file: Path) -> CheckResult:
     """
     lint を実行して result を返す。
     result: CheckResult.PASS / CheckResult.FAIL
@@ -336,7 +336,7 @@ def _run_lint(check_dir: Path, log_file: Path) -> int:
     return CheckResult.FAIL
 
 
-def _run_security(check_dir: Path, log_file: Path) -> int:
+def _run_security(check_dir: Path, log_file: Path) -> CheckResult:
     """
     セキュリティチェックを実行して result を返す。
     """

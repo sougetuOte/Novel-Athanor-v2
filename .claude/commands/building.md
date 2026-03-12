@@ -58,7 +58,7 @@ PLANNING 承認状態:
 
 ## TDDサイクル（t-wada style）
 
-**重要**: 各ステップで `.claude/rules/building-checklist.md`（R-1〜R-12, S-1〜S-2）のルールを適用すること。
+**重要**: 各ステップで `.claude/rules/building-checklist.md`（R-1〜R-13, S-1〜S-2）のルールを適用すること。
 
 ### Step 1: Spec & Task Update
 - コードを書く前に `docs/specs/` の更新案を提示
@@ -134,7 +134,7 @@ PLANNING 承認状態:
 - TDDサイクル: Red → Green → Refactor
 - ドキュメント同期: 必須
 - 報告: 1サイクルごと
-- building-checklist: R-1〜R-12, S-1〜S-2 適用
+- building-checklist: R-1〜R-13, S-1〜S-2 適用
 
 読み込み済み:
 - 02_DEVELOPMENT_FLOW.md (Phase 2)

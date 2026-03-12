@@ -8,7 +8,7 @@ description: |
 # permission-level: PM
 tools: Read, Glob, Grep, Write, Edit, WebSearch
 model: sonnet
-memory: user
+memory: project
 ---
 
 # Requirement Analyst サブエージェント

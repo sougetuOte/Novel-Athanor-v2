@@ -44,7 +44,7 @@ description: "日次振り返り"
 ## KPI 集計セクション
 
 ベースライン確立後（Wave 2 完了後）、以下の KPI を集計・表示する。
-詳細定義: `docs/specs/evaluation-kpi.md`
+詳細定義: `docs/specs/evaluation-kpi.md`（未作成。ベースライン確立後に策定予定）
 
 ### 集計手順
 
@@ -54,7 +54,7 @@ description: "日次振り返り"
 
 ### KPI 出力
 
-テンプレートは `docs/specs/evaluation-kpi.md` Section 6 を参照。
+テンプレートは `docs/specs/evaluation-kpi.md` 策定後に参照。
 
 ## 更新不要な情報
 - プロジェクト概要

@@ -15,20 +15,18 @@ description: "並列監査 + 全修正 + 検証の一気通貫レビュー"
 
 `.claude/lam-loop-state.json` を生成し、自動ループを開始する。
 
-```bash
-# 状態ファイルを生成（Bash で実行）
-# 注: $TARGET と $TIMESTAMP はシェル変数。heredoc 内で展開される
-cat > .claude/lam-loop-state.json << EOF
+Write ツールで `.claude/lam-loop-state.json` を生成する:
+
+```json
 {
   "active": true,
   "command": "full-review",
-  "target": "$TARGET",
+  "target": "<引数から取得した対象パス>",
   "iteration": 0,
   "max_iterations": 5,
-  "started_at": "$TIMESTAMP",
+  "started_at": "<現在時刻 ISO 8601>",
   "log": []
 }
-EOF
 ```
 
 **状態ファイルスキーマ** (`.claude/lam-loop-state.json`):
@@ -212,9 +210,10 @@ iter 3: 発見  0件 →             → ✅ Green State 達成
 
 **フルスキャンの発動手順**: 差分チェックで Green State を達成したら、状態ファイルに `fullscan_pending: true` をセットする:
 
-```bash
+```
 # Phase 4 で差分チェック Green State 達成時に実行
-TMP_FILE=$(mktemp) && jq '.fullscan_pending = true' .claude/lam-loop-state.json > "${TMP_FILE}" && mv "${TMP_FILE}" .claude/lam-loop-state.json
+# Read で .claude/lam-loop-state.json を読み、Edit で "fullscan_pending": true を追加する
+# （jq は Windows 未対応のため使用しない）
 ```
 
 Stop hook がこのフラグを検出すると、もう1サイクル（フルスキャン）を実行する。フルスキャンでも Green State なら本当の停止となる。

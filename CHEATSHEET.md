@@ -117,7 +117,6 @@ requirements → [承認] → design → [承認] → tasks → [承認] → BUI
 | `spec-template` | 仕様書作成テンプレート | 仕様書作成時に自動適用 |
 | `skill-creator` | スキル作成ガイド | スキル新規作成時に参照 |
 | `ui-design-guide` | UI設計チェックリスト | UI仕様作成時に自動適用 |
-| `analyze-style` | 文体分析・StyleGuide/Profile 生成 | `/analyze-style` |
 | `ultimate-think` | AoT+3Agents+Reflection 多層思考 | `/ultimate-think` |
 
 ## 典型的なプロジェクトの進め方

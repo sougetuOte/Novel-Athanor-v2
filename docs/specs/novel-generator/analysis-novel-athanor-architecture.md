@@ -114,13 +114,16 @@ Novel-Athanor/
 | ルール | 内容 |
 |--------|------|
 | `core-identity.md` | Living Architect 行動規範 |
-| `phase-planning.md` | PLANNINGガードレール |
-| `phase-building.md` | BUILDINGガードレール |
-| `phase-auditing.md` | AUDITINGガードレール |
+| ~~`phase-planning.md`~~ | ~~PLANNINGガードレール~~ → v4.0.0 で `phase-rules.md` に統合 |
+| ~~`phase-building.md`~~ | ~~BUILDINGガードレール~~ → v4.0.0 で `phase-rules.md` に統合 |
+| ~~`phase-auditing.md`~~ | ~~AUDITINGガードレール~~ → v4.0.0 で `phase-rules.md` に統合 |
 | `decision-making.md` | 3 Agents Model + AoT |
-| `model-selection.md` | モデル選定ガイド |
+| ~~`model-selection.md`~~ | ~~モデル選定ガイド~~ → v4.0.0 で廃止（CLAUDE.md に統合） |
 | `security-commands.md` | コマンド実行安全基準 |
 | `self-modification.md` | プロジェクト自己改造ルール |
+| `phase-rules.md` | v4.0.0 新設: 統合フェーズガードレール |
+| `permission-levels.md` | v4.0.0 新設: 権限等級（PG/SE/PM） |
+| `upstream-first.md` | v4.0.0 新設: 上流仕様優先原則 |
 
 ### 2.4 スキル（.claude/skills/）
 

@@ -48,7 +48,7 @@ git commit/push と Daily は次セッションで実行してください。
 
 `.claude/logs/loop.log` が存在する場合、未コミットのループログを次のステップの git commit に含める。
 ループログは「ドキュメント更新」グループに分類する。
-詳細: `docs/specs/loop-log-schema.md`
+詳細: ループログの実装は `.claude/hooks/lam-stop-hook.py` の `_save_loop_log()` を参照
 
 ## 4. git commit（論理グループ別）
 

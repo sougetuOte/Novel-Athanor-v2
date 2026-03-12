@@ -142,29 +142,7 @@ lam-orchestrate は `/full-review` コマンドと連携し、自動ループの
 lam-orchestrate または `/full-review` Phase 0 が生成し、ループのライフサイクル全体を通じて管理する中核ファイル。
 `/full-review` が単独実行された場合は `/full-review` 自身が生成する。lam-orchestrate 経由の場合は lam-orchestrate が生成する。
 
-| フィールド | 型 | 説明 |
-|-----------|---|------|
-| `active` | boolean | ループ有効フラグ |
-| `command` | string | 起動コマンド（`"full-review"`） |
-| `target` | string | 監査対象パス |
-| `iteration` | number | 現在のイテレーション番号（0始まり） |
-| `max_iterations` | number | 最大イテレーション数（デフォルト: 5） |
-| `started_at` | string | ループ開始時刻（ISO 8601） |
-| `log` | array | 各イテレーションの記録（下記サブスキーマ参照） |
-| `fullscan_pending` | boolean | フルスキャン待ちフラグ（差分チェック Green State 後に true） |
-| `tool_events` | array | PostToolUse hook が追記するツール実行ログ |
-
-**log エントリ**:
-
-| フィールド | 型 | 説明 |
-|-----------|---|------|
-| `iteration` | number | イテレーション番号 |
-| `issues_found` | number | 発見した問題数 |
-| `issues_fixed` | number | 修正した問題数 |
-| `pg` | number | PG級の問題数 |
-| `se` | number | SE級の問題数 |
-| `pm` | number | PM級の問題数 |
-| `test_count` | number | テスト数（Stop hook がエスカレーション判定に使用） |
+> **スキーマ SSOT**: `.claude/commands/full-review.md` Phase 0 セクション参照。
 
 ### ループライフサイクル
 
@@ -221,9 +199,10 @@ lam-orchestrate は、より複雑なマルチタスク実行時に `/full-revie
 
 Phase 4 の差分チェックで Green State を達成した場合、フルスキャンを発動するためにフラグをセットする:
 
-```bash
+```
 # Phase 4 で差分チェック Green State 達成時に実行
-TMP_FILE=$(mktemp) && jq '.fullscan_pending = true' .claude/lam-loop-state.json > "${TMP_FILE}" && mv "${TMP_FILE}" .claude/lam-loop-state.json
+# Read で .claude/lam-loop-state.json を読み、Edit で "fullscan_pending": true を追加する
+# （jq は Windows 未対応のため使用しない）
 ```
 
 Stop hook がこのフラグを検出すると、もう1サイクル（フルスキャン）を実行する。フルスキャンでも Green State なら本当の停止となる。

@@ -72,7 +72,7 @@ description: "プロジェクトの進捗状況を表示"
 ## KPI ダッシュボード
 
 ベースライン確立後（Wave 2 完了後）、以下を表示する。
-詳細定義: `docs/specs/evaluation-kpi.md`
+詳細定義: `docs/specs/evaluation-kpi.md`（未作成。ベースライン確立後に策定予定）
 
 ```
 ## KPI ダッシュボード

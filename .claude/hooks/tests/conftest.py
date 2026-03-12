@@ -4,16 +4,26 @@ conftest.py - pytest 共通 fixtures
 W2-T1: conftest.py（共通 pytest fixtures）
 対応仕様: design.md Section 4
 """
+from __future__ import annotations
+
 import json
 import os
 import subprocess
 import sys
+from collections.abc import Callable
+from pathlib import Path
+from typing import Any
 
 import pytest
 
+# tests/ ディレクトリを sys.path に追加（_test_helpers を import 可能にする）
+_TESTS_DIR = str(Path(__file__).resolve().parent)
+if _TESTS_DIR not in sys.path:
+    sys.path.insert(0, _TESTS_DIR)
+
 
 @pytest.fixture
-def project_root(tmp_path):
+def project_root(tmp_path: Path) -> Path:
     """テスト用の仮プロジェクトルートを作成する。
 
     .claude/logs/ ディレクトリと .claude/ ディレクトリを作成し、
@@ -28,7 +38,7 @@ def project_root(tmp_path):
 
 
 @pytest.fixture
-def hook_runner(project_root):
+def hook_runner(project_root: Path) -> Callable[..., subprocess.CompletedProcess[str]]:
     """フックを subprocess で実行するヘルパー関数を返す fixture。
 
     返す run_hook() 関数の仕様:
@@ -39,7 +49,11 @@ def hook_runner(project_root):
     - LAM_PROJECT_ROOT を tmp_path に設定（実プロジェクト汚染防止）
     """
 
-    def run_hook(hook_path, input_json=None, env=None):
+    def run_hook(
+        hook_path: Path | str,
+        input_json: dict[str, Any] | None = None,
+        env: dict[str, str] | None = None,
+    ) -> subprocess.CompletedProcess[str]:
         """フックスクリプトを subprocess で実行する。
 
         Args:

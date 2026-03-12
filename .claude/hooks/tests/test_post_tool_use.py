@@ -4,6 +4,8 @@ test_post_tool_use.py - post-tool-use.py の TDD テスト
 W3-T1: Red フェーズ（テストファースト）
 対応仕様: docs/specs/hooks-python-migration/design.md H2（post-tool-use）
 """
+from __future__ import annotations
+
 import json
 from pathlib import Path
 
@@ -14,7 +16,7 @@ HOOK_PATH = Path(__file__).resolve().parent.parent / "post-tool-use.py"
 class TestTDDPatternDetection:
     """TDD パターン検出テスト（責務1）"""
 
-    def test_pytest_fail_recorded(self, hook_runner, project_root):
+    def test_pytest_fail_recorded(self, hook_runner, project_root) -> None:
         """Bash + pytest 失敗（exit_code=1）→ tdd-patterns.log に FAIL 記録"""
         input_json = {
             "tool_name": "Bash",
@@ -30,10 +32,10 @@ class TestTDDPatternDetection:
         tdd_log = project_root / ".claude" / "tdd-patterns.log"
         assert tdd_log.exists(), "tdd-patterns.log が作成されるべき"
         content = tdd_log.read_text(encoding="utf-8")
-        assert "FAIL" in content
+        assert "\tFAIL\t" in content
         assert "pytest" in content
 
-    def test_pytest_pass_after_fail(self, hook_runner, project_root):
+    def test_pytest_pass_after_fail(self, hook_runner, project_root) -> None:
         """失敗後成功 → PASS 記録（last-test-result ファイル経由）"""
         # まず失敗を記録
         fail_input = {
@@ -63,7 +65,7 @@ class TestTDDPatternDetection:
         content = tdd_log.read_text(encoding="utf-8")
         assert "PASS" in content, "失敗→成功パターンが PASS として記録されるべき"
 
-    def test_npm_test_fail_recorded(self, hook_runner, project_root):
+    def test_npm_test_fail_recorded(self, hook_runner, project_root) -> None:
         """npm test 失敗 → FAIL 記録"""
         input_json = {
             "tool_name": "Bash",
@@ -79,10 +81,10 @@ class TestTDDPatternDetection:
         tdd_log = project_root / ".claude" / "tdd-patterns.log"
         assert tdd_log.exists(), "tdd-patterns.log が作成されるべき"
         content = tdd_log.read_text(encoding="utf-8")
-        assert "FAIL" in content
+        assert "\tFAIL\t" in content
         assert "npm test" in content
 
-    def test_go_test_fail_recorded(self, hook_runner, project_root):
+    def test_go_test_fail_recorded(self, hook_runner, project_root) -> None:
         """go test 失敗 → FAIL 記録"""
         input_json = {
             "tool_name": "Bash",
@@ -98,10 +100,10 @@ class TestTDDPatternDetection:
         tdd_log = project_root / ".claude" / "tdd-patterns.log"
         assert tdd_log.exists(), "tdd-patterns.log が作成されるべき"
         content = tdd_log.read_text(encoding="utf-8")
-        assert "FAIL" in content
+        assert "\tFAIL\t" in content
         assert "go test" in content
 
-    def test_non_test_command_no_record(self, hook_runner, project_root):
+    def test_non_test_command_no_record(self, hook_runner, project_root) -> None:
         """テスト以外のコマンド（ls）→ 記録なし"""
         input_json = {
             "tool_name": "Bash",
@@ -122,7 +124,7 @@ class TestTDDPatternDetection:
 class TestDocSyncFlag:
     """doc-sync-flag テスト（責務2）"""
 
-    def test_edit_src_doc_sync_flag(self, hook_runner, project_root):
+    def test_edit_src_doc_sync_flag(self, hook_runner, project_root) -> None:
         """Edit + src/main.py → doc-sync-flag に追記"""
         input_json = {
             "tool_name": "Edit",
@@ -140,7 +142,7 @@ class TestDocSyncFlag:
         content = doc_sync_flag.read_text(encoding="utf-8")
         assert "src/main.py" in content
 
-    def test_write_src_doc_sync_flag(self, hook_runner, project_root):
+    def test_write_src_doc_sync_flag(self, hook_runner, project_root) -> None:
         """Write + src/main.py → doc-sync-flag に追記"""
         input_json = {
             "tool_name": "Write",
@@ -157,7 +159,7 @@ class TestDocSyncFlag:
         content = doc_sync_flag.read_text(encoding="utf-8")
         assert "src/main.py" in content
 
-    def test_edit_docs_no_sync_flag(self, hook_runner, project_root):
+    def test_edit_docs_no_sync_flag(self, hook_runner, project_root) -> None:
         """Edit + docs/readme.md → doc-sync-flag に追記なし"""
         input_json = {
             "tool_name": "Edit",
@@ -171,16 +173,15 @@ class TestDocSyncFlag:
         assert result.returncode == 0
 
         doc_sync_flag = project_root / ".claude" / "doc-sync-flag"
-        # doc-sync-flag が存在しないか、存在しても docs/readme.md が記録されていない
-        if doc_sync_flag.exists():
-            content = doc_sync_flag.read_text(encoding="utf-8")
-            assert "docs/readme.md" not in content
+        assert not doc_sync_flag.exists(), (
+            "docs/ パスでは doc-sync-flag が作成されるべきでない"
+        )
 
 
 class TestLoopLog:
     """ループログテスト（責務3）"""
 
-    def test_loop_state_tool_events(self, hook_runner, project_root):
+    def test_loop_state_tool_events(self, hook_runner, project_root) -> None:
         """lam-loop-state.json 存在時 → tool_events に追記"""
         # lam-loop-state.json を事前に作成
         loop_state_path = project_root / ".claude" / "lam-loop-state.json"
@@ -213,7 +214,7 @@ class TestLoopLog:
 class TestAtomicWriteSafety:
     """アトミック書き込みの安全性テスト（責務3）"""
 
-    def test_atomic_write_safety(self, hook_runner, project_root):
+    def test_atomic_write_safety(self, hook_runner, project_root) -> None:
         """lam-loop-state.json への追記がアトミックに行われる"""
         # lam-loop-state.json を事前に作成
         loop_state_path = project_root / ".claude" / "lam-loop-state.json"

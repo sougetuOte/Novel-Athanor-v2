@@ -4,28 +4,18 @@ test_loop_integration.py - ループ統合テスト
 W4-T2: H4/H1/H2/H3 をまたぐループ統合テスト。
 bash 版 test-loop-integration.sh の 5 シナリオ (S-1〜S-5) を pytest で再現。
 
-対応仕様: docs/specs/hooks-python-migration/design.md Section 4 (S-1〜S-5)
+対応仕様: docs/internal/07_SECURITY_AND_AUTOMATION.md Section 5（統合テスト）
 """
 from __future__ import annotations
 
+import datetime
 import json
 from pathlib import Path
 
-import pytest
+from _test_helpers import DEFAULT_STATE, read_state, write_state
 
 # テスト対象フックのパス
 STOP_HOOK_PATH = Path(__file__).resolve().parent.parent / "lam-stop-hook.py"
-
-# 状態ファイルのデフォルト構造
-DEFAULT_STATE = {
-    "active": True,
-    "iteration": 0,
-    "max_iterations": 5,
-    "command": "full-review",
-    "target": "src/",
-    "started_at": "2026-03-10T00:00:00Z",
-    "log": [],
-}
 
 DEFAULT_INPUT = {
     "session_id": "test-integration",
@@ -35,21 +25,6 @@ DEFAULT_INPUT = {
     "stop_hook_active": False,
     "last_assistant_message": "done",
 }
-
-
-def _write_state(project_root: Path, state: dict) -> Path:
-    """lam-loop-state.json を書き込む。"""
-    state_file = project_root / ".claude" / "lam-loop-state.json"
-    state_file.write_text(json.dumps(state), encoding="utf-8")
-    return state_file
-
-
-def _read_state(project_root: Path) -> dict | None:
-    """lam-loop-state.json を読み込む。存在しなければ None。"""
-    state_file = project_root / ".claude" / "lam-loop-state.json"
-    if not state_file.exists():
-        return None
-    return json.loads(state_file.read_text(encoding="utf-8"))
 
 
 def _make_input(project_root: Path, message: str = "done", **overrides) -> dict:
@@ -70,9 +45,10 @@ def _setup_test_env(project_root: Path, test_pass: bool = True, lint_pass: bool 
     Makefile は make が未インストールの環境で動作しないため使用しない。
     """
     # pyproject.toml: pytest + ruff 設定
-    sections = ["[tool.pytest.ini_options]\ntestpaths = [\"tests\"]\n"]
-    if lint_pass is not None:
-        sections.append("[tool.ruff]\nline-length = 120\n")
+    sections = [
+        "[tool.pytest.ini_options]\ntestpaths = [\"tests\"]\n",
+        "[tool.ruff]\nline-length = 120\n",
+    ]
     (project_root / "pyproject.toml").write_text("\n".join(sections), encoding="utf-8")
 
     # テストファイル（前回のテストファイルをクリーンアップ）
@@ -100,7 +76,7 @@ class TestNormalConvergence:
     """S-1: 正常収束シミュレーション
     PG級のみ → Green State 達成 → 自動停止"""
 
-    def test_green_state_stops_loop(self, hook_runner, project_root):
+    def test_green_state_stops_loop(self, hook_runner, project_root) -> None:
         """S-1-1: テスト・lint 成功環境 → Green State → ループ停止"""
         state = {
             **DEFAULT_STATE,
@@ -109,7 +85,7 @@ class TestNormalConvergence:
                 {"iteration": 0, "issues_found": 2, "issues_fixed": 2, "pg": 2, "se": 0, "pm": 0},
             ],
         }
-        _write_state(project_root, state)
+        write_state(project_root, state)
         _setup_test_env(project_root, test_pass=True, lint_pass=True)
 
         input_data = _make_input(project_root, "Green State 達成。全修正完了。")
@@ -127,7 +103,7 @@ class TestNormalConvergence:
 class TestPMEscalation:
     """S-2: PM級エスカレーション シミュレーション"""
 
-    def test_test_failure_blocks(self, hook_runner, project_root):
+    def test_test_failure_blocks(self, hook_runner, project_root) -> None:
         """S-2-1: テスト失敗 → block で継続（PM級検出は Claude の責務）"""
         state = {
             **DEFAULT_STATE,
@@ -136,7 +112,7 @@ class TestPMEscalation:
                 {"iteration": 0, "issues_found": 5, "issues_fixed": 3, "pg": 2, "se": 1, "pm": 2},
             ],
         }
-        _write_state(project_root, state)
+        write_state(project_root, state)
         _setup_test_env(project_root, test_pass=False)
 
         input_data = _make_input(
@@ -151,10 +127,10 @@ class TestPMEscalation:
         data = json.loads(stdout)
         assert data.get("decision") == "block"
 
-    def test_active_false_stops(self, hook_runner, project_root):
+    def test_active_false_stops(self, hook_runner, project_root) -> None:
         """S-2-2: active=false → ループ無効で停止"""
         state = {**DEFAULT_STATE, "active": False, "iteration": 1}
-        _write_state(project_root, state)
+        write_state(project_root, state)
 
         result = hook_runner(STOP_HOOK_PATH, _make_input(project_root))
 
@@ -167,7 +143,7 @@ class TestPMEscalation:
 class TestMaxIterationsLifecycle:
     """S-3: 上限到達ライフサイクル"""
 
-    def test_below_max_continues(self, hook_runner, project_root):
+    def test_below_max_continues(self, hook_runner, project_root) -> None:
         """S-3-1: iteration=4, max_iterations=5 → まだ継続可能"""
         state = {
             **DEFAULT_STATE,
@@ -180,7 +156,7 @@ class TestMaxIterationsLifecycle:
                 {"iteration": 3, "issues_found": 2, "issues_fixed": 1, "pg": 1, "se": 0, "pm": 0},
             ],
         }
-        _write_state(project_root, state)
+        write_state(project_root, state)
         _setup_test_env(project_root, test_pass=False)
 
         input_data = _make_input(project_root, "Green State 未達。残 Issue: 1件")
@@ -190,7 +166,7 @@ class TestMaxIterationsLifecycle:
         data = json.loads(result.stdout.strip())
         assert data.get("decision") == "block", "上限未到達時は block で継続"
 
-    def test_at_max_stops(self, hook_runner, project_root):
+    def test_at_max_stops(self, hook_runner, project_root) -> None:
         """S-3-2: iteration=5 == max_iterations=5 → 強制停止"""
         state = {
             **DEFAULT_STATE,
@@ -204,7 +180,7 @@ class TestMaxIterationsLifecycle:
                 {"iteration": 4, "issues_found": 1, "issues_fixed": 0, "pg": 0, "se": 1, "pm": 0},
             ],
         }
-        state_file = _write_state(project_root, state)
+        state_file = write_state(project_root, state)
 
         input_data = _make_input(project_root, "Green State 未達。残 Issue: 1件")
         result = hook_runner(STOP_HOOK_PATH, input_data)
@@ -219,12 +195,11 @@ class TestMaxIterationsLifecycle:
 class TestContextExhaustion:
     """S-4: コンテキスト枯渇 → ループ停止"""
 
-    def test_precompact_recent_stops(self, hook_runner, project_root):
+    def test_precompact_recent_stops(self, hook_runner, project_root) -> None:
         """S-4-1: PreCompact フラグが直近 → ループ停止"""
-        import datetime
 
         state = {**DEFAULT_STATE, "iteration": 2}
-        state_file = _write_state(project_root, state)
+        state_file = write_state(project_root, state)
 
         # 直近のタイムスタンプで pre-compact-fired フラグを作成
         now_ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -243,9 +218,8 @@ class TestContextExhaustion:
 class TestFullLifecycle:
     """S-5: ループライフサイクル全体（初期化→複数サイクル→収束）"""
 
-    def test_init_fail_then_converge(self, hook_runner, project_root):
+    def test_init_fail_then_converge(self, hook_runner, project_root) -> None:
         """S-5-1: Phase 0 初期化 → サイクル1(失敗) → サイクル2(成功) の流れ"""
-        import datetime
 
         # Phase 0: 初期化（状態ファイル生成）
         now_ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -253,7 +227,7 @@ class TestFullLifecycle:
             **DEFAULT_STATE,
             "started_at": now_ts,
         }
-        state_file = _write_state(project_root, state)
+        state_file = write_state(project_root, state)
         assert state_file.exists(), "Phase 0: 状態ファイルが生成されるべき"
 
         # サイクル1: テスト失敗 → block で継続
@@ -267,7 +241,7 @@ class TestFullLifecycle:
         assert state_file.exists(), "サイクル1: 状態ファイルが残っているべき"
 
         # iteration がインクリメントされたか確認
-        updated_state = _read_state(project_root)
+        updated_state = read_state(project_root)
         assert updated_state is not None
         assert updated_state["iteration"] == 1, (
             f"サイクル1 後に iteration が 1 であるべき。got: {updated_state['iteration']}"

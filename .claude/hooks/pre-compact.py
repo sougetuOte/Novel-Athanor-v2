@@ -9,6 +9,7 @@ NOTE: PreCompact は公式ドキュメント未掲載だが動作確認済み（
 エラーが発生しても exit 0 を返し、圧縮をブロックしない。
 """
 from __future__ import annotations
+
 import datetime
 import pathlib
 import shutil
@@ -17,7 +18,7 @@ import sys
 _HOOKS_DIR = str(pathlib.Path(__file__).resolve().parent)
 if _HOOKS_DIR not in sys.path:
     sys.path.insert(0, _HOOKS_DIR)
-from _hook_utils import get_project_root, safe_exit  # noqa: E402
+from _hook_utils import get_project_root  # noqa: E402
 
 
 def now_iso8601() -> str:
@@ -103,7 +104,7 @@ def main() -> None:
         # 圧縮をブロックしないため常に正常終了
         pass
 
-    safe_exit(0)
+    sys.exit(0)
 
 
 if __name__ == "__main__":

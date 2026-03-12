@@ -4,7 +4,7 @@ _hook_utils.py - フックスクリプト共通ユーティリティ
 bash 版で各フックに重複していた処理を集約する。
 標準ライブラリのみ使用（外部パッケージ不要）。
 
-対応仕様: design.md Section 2
+対応仕様: docs/internal/07_SECURITY_AND_AUTOMATION.md Section 5（Hooks-Based Permission System）
 """
 from __future__ import annotations
 
@@ -17,6 +17,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from typing import Any
 
 
 def get_project_root() -> pathlib.Path:
@@ -29,7 +30,11 @@ def get_project_root() -> pathlib.Path:
     """
     env_root = os.environ.get("LAM_PROJECT_ROOT")
     if env_root:
-        return pathlib.Path(env_root)
+        candidate = pathlib.Path(env_root)
+        # バリデーション: .claude/ ディレクトリが存在するか確認
+        if (candidate / ".claude").is_dir():
+            return candidate
+        # .claude/ が存在しなければ環境変数を無視してデフォルトにフォールバック
     # __file__ は .claude/hooks/_hook_utils.py
     # parent   -> .claude/hooks/
     # parent.parent -> .claude/
@@ -67,7 +72,7 @@ def get_tool_input(data: dict, key: str) -> str:
     return tool_input.get(key, "")
 
 
-def get_tool_response(data: dict, key: str, default: object):
+def get_tool_response(data: dict, key: str, default: Any) -> Any:
     """
     data["tool_response"][key] を返す。
     tool_response またはキーが存在しない場合は default を返す。

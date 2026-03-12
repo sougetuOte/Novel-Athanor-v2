@@ -51,7 +51,7 @@ description: "セキュリティレビュー - 変更内容の安全性を検証
 - [具体的な対応項目]
 ```
 
-## 権限等級対応表
+## 権限等級対応表（v4.0.0）
 
 セキュリティリスクと権限等級の対応:
 
@@ -61,7 +61,7 @@ description: "セキュリティレビュー - 変更内容の安全性を検証
 | Medium | SE | 修正後報告。計画的に対応 |
 | Low | PG | 自動修正可。報告不要 |
 
-権限等級の詳細: `.claude/rules/permission-levels.md`（存在する場合）
+権限等級の詳細: `.claude/rules/permission-levels.md`
 
 ## 自動化ツール連携
 
@@ -69,6 +69,7 @@ description: "セキュリティレビュー - 変更内容の安全性を検証
 
 | チェック項目 | ツール | コマンド |
 |:---|:---|:---|
+| 依存脆弱性 (JS) | npm audit | `npm audit --audit-level=high` |
 | 依存脆弱性 (Python) | pip-audit / safety | `pip-audit --desc` / `safety check` |
 | シークレット漏洩 | grep パターン | `grep -rE '(password\|secret\|api_key)\s*=\s*["'"'"'][^"'"'"']{8,}' src/` |
 

@@ -6,14 +6,6 @@
 2. **Freshness Verification**: 重要判断前には再読込を行う
 3. **Assumption Elimination**: 「覚えているはずだ」を仮定しない
 
-**禁止**: 検索・確認を行わずに「以前の記憶」だけで回答すること
-
-## SSOT Priority（真実の優先順位）
-
-1. `docs/internal/00-07`: プロセスとルールの SSOT
-2. `docs/specs/`: ドキュメント化された仕様
-3. 既存コード: コードと仕様が矛盾する場合、**仕様が正**
-
 ## 権限等級（PG/SE/PM）
 
 v4.0.0 で導入された変更のリスクレベルに応じた三段階分類:
@@ -28,10 +20,5 @@ v4.0.0 で導入された変更のリスクレベルに応じた三段階分類:
 ## Context Compression
 
 セッションが長くなった場合:
-1. 決定事項と未解決タスクを `docs/tasks/` または `docs/memos/` に書き出す
+1. 決定事項と未解決タスクを `docs/tasks/` または `docs/artifacts/` に書き出す
 2. ユーザーに「コンテキストをリセットします」と宣言
-
-## References
-
-- `docs/internal/00_PROJECT_STRUCTURE.md`
-- `docs/internal/05_MCP_INTEGRATION.md`

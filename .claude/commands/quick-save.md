@@ -1,9 +1,13 @@
+---
+description: "SESSION_STATE.md への軽量セーブ（git commitなし）"
+---
+
 # クイックセーブ（軽量版）
 
-SESSION_STATE.md への記録のみ。git commit は行わない。
+プロジェクトルートの `SESSION_STATE.md` への記録のみ。git commit は行わない。
 コンテキスト消費を最小限に抑えるため、簡潔に実行すること。
 
-## 1. SESSION_STATE.md を書き出す
+## 1. プロジェクトルートの SESSION_STATE.md を書き出す
 
 以下の内容を **簡潔に** 記録（各項目は箇条書き数行で十分）:
 
@@ -24,6 +28,7 @@ SESSION_STATE.md への記録のみ。git commit は行わない。
 - 残っている課題、確認事項（なければ「なし」）
 
 ### コンテキスト情報
+- 現在のフェーズ (PLANNING / BUILDING / AUDITING)
 - 現在のgitブランチ
 - 関連するSPEC/ADR/設計書ファイル名
 
@@ -37,6 +42,6 @@ SESSION_STATE.md への記録のみ。git commit は行わない。
   claude -c  （直前セッション続行）
   claude     （新規セッション）
 
-再開後: /full-load
+再開後: 「SESSION_STATE.md を読んで前回の続きから」
 ---
 ```

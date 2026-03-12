@@ -88,16 +88,18 @@ requirements → [承認] → design → [承認] → tasks → [承認] → BUI
 
 ### 汎用エージェント
 
-| エージェント | 呼び出し例 | フェーズ | 等級 |
-|-------------|-----------|---------|:----:|
-| `requirement-analyst` | 「要件を整理して」 | PLANNING | PM |
-| `design-architect` | 「APIを設計して」 | PLANNING | SE |
-| `task-decomposer` | 「タスクを分割して」 | PLANNING | SE |
-| `tdd-developer` | 「TASK-001を実装して」 | BUILDING | SE |
-| `code-reviewer` | 「src/をレビューして」 | AUDITING | SE |
-| `quality-auditor` | 「src/を監査して」 | AUDITING | SE |
-| `doc-writer` | 「ドキュメントを更新して」 | ALL | SE |
-| `test-runner` | 「テストを実行して」 | BUILDING | PG |
+| エージェント | 呼び出し例 | フェーズ | Memory |
+|-------------|-----------|---------|:------:|
+| `requirement-analyst` | 「要件を整理して」 | PLANNING | project |
+| `design-architect` | 「APIを設計して」 | PLANNING | project |
+| `task-decomposer` | 「タスクを分割して」 | PLANNING | - |
+| `tdd-developer` | 「TASK-001を実装して」 | BUILDING | project |
+| `code-reviewer` | 「コードレビューして」 | AUDITING | project |
+| `quality-auditor` | 「src/を監査して」 | AUDITING | project |
+| `doc-writer` | 「ドキュメントを更新して」 | ALL | project |
+| `test-runner` | 「テストを実行して」 | BUILDING | - |
+
+Memory 列: `project` = `.claude/agent-memory/<name>/` にセッション跨ぎで知見を自動蓄積。
 
 ### プロジェクト固有エージェント（Novel-Athanor-v2）
 
@@ -147,6 +149,8 @@ requirements → [承認] → design → [承認] → tasks → [承認] → BUI
 | `.claude/current-phase.md` | 現在のフェーズ |
 | `.claude/states/<feature>.json` | 機能ごとの進捗・承認状態 |
 | `SESSION_STATE.md` | セッション間の引き継ぎ（/quick-save で生成） |
+| `docs/artifacts/knowledge/` | プロジェクト知見の構造化蓄積（/retro 経由） |
+| `.claude/agent-memory/` | Subagent の自動学習記録 |
 
 ## ワークフローコマンド
 

@@ -8,7 +8,7 @@ description: |
 # permission-level: SE
 tools: Read, Glob, Grep, Bash
 model: sonnet
-memory: user
+memory: project
 ---
 
 # Quality Auditor サブエージェント

@@ -23,11 +23,10 @@ docs/adr/                  # アーキテクチャ決定記録
 | ファイル | 内容 |
 |---------|------|
 | `core-identity.md` | Living Architect 行動規範 |
-| `phase-planning.md` | PLANNING ガードレール |
-| `phase-building.md` | BUILDING ガードレール |
-| `phase-auditing.md` | AUDITING ガードレール |
-| `security-commands.md` | コマンド安全基準（Allow/Deny List） |
-| `model-selection.md` | モデル選定ガイド |
+| `phase-rules.md` | フェーズ別ガードレール（PLANNING/BUILDING/AUDITING 統合） |
+| `permission-levels.md` | 権限等級分類基準（PG/SE/PM 三段階） |
+| `upstream-first.md` | 上流仕様優先原則 |
+| `security-commands.md` | コマンド安全基準（Layer 0/1/2） |
 | `decision-making.md` | 意思決定プロトコル |
 | `self-modification.md` | **プロジェクト自己改造ルール（計画優先原則）** |
 | `audit-fix-policy.md` | 監査修正ポリシー（全重篤度対応義務） |
@@ -39,7 +38,7 @@ docs/adr/                  # アーキテクチャ決定記録
 |---------|------|---------|
 | `/planning` | 要件定義・設計・タスク分解 | コード生成禁止 |
 | `/building` | TDD実装 | 仕様なし実装禁止 |
-| `/auditing` | レビュー・監査・リファクタ | 修正の直接実施禁止 |
+| `/auditing` | レビュー・監査・リファクタ | PM級修正禁止（PG/SE級は許可） |
 | `/project-status` | 進捗状況の表示 | - |
 
 ## 承認ゲート
@@ -75,19 +74,30 @@ requirements → [承認] → design → [承認] → tasks → [承認] → BUI
 - 黄 (15-30%): 注意
 - 赤 (<=15%): `/quick-save` 推奨
 
+## 権限等級（PG/SE/PM）
+
+| 等級 | 意味 | 対応 |
+|:----:|------|------|
+| PG | 自明な修正（typo, lint, format） | 自動修正・報告不要 |
+| SE | 技術的判断含む（テスト追加, リファクタ） | 修正後に報告 |
+| PM | 仕様・アーキテクチャ影響 | 承認ゲート必須 |
+
+迷ったら SE に丸める。詳細: `.claude/rules/permission-levels.md`
+
 ## サブエージェント
 
 ### 汎用エージェント
 
-| エージェント | 呼び出し例 | フェーズ |
-|-------------|-----------|---------|
-| `requirement-analyst` | 「要件を整理して」 | PLANNING |
-| `design-architect` | 「APIを設計して」 | PLANNING |
-| `task-decomposer` | 「タスクを分割して」 | PLANNING |
-| `tdd-developer` | 「TASK-001を実装して」 | BUILDING |
-| `quality-auditor` | 「src/を監査して」 | AUDITING |
-| `doc-writer` | 「ドキュメントを更新して」「仕様を策定して」 | ALL |
-| `test-runner` | 「テストを実行して」 | BUILDING |
+| エージェント | 呼び出し例 | フェーズ | 等級 |
+|-------------|-----------|---------|:----:|
+| `requirement-analyst` | 「要件を整理して」 | PLANNING | PM |
+| `design-architect` | 「APIを設計して」 | PLANNING | SE |
+| `task-decomposer` | 「タスクを分割して」 | PLANNING | SE |
+| `tdd-developer` | 「TASK-001を実装して」 | BUILDING | SE |
+| `code-reviewer` | 「src/をレビューして」 | AUDITING | SE |
+| `quality-auditor` | 「src/を監査して」 | AUDITING | SE |
+| `doc-writer` | 「ドキュメントを更新して」 | ALL | SE |
+| `test-runner` | 「テストを実行して」 | BUILDING | PG |
 
 ### プロジェクト固有エージェント（Novel-Athanor-v2）
 
@@ -105,7 +115,8 @@ requirements → [承認] → design → [承認] → tasks → [承認] → BUI
 | `lam-orchestrate` | タスク分解・並列実行の自動調整 | 「lam-orchestrateで実行して」 |
 | `adr-template` | ADR作成テンプレート | `/adr-create` 実行時に自動適用 |
 | `spec-template` | 仕様書作成テンプレート | 仕様書作成時に自動適用 |
-| `analyze-style` | 文体分析・StyleGuide/Profile 生成 | `/analyze-style` |
+| `skill-creator` | スキル作成ガイド | スキル新規作成時に参照 |
+| `ui-design-guide` | UI設計チェックリスト | UI仕様作成時に自動適用 |
 | `ultimate-think` | AoT+3Agents+Reflection 多層思考 | `/ultimate-think` |
 
 ## 典型的なプロジェクトの進め方
@@ -141,18 +152,23 @@ requirements → [承認] → design → [承認] → tasks → [承認] → BUI
 
 | コマンド | 用途 |
 |---------|------|
-| `/ship` | 変更の棚卸し → 論理グループ分けコミット → 手動作業通知 |
-| `/full-review` | 3エージェント並列監査 → 全Issue修正 → テスト/lint検証 |
+| `/ship` | 変更の棚卸し → Doc Sync → 論理コミット → 手動作業通知 |
+| `/full-review` | 並列監査ループ → PG/SE/PM分類 → 全修正 → Green State検証 |
+| `/wave-plan` | 次 Wave のタスク選定・実行順序決定 |
+| `/retro` | Wave/Phase 完了時の振り返り（KPT） |
+| `/pattern-review` | TDD パターン審査・ルール候補の承認 |
 
 ## 補助コマンド
 
 | コマンド | 用途 |
 |---------|------|
 | `/focus` | 現在のタスクに集中 |
-| `/daily` | 日次振り返り |
+| `/daily` | 日次振り返り + KPI 集計 |
 | `/adr-create` | ADR作成支援 |
-| `/security-review` | セキュリティレビュー |
-| `/impact-analysis` | 変更の影響分析 |
+| `/security-review` | セキュリティレビュー + 権限等級対応 |
+| `/impact-analysis` | 変更の影響分析 + 権限等級分類 |
+| `/draft-scene` | シーンドラフト生成パイプライン（コンテキスト→執筆→レビュー→品質評価） |
+| `/analyze-style` | 文体分析・StyleGuide/Profile 自動生成 |
 
 ## 参照ドキュメント (SSOT)
 

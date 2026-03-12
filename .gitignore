@@ -52,3 +52,12 @@ docs/memo/
 
 # LAM save file
 SESSION_STATE.md
+docs/daily/
+
+# LAM runtime state files
+.claude/lam-loop-state.json
+.claude/doc-sync-flag
+.claude/pre-compact-fired
+.claude/last-test-result
+.claude/tdd-patterns.log
+.claude/logs/

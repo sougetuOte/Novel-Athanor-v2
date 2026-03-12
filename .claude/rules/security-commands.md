@@ -1,14 +1,6 @@
 # コマンド実行安全基準
 
-## Purpose
-
-ターミナルコマンド実行時の安全基準を定義する。
-
-## Permission Categories
-
-### Allow List（自動実行可）
-
-副作用がなく、ローカル環境で完結するもの（`SafeToAutoRun: true`）:
+## Allow List（自動実行可）
 
 | カテゴリ | コマンド |
 |---------|---------|
@@ -18,9 +10,7 @@
 | パッケージ情報 | `npm list`, `pip list` |
 | プロセス情報 | `ps` |
 
-### Deny List（承認必須）
-
-システムに変更を加える、または外部通信するもの（`SafeToAutoRun: false`）:
+## 高リスクコマンド（Layer 0: 承認必須）
 
 | カテゴリ | コマンド | リスク |
 |---------|---------|--------|
@@ -32,14 +22,19 @@
 | ネットワーク | `curl`, `wget`, `ssh` | 外部通信 |
 | 実行 | `npm start`, `python main.py`, `make` | リソース枯渇 |
 
-## Gray Area Protocol
+上記に含まれないコマンドは **高リスク扱い**（承認必須）。
 
-上記に含まれないコマンドは **Deny List 扱い**（承認必須）。
-
-## Emergency Stop
-
+> Layer 1（`settings.json`）では、上記コマンドの多くが `deny` または `ask` に分類されている。
 「止めて」「ストップ」等の指示で直ちに停止。
 
-## References
+## v4.0.0: ネイティブ権限モデルへの移行
 
-- `docs/internal/07_SECURITY_AND_AUTOMATION.md`
+v4.0.0 以降、コマンド安全基準は以下の二層で管理される:
+
+- **Layer 1（ネイティブ権限）**: `.claude/settings.json` の `permissions`（allow/ask/deny）で粗粒度の境界を設定
+- **Layer 2（PreToolUse hook）**: `.claude/hooks/pre-tool-use.py` でファイルパスベースの動的判定（PG/SE/PM 分類）
+
+本ファイルの Allow/Deny List は Layer 0（憲法的プロンプティング）として引き続き有効。
+Layer 1 の `permissions.allow` に PG級コマンド（`ruff format`, `eslint --fix` 等）が追加されている。
+
+権限等級の詳細: `.claude/rules/permission-levels.md`

@@ -19,6 +19,13 @@ TDD サイクルの各ステップで適用する。
   - 同じヘルパーを3テストファイル以上で使う場合は `conftest.py` に集約する。
   - import は全てファイル先頭に置く（テスト内のインライン import 禁止）。
 
+- **R-13: assertion-absent path の禁止**
+  テスト内で `if condition:` の分岐内にのみアサーションを配置しない。
+  条件が偽の場合にテストが無条件パスする「assertion-absent path」を防ぐ。
+  - NG: `if file.exists(): assert "x" in file.read_text()`（ファイル不存在時にパス）
+  - OK: `assert not file.exists()` または `assert file.exists(); assert "x" in ...`
+  条件分岐が必要な場合は、else ブランチにも `assert` を配置するか、条件自体を `assert` にする。
+
 ## Green（実装時）
 
 - **R-2: 有限セットは dict ディスパッチ**
@@ -87,3 +94,4 @@ TDD サイクルの各ステップで適用する。
 |------|------|
 | 2026-02-05 | R-1〜R-6, S-1 初版（Phase 1 監査結果） |
 | 2026-03-07 | R-7〜R-12, S-2 追加（Full Review 反省点反映） |
+| 2026-03-12 | R-13 追加（assertion-absent path 禁止、LAM 4.1.0 full-review 教訓） |

@@ -1,10 +1,8 @@
 # 意思決定プロトコル
 
-## Purpose
-
-重要な意思決定において「3 つの視点」と AoT を適用するプロトコル。
-
 ## Three Agents Model
+
+> **SSOT**: `docs/internal/06_DECISION_MAKING.md`。本ファイルは実行時の要約版。
 
 | Agent | ペルソナ | フォーカス |
 |-------|---------|-----------|
@@ -57,7 +55,3 @@ AoT Decomposition → Three Agents Debate (各Atom) → AoT Synthesis
 ### AoT Synthesis
 **統合結論**: ...
 ```
-
-## References
-
-- `docs/internal/06_DECISION_MAKING.md`（SSOT）

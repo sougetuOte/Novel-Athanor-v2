@@ -17,11 +17,20 @@
 │   ├── adr/                # アーキテクチャ決定記録 (Why)
 │   ├── tasks/              # タスク管理 (Kanban/List)
 │   ├── internal/           # プロジェクト運用ルール (本フォルダ)
-│   ├── memos/              # [Input] ユーザーからの生メモ・資料
+│   ├── artifacts/          # 成果物（監査レポート、知見、TDDパターン）
+│   ├── memos/              # [Input] ユーザーからの生メモ・過去の設計資料
 │   ├── Novel-Athanor-main/      # [解析対象] 設定管理プロジェクト
 │   ├── NovelWriter-main/        # [解析対象] 自動生成プロジェクト
 │   └── 302_novel_writing-main/  # [解析対象] Web UIプロジェクト
 ├── .claude/                # Claude Code用設定・コマンド
+│   ├── rules/              # ガードレール・行動規範（自動ロード）
+│   ├── commands/           # スラッシュコマンド
+│   ├── agents/             # サブエージェント定義
+│   ├── skills/             # オーケストレーション・テンプレート
+│   ├── hooks/              # PreToolUse/PostToolUse/Stop/PreCompact
+│   ├── states/             # 機能ごとの進捗状態 JSON
+│   ├── agent-memory/       # サブエージェント永続メモリ
+│   └── logs/               # フック実行ログ
 ├── .exchange/              # 外部AI連携（Antigravity等）
 └── CLAUDE.md               # プロジェクト憲法
 ```
@@ -55,7 +64,10 @@
 ### A. User Inputs & Intermediate Artifacts (ユーザー入力と中間成果物)
 
 - **Raw Ideas**: ユーザーからの未加工のアイデアやチャットログは `docs/memos/YYYY-MM-DD_topic.md` に保存する。
-- **Intermediate Reports**: lam-orchestrate の Wave 間で受け渡す調査結果等の中間成果物は `docs/memos/YYYY-MM-DD_intermediate_[topic].md` に保存する（Coordinator のコンテキスト圧迫を防ぐため）。
+- **Artifacts (成果物)**: 監査レポート、知見、TDDパターン等の自動生成成果物は `docs/artifacts/` 配下に保存する。
+  - `docs/artifacts/audit-reports/` — 監査レポート
+  - `docs/artifacts/knowledge/` — 知見（/retro Step 4 で蓄積）
+  - `docs/artifacts/tdd-patterns/` — TDD 内省パターン記録
 - **Reference Materials**: 参考資料（画像、PDF）は `docs/memos/assets/` に配置する。
 
 ### B. Specifications (仕様書)

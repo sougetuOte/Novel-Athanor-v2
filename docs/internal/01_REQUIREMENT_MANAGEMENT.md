@@ -5,7 +5,7 @@
 
 ## 1. From Memo to Spec (要件定義プロセス)
 
-ユーザーの曖昧なメモや初期要望 (`docs/memos/`) を仕様書 (`docs/specs/`) に昇華させるため、以下の 4 要素を確定させること。
+ユーザーの曖昧なメモや初期要望（`docs/memos/` に保存）を仕様書 (`docs/specs/`) に昇華させるため、以下の 4 要素を確定させること。
 
 ### A. Core Value (Why & Who)
 

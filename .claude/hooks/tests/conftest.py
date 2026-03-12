@@ -21,6 +21,11 @@ _TESTS_DIR = str(Path(__file__).resolve().parent)
 if _TESTS_DIR not in sys.path:
     sys.path.insert(0, _TESTS_DIR)
 
+# hooks/ ディレクトリを sys.path に追加（_hook_utils を直接 import 可能にする）
+_HOOKS_DIR = str(Path(__file__).resolve().parent.parent)
+if _HOOKS_DIR not in sys.path:
+    sys.path.insert(0, _HOOKS_DIR)
+
 
 @pytest.fixture
 def project_root(tmp_path: Path) -> Path:

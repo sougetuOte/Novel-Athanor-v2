@@ -493,7 +493,7 @@ auditor_group:
 ```yaml
 name: Consistency Agent
 role: 整合性チェック
-implementation: .claude/agents/consistency-agent.md
+# implementation: Phase G 以降で .claude/agents/consistency-agent.md を作成予定
 
 checks:
   - character_consistency
@@ -514,7 +514,7 @@ output:
 ```yaml
 name: Foreshadowing Agent
 role: 伏線管理
-implementation: .claude/agents/foreshadowing-agent.md
+# implementation: Phase G 以降で .claude/agents/foreshadowing-agent.md を作成予定
 
 functions:
   - register_foreshadowing
@@ -530,7 +530,7 @@ functions:
 ```yaml
 name: Extract Agent
 role: 設定抽出
-implementation: .claude/agents/extract-agent.md
+# implementation: Phase G 以降で .claude/agents/extract-agent.md を作成予定
 
 functions:
   - extract_character
@@ -722,6 +722,7 @@ if result.has_warnings():
 ├── style-agent.md           # 文体
 │
 │  # 開発支援エージェント（実装済み）
+├── code-reviewer.md         # コードレビュー
 ├── design-architect.md      # 設計
 ├── doc-writer.md            # ドキュメント
 ├── quality-auditor.md       # 監査

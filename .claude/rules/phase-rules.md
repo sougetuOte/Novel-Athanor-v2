@@ -38,7 +38,7 @@ requirements → [承認] → design → [承認] → tasks → [承認] → BUI
 
 - [ ] R-1: 仕様突合 — FR/設計仕様のフィールド名・定数名と実装が文字単位で一致
 - [ ] R-4: テスト網羅 — 各 FR/要件に対応するテストが存在する
-- [ ] R-5〜R-12: プロジェクト固有ルール → `.claude/rules/building-checklist.md` を参照
+- [ ] R-5〜R-13: プロジェクト固有ルール → `.claude/rules/building-checklist.md` を参照
 
 ### 仕様同期ルール
 

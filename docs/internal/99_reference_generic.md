@@ -98,7 +98,7 @@ AI がやるのは「仕様化・実装・検証・自律ループ」。
 
 - Deep Nesting > 3
 - Long Function > 50 lines
-- Duplication > 3 (Rule of Three)
+- Duplication > 2（定型処理）/ > 3（一般コード, Rule of Three）
 - Parameter Explosion > 4
 
 ---

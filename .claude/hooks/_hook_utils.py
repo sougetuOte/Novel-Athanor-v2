@@ -29,7 +29,7 @@ def get_project_root() -> pathlib.Path:
           (.claude/hooks/_hook_utils.py -> .claude/hooks/ -> .claude/ -> PROJECT_ROOT)
     """
     env_root = os.environ.get("LAM_PROJECT_ROOT")
-    if env_root:
+    if env_root is not None:
         candidate = pathlib.Path(env_root)
         # バリデーション: .claude/ ディレクトリが存在するか確認
         if (candidate / ".claude").is_dir():
@@ -42,7 +42,7 @@ def get_project_root() -> pathlib.Path:
     return pathlib.Path(__file__).resolve().parent.parent.parent
 
 
-def read_stdin_json() -> dict:
+def read_stdin_json() -> dict[str, Any]:
     """
     stdin から JSON を読み取って dict を返す。
     失敗時（不正 JSON、空入力）は空 dict を返す。
@@ -56,12 +56,12 @@ def read_stdin_json() -> dict:
         return {}
 
 
-def get_tool_name(data: dict) -> str:
+def get_tool_name(data: dict[str, Any]) -> str:
     """data["tool_name"] を返す。存在しない場合は空文字。"""
     return data.get("tool_name", "")
 
 
-def get_tool_input(data: dict, key: str) -> str:
+def get_tool_input(data: dict[str, Any], key: str) -> str:
     """
     data["tool_input"][key] を返す。
     tool_input またはキーが存在しない場合は空文字。
@@ -72,7 +72,7 @@ def get_tool_input(data: dict, key: str) -> str:
     return tool_input.get(key, "")
 
 
-def get_tool_response(data: dict, key: str, default: Any) -> Any:
+def get_tool_response(data: dict[str, Any], key: str, default: Any) -> Any:
     """
     data["tool_response"][key] を返す。
     tool_response またはキーが存在しない場合は default を返す。
@@ -101,22 +101,27 @@ def normalize_path(file_path: str, project_root: pathlib.Path) -> str:
         return file_path
 
 
-def log_entry(log_file: pathlib.Path, level: str, source: str, message: str):
+def utc_now_iso8601() -> str:
+    """UTC タイムスタンプを ISO 8601 形式で返す。"""
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def log_entry(log_file: pathlib.Path, level: str, source: str, message: str) -> None:
     """
     TSV 形式でログを追記する。
 
     形式: timestamp\tlevel\tsource\tmessage
     タイムスタンプは UTC ISO 8601 形式。
     """
-    timestamp = datetime.datetime.now(datetime.timezone.utc).strftime(
-        "%Y-%m-%dT%H:%M:%SZ"
-    )
+    timestamp = utc_now_iso8601()
+    # TSV 構造を保護: message 内の改行をエスケープ（タブはサブフィールド区切りとして許容）
+    safe_message = message.replace("\n", " ")
     log_file.parent.mkdir(parents=True, exist_ok=True)
     with open(log_file, "a", encoding="utf-8", newline="\n") as f:
-        f.write(f"{timestamp}\t{level}\t{source}\t{message}\n")
+        f.write(f"{timestamp}\t{level}\t{source}\t{safe_message}\n")
 
 
-def atomic_write_json(path: pathlib.Path, data: dict):
+def atomic_write_json(path: pathlib.Path, data: dict[str, Any]) -> None:
     """
     JSON データをアトミックに書き込む。
 

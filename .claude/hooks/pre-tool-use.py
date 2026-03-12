@@ -38,6 +38,10 @@ from _hook_utils import (  # noqa: E402
 # 読み取り専用ツール: 常に PG 許可
 _READ_ONLY_TOOLS = frozenset({"Read", "Glob", "Grep", "WebSearch", "WebFetch"})
 
+# 危険コマンドのベース名（フルパス指定によるバイパス防止用）
+# settings.json の deny と併用する多層防御
+_DANGEROUS_COMMANDS = frozenset({"rm", "rmdir", "del"})
+
 # AUDITING フェーズの PG 許可コマンドのプレフィックス
 _AUDITING_PG_COMMANDS = (
     "npx prettier",
@@ -46,7 +50,7 @@ _AUDITING_PG_COMMANDS = (
     "ruff format",
 )
 
-# パス判定パターン（PM 級）
+# パス判定パターン（PM 級 → SE 級の順で照合。先にマッチした方が優先）
 _PM_PATTERNS = [
     (re.compile(r"^docs/specs/.*\.md$"), "specs/ path"),
     (re.compile(r"^docs/adr/.*\.md$"), "adr/ path"),
@@ -59,6 +63,18 @@ _SE_PATTERNS = [
     (re.compile(r"^docs/"), "docs/ path (non-specs/adr)"),
     (re.compile(r"^src/"), "src/ path"),
 ]
+
+
+def _extract_command_basename(command: str) -> str:
+    """コマンド文字列から最初のトークンのベース名を抽出する。
+
+    フルパス指定（/usr/bin/rm, /bin/rm 等）による deny バイパスを防ぐ。
+    例: "/usr/bin/rm -rf /" → "rm", "rm -rf /" → "rm"
+    """
+    first_token = command.split()[0] if command.strip() else ""
+    # パスの末尾（ベース名）を取得。拡張子（.exe等）は除去。
+    basename = Path(first_token).stem if first_token else ""
+    return basename
 
 
 def _determine_level_and_reason(
@@ -74,6 +90,7 @@ def _determine_level_and_reason(
         (level, reason): level は "PG" | "SE" | "PM"
     """
     # 1. ファイルパスが存在する場合はパスベース判定
+    # file_path は get_tool_input() が返す str（None 不可）。空文字=未設定。
     if file_path:
         normalized = normalize_path(file_path, project_root)
 
@@ -90,7 +107,13 @@ def _determine_level_and_reason(
         return "SE", "default path"
 
     # 2. コマンドベース判定（Bash ツール等）
+    # command は get_tool_input() が返す str（None 不可）。空文字=未設定。
     if command:
+        # フルパスバイパス防止: コマンドのベース名を抽出して危険コマンドを検出
+        cmd_base = _extract_command_basename(command)
+        if cmd_base in _DANGEROUS_COMMANDS:
+            return "PM", f"dangerous command ({cmd_base}) via full path"
+
         # AUDITING フェーズの PG コマンド特別処理
         current_phase = _read_current_phase(phase_file)
         if current_phase == "AUDITING":

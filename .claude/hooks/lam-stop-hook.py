@@ -32,6 +32,7 @@ import shutil
 import sys
 import time
 from pathlib import Path
+from typing import NoReturn
 
 # sys.path に hooks ディレクトリを追加（_hook_utils を import するため）
 _HOOKS_DIR = Path(__file__).resolve().parent
@@ -53,6 +54,9 @@ class CheckResult(enum.IntEnum):
     PASS = 1
     FAIL = 2
 
+# detect 関数の戻り値型: (name, args) | (None, None)
+DetectResult = tuple[str, list[str]] | tuple[None, None]
+
 # PreCompact 発火から何秒以内を「直近」とみなすか（10分）
 PRE_COMPACT_THRESHOLD_SECONDS = 600
 
@@ -65,6 +69,11 @@ _SAFE_PATTERN = re.compile(
     r"(test|spec|mock|example|placeholder|xxx|changeme)",
     re.IGNORECASE,
 )
+# シークレットスキャン対象の拡張子（テキストファイルのみ）
+_SECRET_SCAN_EXTENSIONS = frozenset({
+    ".py", ".js", ".ts", ".json", ".yaml", ".yml", ".toml",
+    ".env", ".cfg", ".ini", ".sh", ".bash", ".md",
+})
 
 
 def _get_log_file(project_root: Path) -> Path:
@@ -78,17 +87,25 @@ def _log(log_file: Path, level: str, message: str) -> None:
         pass
 
 
-def _stop(log_file: Path, message: str) -> None:
+def _stop(log_file: Path, message: str) -> NoReturn:
     """停止許可: 何も出力せず exit 0。"""
     _log(log_file, "INFO", message)
     sys.exit(0)
 
 
-def _block(log_file: Path, reason: str) -> None:
+def _block(log_file: Path, reason: str) -> NoReturn:
     """継続指示: block JSON を stdout に出力して exit 0。"""
     _log(log_file, "INFO", f"block: {reason}")
     print(json.dumps({"decision": "block", "reason": reason}), flush=True)
     sys.exit(0)
+
+
+def _safe_unlink(path: Path) -> None:
+    """ファイルを安全に削除する。失敗時は黙殺。"""
+    try:
+        path.unlink()
+    except Exception:
+        pass
 
 
 def _loop_result_label(state: dict) -> str:
@@ -171,7 +188,7 @@ def _validate_check_dir(cwd: str, project_root: Path) -> Path:
 # ================================================================
 
 
-def _detect_test_framework(check_dir: Path) -> tuple[str, list[str]] | tuple[None, None]:
+def _detect_test_framework(check_dir: Path) -> DetectResult:
     """
     テストフレームワークを自動検出して (framework_name, command_args) を返す。
     検出できない場合は (None, None)。
@@ -210,7 +227,7 @@ def _detect_test_framework(check_dir: Path) -> tuple[str, list[str]] | tuple[Non
     return (None, None)
 
 
-def _detect_lint_tool(check_dir: Path) -> tuple[str, list[str]] | tuple[None, None]:
+def _detect_lint_tool(check_dir: Path) -> DetectResult:
     """
     lint ツールを自動検出して (tool_name, command_args) を返す。
     検出できない場合は (None, None)。
@@ -352,12 +369,16 @@ def _run_security(check_dir: Path, log_file: Path) -> CheckResult:
         elif "timed out" in stderr:
             _log(log_file, "WARN", f"G5: {tool_name} timeout (60s)")
 
-    # シークレットスキャン（src/ ディレクトリが存在する場合）
-    src_dir = check_dir / "src"
-    if src_dir.is_dir():
-        secret_count = 0
-        for src_file in src_dir.rglob("*"):
+    # シークレットスキャン（src/ と .claude/hooks/ を対象、テキストファイル拡張子のみ）
+    scan_dirs = [check_dir / "src", check_dir / ".claude" / "hooks"]
+    secret_count = 0
+    for scan_dir in scan_dirs:
+        if not scan_dir.is_dir():
+            continue
+        for src_file in scan_dir.rglob("*"):
             if not src_file.is_file():
+                continue
+            if src_file.suffix.lower() not in _SECRET_SCAN_EXTENSIONS:
                 continue
             # 1MB超のファイルはバイナリ等の可能性が高いためスキップ
             try:
@@ -372,9 +393,9 @@ def _run_security(check_dir: Path, log_file: Path) -> CheckResult:
                         secret_count += 1
             except Exception:
                 pass
-        if secret_count > 0:
-            _log(log_file, "WARN", f"G5: potential secret leak detected in src/ ({secret_count} matches)")
-            sec_fail = True
+    if secret_count > 0:
+        _log(log_file, "WARN", f"G5: potential secret leak detected ({secret_count} matches)")
+        sec_fail = True
 
     if sec_fail:
         _log(log_file, "INFO", "G5: security checks FAILED")
@@ -425,7 +446,7 @@ def main() -> None:
     except Exception:
         _stop(log_file, "failed to read state file → normal stop")
 
-    if not state.get("active"):
+    if state.get("active") is not True:
         _stop(log_file, "active=false → loop disabled, normal stop")
 
     iteration = state.get("iteration", 0)
@@ -440,10 +461,7 @@ def main() -> None:
     if iteration >= max_iterations:
         _log(log_file, "WARN", f"max_iterations reached ({iteration}/{max_iterations}) → stop loop")
         _save_loop_log(project_root, state, log_file)
-        try:
-            state_file.unlink()
-        except Exception:
-            pass
+        _safe_unlink(state_file)
         _stop(log_file, "max_iterations reached → stopped")
 
     # ================================================================
@@ -494,23 +512,18 @@ def main() -> None:
     log_entries = state.get("log", [])
     prev_test_count = 0
     if log_entries:
+        # int() は JSON デシリアライズ後の型安全保証（float や str の防御）
         prev_test_count = int(log_entries[-1].get("test_count", 0))
 
     # test_count=0 はフレームワーク未検出等でカウント不明の場合。誤検知を避けるためスキップ
     if prev_test_count > 0 and test_count > 0 and test_count < prev_test_count:
         _log(log_file, "WARN", f"ESC: test count decreased ({prev_test_count} → {test_count}) → escalate to human")
-        try:
-            state_file.unlink()
-        except Exception:
-            pass
+        _safe_unlink(state_file)
         _stop(log_file, f"ESC: test count decreased ({prev_test_count} → {test_count}) → escalate to human")
 
     # 同一 Issue 再発チェック
     if _check_issue_recurrence(state):
-        try:
-            state_file.unlink()
-        except Exception:
-            pass
+        _safe_unlink(state_file)
         _stop(log_file, "ESC: same issues recurring (no fix for 2 cycles) → escalate to human")
 
     # ================================================================
@@ -550,7 +563,9 @@ def main() -> None:
     # ================================================================
     new_iteration = iteration + 1
     state["iteration"] = new_iteration
-    # テスト数を log エントリに記録。log_entries[-1] は前サイクルの最終エントリ。
+    # テスト数を log エントリに記録。
+    # log_entries[-1] は full-review Phase 4 が追記した直近イテレーションの結果。
+    # ここで test_count を追記し、次イテレーションのエスカレーション判定（STEP 5）で参照する。
     # test_count=0 はフレームワーク未検出等でカウント不明のため記録しない。
     if test_count > 0 and log_entries:
         log_entries[-1]["test_count"] = test_count

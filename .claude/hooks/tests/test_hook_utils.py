@@ -6,51 +6,35 @@ W1-T2a: test_hook_utils.py（共通ユーティリティのユニットテスト
 """
 import io
 import json
-import os
-import sys
 from pathlib import Path
 
-import pytest
-
-# import パス解決: _hook_utils.py は tests/ の一つ上のディレクトリに存在する
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
 import _hook_utils
+import pytest
 
 
 class TestGetProjectRoot:
-    def test_get_project_root_default(self) -> None:
+    def test_get_project_root_default(self, monkeypatch) -> None:
         """__file__ ベースの PROJECT_ROOT 取得（環境非依存）"""
-        env_backup = os.environ.pop("LAM_PROJECT_ROOT", None)
-        try:
-            root = _hook_utils.get_project_root()
-            assert isinstance(root, Path)
-            # __file__ から3階層上のディレクトリが返る
-            assert root.is_dir()
-        finally:
-            if env_backup is not None:
-                os.environ["LAM_PROJECT_ROOT"] = env_backup
+        monkeypatch.delenv("LAM_PROJECT_ROOT", raising=False)
+        root = _hook_utils.get_project_root()
+        assert isinstance(root, Path)
+        # __file__ から3階層上のディレクトリが返る
+        assert root.is_dir()
 
-    def test_get_project_root_env_override(self, tmp_path) -> None:
+    def test_get_project_root_env_override(self, tmp_path, monkeypatch) -> None:
         """LAM_PROJECT_ROOT 環境変数でのオーバーライド（.claude/ が存在する場合）"""
         # バリデーション: .claude/ ディレクトリが存在する場合のみ環境変数を信頼
         (tmp_path / ".claude").mkdir()
-        os.environ["LAM_PROJECT_ROOT"] = str(tmp_path)
-        try:
-            root = _hook_utils.get_project_root()
-            assert root == tmp_path
-        finally:
-            del os.environ["LAM_PROJECT_ROOT"]
+        monkeypatch.setenv("LAM_PROJECT_ROOT", str(tmp_path))
+        root = _hook_utils.get_project_root()
+        assert root == tmp_path
 
-    def test_get_project_root_env_invalid_fallback(self, tmp_path) -> None:
+    def test_get_project_root_env_invalid_fallback(self, tmp_path, monkeypatch) -> None:
         """LAM_PROJECT_ROOT に .claude/ がない場合はデフォルトにフォールバック"""
-        os.environ["LAM_PROJECT_ROOT"] = str(tmp_path)
-        try:
-            root = _hook_utils.get_project_root()
-            # .claude/ がないのでデフォルト（__file__ベース）にフォールバック
-            assert root != tmp_path
-        finally:
-            del os.environ["LAM_PROJECT_ROOT"]
+        monkeypatch.setenv("LAM_PROJECT_ROOT", str(tmp_path))
+        root = _hook_utils.get_project_root()
+        # .claude/ がないのでデフォルト（__file__ベース）にフォールバック
+        assert root != tmp_path
 
 
 class TestReadStdinJson:

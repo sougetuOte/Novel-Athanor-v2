@@ -156,6 +156,52 @@ class TestPreToolUse:
         assert result.stdout.strip() == "", f"PG 許可時は stdout が空であるべき。got: {result.stdout!r}"
 
 
+class TestPreToolUseFullPathBypass:
+    """フルパス指定による危険コマンドのバイパス防止テスト"""
+
+    def test_full_path_rm_detected_as_pm(self, hook_runner) -> None:
+        """/usr/bin/rm のようなフルパス指定でも PM 級として検出される"""
+        input_json = {
+            "tool_name": "Bash",
+            "tool_input": {
+                "command": "/usr/bin/rm -rf /tmp/test",
+            },
+        }
+        result = hook_runner(HOOK_PATH, input_json)
+        assert result.returncode == 0
+        stdout = result.stdout.strip()
+        assert stdout, "危険コマンドのフルパス指定は PM ask であるべき"
+        data = json.loads(stdout)
+        assert data["hookSpecificOutput"]["permissionDecision"] == "ask"
+
+    def test_bare_rm_detected_as_pm(self, hook_runner) -> None:
+        """rm（パスなし）も PM 級として検出される"""
+        input_json = {
+            "tool_name": "Bash",
+            "tool_input": {
+                "command": "rm -rf /tmp/test",
+            },
+        }
+        result = hook_runner(HOOK_PATH, input_json)
+        assert result.returncode == 0
+        stdout = result.stdout.strip()
+        assert stdout, "rm は PM ask であるべき"
+        data = json.loads(stdout)
+        assert data["hookSpecificOutput"]["permissionDecision"] == "ask"
+
+    def test_safe_command_not_blocked(self, hook_runner) -> None:
+        """通常のコマンドは PM にならない"""
+        input_json = {
+            "tool_name": "Bash",
+            "tool_input": {
+                "command": "echo hello",
+            },
+        }
+        result = hook_runner(HOOK_PATH, input_json)
+        assert result.returncode == 0
+        assert result.stdout.strip() == "", "echo は SE 許可であるべき"
+
+
 class TestPreToolUseAuditing:
     """AUDITING フェーズでの PG コマンド特別許可テスト"""
 
